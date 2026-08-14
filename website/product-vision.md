@@ -38,8 +38,10 @@ or synchronization protocols to know what is available and what to do next.
    policies, and evidence outside the application boundary.
 4. **One experience across modes.** Do not turn disruption into an unfamiliar
    emergency-only product.
-5. **Useful components, coherent whole.** Keep the sibling products separately
-   deployable, testable, and replaceable.
+5. **Good boundaries, not barriers.** Keep the sibling products separately
+   deployable, testable, and replaceable, with clear authority and failure
+   boundaries. Use open protocols so separation preserves interoperability
+   and continuity rather than obstructing them.
 6. **Bounded economies remain bounded.** Never imply that separate Clear
    currencies are interchangeable, universally accepted, or legal tender.
 
@@ -58,9 +60,18 @@ records, identity, storage, events, and payments.
 
 ## What Mainstay does not become
 
-Mainstay does not become the system of record, the mint, the relay, or the
-holder of every authority key. It presents and coordinates state preserved by
-the underlying components.
+**Mainstay is intentionally not a system of record.** It does not become the
+mint, the relay, the institutional ledger, or the holder of every authority
+key. It presents and coordinates state preserved by the underlying components
+without claiming that the application itself is the final authority.
+
+Working in conjunction with OpenETR, however, Mainstay can support a system of
+record that needs continuity of its records. OpenETR contributes signed
+evidence about origin, attestation, integrity, transfer, and termination;
+Mainstay keeps that evidence and its associated records understandable and
+available across connected and disrupted conditions. The responsible
+institution, community, or recognized authority still determines what is
+legitimate and authoritative.
 
 That distinction allows the app to evolve without trapping the user. Acorn
 keys and proofs remain portable. Grove blobs remain content-addressed.

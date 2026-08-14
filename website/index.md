@@ -91,6 +91,19 @@ mesh.
 Each sibling product remains independently useful. Mainstay coordinates them
 without becoming the authority or collapsing them into a monolith.
 
+### Good boundaries, not barriers
+
+Continuity depends on knowing which component holds which responsibility and
+which authority. Clear boundaries keep a relay from becoming a mint, an
+application from becoming the system of record, and one failure from silently
+changing the meaning of another component's state.
+
+Those boundaries should not become walls. Open protocols let keys, records,
+funds, and signed evidence move across compatible applications, operators, and
+infrastructure. Mainstay coordinates the family at those boundaries so each
+product remains independently useful while the overall experience remains
+coherent.
+
 <div class="family-strip" markdown>
 
 <a class="family-mark" href="https://getsafebox.app">

@@ -36,6 +36,22 @@ The same user app should work across all four. A mode change should alter
 availability and finality messaging, not force people into an unfamiliar
 emergency interface.
 
+## Good boundaries, not barriers
+
+Continuity requires clear boundaries because different components fail in
+different ways and answer to different authorities. A relay can preserve an
+event but cannot declare an ecash proof spendable. Mainstay can preserve and
+present a record but does not become its institutional authority. A local
+service can keep operating without pretending that an unavailable external
+service has confirmed anything.
+
+These boundaries contain failures, preserve honest status, and make each
+component independently replaceable. They must not become barriers. Open
+protocols allow signed events, encrypted records, proofs, and control evidence
+to move or synchronize across compatible local and remote infrastructure.
+Continuity comes from maintaining those connections without erasing the
+meaning of the boundaries they cross.
+
 ## Records and evidence
 
 Spurline preserves relevant Nostr events locally. Grove preserves encrypted

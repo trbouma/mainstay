@@ -90,6 +90,23 @@ family without replacing their protocol boundaries.
 
 </article>
 
+<article class="product-card" markdown>
+
+## OpenETR
+
+The control and provenance layer for records. OpenETR provides a way to examine
+where a record originated, who issued or attested it, whether it remains
+unchanged, and how control has moved or ended over time.
+
+Mainstay is being designed to work in conjunction with OpenETR so records can
+be assessed for legitimacy rather than merely stored and retrieved. This
+relationship also enables digital trade documentation and other workflows in
+which provenance, integrity, presentation, and control history matter.
+
+[Website](https://trbouma.github.io/openetr/) · [Source](https://github.com/trbouma/openetr)
+
+</article>
+
 </div>
 
 ## How the pieces fit
@@ -109,12 +126,22 @@ family without replacing their protocol boundaries.
                      events       blobs
 
                    Lockbox runs the stack locally
+
+                Mainstay <----> OpenETR
+                  record legitimacy
+       provenance, control history, digital trade
 ```
 
 Mainstay should discover available services and explain their state in plain
 language. It must keep different mints, currencies, issuers, relays, and
 storage providers visible enough that convenience never becomes false
 equivalence.
+
+OpenETR is not another storage provider or system of record. It complements
+Mainstay with a control graph: signed evidence about record origin,
+attestation, transfer, and termination. Mainstay can present that evidence
+alongside a safeguarded record while leaving the legitimacy judgment with the
+people, organizations, and authorities that recognize it.
 
 ## Clear and local economies
 
