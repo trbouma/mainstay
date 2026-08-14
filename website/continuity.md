@@ -5,6 +5,20 @@ description: How Mainstay keeps records and payments understandable across chang
 
 # Continuity
 
+## When distant infrastructure disappears
+
+A satellite link goes down. A distant cloud service starts behaving
+unpredictably. A tornado takes out the local registry office and bank. Solar
+power and backup systems are keeping the electricity on, but the community has
+lost access to much of what it needs to function: payment services, critical
+records, local evidence, and the remote systems used to coordinate them.
+
+The people, funds, and records have not disappeared. The paths used to reach
+them have. Mainstay is intended to provide a local point of continuity: keeping
+nearby records and payment capabilities understandable and usable, supporting
+community coordination, and reconciling with external systems when
+connectivity returns.
+
 Continuity means that records, identity, and value remain usable when external
 conditions change. It does not mean pretending every action has the same level
 of finality.
