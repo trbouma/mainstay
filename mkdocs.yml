@@ -1,0 +1,56 @@
+site_name: Mainstay
+site_description: A unified local-first application for records, identity, payments, and community continuity.
+site_url: https://trbouma.github.io/mainstay/
+repo_url: https://github.com/trbouma/mainstay
+repo_name: trbouma/mainstay
+
+docs_dir: website
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  logo: assets/mainstay-logo.svg
+  favicon: assets/mainstay-logo.svg
+  features:
+    - navigation.top
+    - navigation.sections
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Use dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Use light mode
+
+nav:
+  - Home: index.md
+  - Understand Mainstay:
+      - Product Vision: product-vision.md
+      - Product Family: product-family.md
+      - Continuity: continuity.md
+      - Lockbox Appliance: lockbox.md
+  - Project Status: project-status.md
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+extra_css:
+  - stylesheets/extra.css
+
+copyright: Mainstay is open-source software released under the MIT License.
