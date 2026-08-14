@@ -12,7 +12,7 @@ services a dedicated local home. It is intended for people and communities
 that need durable storage, predictable service operation, local networking,
 and hardware-backed controls.
 
-<img class="lockbox-hero-image" src="assets/lockbox-appliance-concept.jpg" alt="Lockbox appliance with a phone on a table">
+<img class="lockbox-hero-image" src="../assets/lockbox-appliance-concept.jpg" alt="Lockbox appliance with a phone on a table">
 
 ## Initial platform direction
 

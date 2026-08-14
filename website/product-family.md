@@ -13,7 +13,7 @@ and understood on its own.
 
 <article class="product-card" markdown>
 
-<img src="assets/safebox-logo.png" alt="Safebox">
+<img src="../assets/safebox-logo.png" alt="Safebox">
 
 ## Safebox
 
@@ -27,7 +27,7 @@ Mainstay.
 
 <article class="product-card" markdown>
 
-<img src="assets/acorn-logo.png" alt="Acorn">
+<img src="../assets/acorn-logo.png" alt="Acorn">
 
 ## Acorn
 
@@ -40,7 +40,7 @@ portable protocol authority below the application layer.
 
 <article class="product-card" markdown>
 
-<img src="assets/grove-logo.png" alt="Grove">
+<img src="../assets/grove-logo.png" alt="Grove">
 
 ## Grove
 
@@ -53,7 +53,7 @@ attachments. Grove preserves bytes without needing to understand plaintext.
 
 <article class="product-card" markdown>
 
-<img src="assets/spurline-logo.svg" alt="Spurline">
+<img src="../assets/spurline-logo.svg" alt="Spurline">
 
 ## Spurline
 
@@ -66,7 +66,7 @@ future community mesh operation.
 
 <article class="product-card" markdown>
 
-<img src="assets/clear-logo.svg" alt="Clear">
+<img src="../assets/clear-logo.svg" alt="Clear">
 
 ## Clear
 
@@ -79,7 +79,7 @@ and internal economies without Bitcoin or Lightning settlement.
 
 <article class="product-card product-card--mainstay" markdown>
 
-<img src="assets/mainstay-logo.svg" alt="Mainstay">
+<img src="../assets/mainstay-logo.svg" alt="Mainstay">
 
 ## Mainstay
 
