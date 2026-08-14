@@ -1,6 +1,6 @@
 ---
 title: Mainstay
-description: A local-first application for records, identity, payments, and community continuity.
+description: A local-first application for keys, records, payments, and community continuity.
 ---
 
 <section class="mainstay-hero" markdown>
@@ -9,7 +9,7 @@ description: A local-first application for records, identity, payments, and comm
 
 # Mainstay
 
-<p class="mainstay-tagline">A dependable place for records, identity, payments, and community continuity.</p>
+<p class="mainstay-tagline">A dependable place for keys, records, payments, and community continuity.</p>
 
 <p class="mainstay-intro">A unified local-first application that keeps essential information and value understandable and usable when conditions change.</p>
 
@@ -107,8 +107,8 @@ coherent.
 <div class="family-strip" markdown>
 
 <a class="family-mark" href="https://getsafebox.app">
-  <img src="assets/safebox-logo.png" alt="Safebox">
-  <strong>Safebox</strong><span>User app</span>
+  <img src="assets/safebox-logo.png" alt="Safebox Web">
+  <strong>Safebox Web</strong><span>User app</span>
 </a>
 <a class="family-mark" href="https://trbouma.github.io/safebox-acorn/">
   <img src="assets/acorn-logo.png" alt="Acorn">

@@ -10,7 +10,7 @@ the flagship reference for how the sibling products fit together.
 
 ## Available foundations
 
-- Safebox provides working user-facing records and payment workflows.
+- Safebox Web provides working user-facing records and payment workflows.
 - Acorn provides the portable wallet, key, record, and proof runtime.
 - Grove provides working local and hosted encrypted blob storage.
 - Spurline provides a tested local Nostr relay foundation.
@@ -23,7 +23,7 @@ the flagship reference for how the sibling products fit together.
 
 - continue proving each sibling component independently;
 - define stable service discovery and health contracts;
-- bring the current Safebox experience toward the Mainstay application model;
+- bring the current Safebox Web experience toward the Mainstay application model;
 - integrate local Spurline and Grove paths;
 - add Clear currency discovery without combining balances or issuers;
 - define the first FreeBSD Lockbox service profile;

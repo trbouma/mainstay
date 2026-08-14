@@ -13,9 +13,9 @@ and understood on its own.
 
 <article class="product-card" markdown>
 
-<img src="../assets/safebox-logo.png" alt="Safebox">
+<img src="../assets/safebox-logo.png" alt="Safebox Web">
 
-## Safebox
+## Safebox Web
 
 The current standalone user app for records, payments, recovery, handles, and
 everyday wallet workflows. It is the practical application foundation for
@@ -31,8 +31,9 @@ Mainstay.
 
 ## Acorn
 
-The wallet, identity, signing, record, proof, and recovery runtime. Acorn keeps
-portable protocol authority below the application layer.
+The protocol-first component for safeguarding user-controlled keys, funds, and
+records. Acorn keeps portable signing, recovery, and wallet authority below the
+application layer.
 
 [Website](https://trbouma.github.io/safebox-acorn/) · [Source](https://github.com/trbouma/safebox-acorn)
 
@@ -117,7 +118,7 @@ which provenance, integrity, presentation, and control history matter.
                               |
              +----------------+----------------+
              |                |                |
-          Safebox           Acorn            Clear
+       Safebox Web         Acorn            Clear
          user flows    portable authority   local mint
                               |
                         +-----+-----+

@@ -31,7 +31,7 @@ with a physical keypad and TROPIC01 HSM
 A Lockbox deployment can run:
 
 - Mainstay as the unified user application;
-- Safebox as the current application foundation;
+- Safebox Web as the current application foundation;
 - Acorn for keys, records, proofs, signing, and recovery;
 - Spurline for local Nostr event continuity;
 - Grove for encrypted blob storage; and

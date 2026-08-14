@@ -19,7 +19,7 @@ nearby records and payment capabilities understandable and usable, supporting
 community coordination, and reconciling with external systems when
 connectivity returns.
 
-Continuity means that records, identity, and value remain usable when external
+Continuity means that keys, records, and value remain usable when external
 conditions change. It does not mean pretending every action has the same level
 of finality.
 

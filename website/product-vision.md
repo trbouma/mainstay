@@ -5,7 +5,7 @@ description: The product promise, principles, and direction for Mainstay.
 
 # Product Vision
 
-**Mainstay is a local-first application for records, identity, payments, and
+**Mainstay is a local-first application for keys, records, payments, and
 community resource coordination that keeps working across connected and
 disrupted conditions.**
 
@@ -56,7 +56,7 @@ Continuity is the capability.
 Mainstay is the primary user entry point. Lockbox is the preferred integrated
 deployment when durable local operation, appliance simplicity, and
 hardware-backed controls matter. Continuity is the shared capability across
-records, identity, storage, events, and payments.
+keys, records, storage, events, and payments.
 
 ## What Mainstay does not become
 
@@ -85,5 +85,5 @@ continue proving each component independently, strengthen local operation, and
 simplify the shared user experience before assembling the complete Lockbox
 profile.
 
-The desired result is calm capability: records, identity, payments, and local
+The desired result is calm capability: keys, records, payments, and local
 resource coordination remain understandable when conditions change.
