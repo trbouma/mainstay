@@ -9,7 +9,7 @@ description: The product promise, principles, and direction for Mainstay.
 community resource coordination that keeps working across connected and
 disrupted conditions.**
 
-It gives individuals, organizations, and communities one dependable place to
+It gives individuals, organizations, and communities a dependable place to
 manage the information and value they need to continue operating. Hosted
 services can assist, but the experience should not disappear when a provider,
 mint, or wider network becomes unavailable.

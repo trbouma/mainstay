@@ -1,6 +1,6 @@
 ---
 title: Mainstay
-description: One local-first application for records, identity, payments, and community continuity.
+description: A local-first application for records, identity, payments, and community continuity.
 ---
 
 <section class="mainstay-hero" markdown>
@@ -9,7 +9,7 @@ description: One local-first application for records, identity, payments, and co
 
 # Mainstay
 
-<p class="mainstay-tagline">One dependable place for records, identity, payments, and community continuity.</p>
+<p class="mainstay-tagline">A dependable place for records, identity, payments, and community continuity.</p>
 
 <p class="mainstay-intro">A unified local-first application that keeps essential information and value understandable and usable when conditions change.</p>
 
@@ -23,6 +23,20 @@ description: One local-first application for records, identity, payments, and co
 **Mainstay is the application. Lockbox is the appliance. Continuity is the capability.**
 
 </div>
+
+## When distant infrastructure disappears
+
+A satellite link goes down. A distant cloud service starts behaving
+unpredictably. A tornado takes out the local registry office and bank. Solar
+power and backup systems are keeping the electricity on, but the community has
+lost access to much of what it needs to function: payment services, critical
+records, local evidence, and the remote systems used to coordinate them.
+
+The people, funds, and records have not disappeared. The paths used to reach
+them have. Mainstay is intended to provide a local point of continuity: keeping
+nearby records and payment capabilities understandable and usable, supporting
+community coordination, and reconciling with external systems when
+connectivity returns.
 
 ## Local-first, not local-only
 
