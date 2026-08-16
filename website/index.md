@@ -106,7 +106,7 @@ coherent.
 
 <div class="family-strip" markdown>
 
-<a class="family-mark" href="https://getsafebox.app">
+<a class="family-mark" href="https://trbouma.github.io/safebox-web/">
   <img src="assets/safebox-logo.png" alt="Safebox Web">
   <strong>Safebox Web</strong><span>User app</span>
 </a>

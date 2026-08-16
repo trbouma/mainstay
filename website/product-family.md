@@ -21,7 +21,7 @@ The current standalone user app for records, payments, recovery, handles, and
 everyday wallet workflows. It is the practical application foundation for
 Mainstay.
 
-[Website](https://getsafebox.app) · [Source](https://github.com/trbouma/safebox-web)
+[Website](https://trbouma.github.io/safebox-web/) · [Source](https://github.com/trbouma/safebox-web)
 
 </article>
 
