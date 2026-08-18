@@ -33,6 +33,7 @@ A Lockbox deployment can run:
 - Mainstay as the unified user application;
 - Safebox Web as the current application foundation;
 - Acorn for keys, records, proofs, signing, and recovery;
+- Stroma as Acorn's narrow Nostr wire-format library;
 - Spurline for local Nostr event continuity;
 - Grove for encrypted blob storage; and
 - optionally, Clear for a locally governed currency or voucher system.
@@ -40,6 +41,10 @@ A Lockbox deployment can run:
 Not every Lockbox needs every component. Clear in particular must be an
 explicit organizational choice: operating an appliance must never silently
 make someone a currency issuer.
+
+Stroma is packaged with the software that uses it rather than operated as a
+separate appliance service. It keeps Acorn's Nostr protocol dependency small
+and inspectable while Spurline remains an independently replaceable relay.
 
 ## Local authority
 

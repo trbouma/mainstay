@@ -12,6 +12,8 @@ the flagship reference for how the sibling products fit together.
 
 - Safebox Web provides working user-facing records and payment workflows.
 - Acorn provides the portable wallet, key, record, and proof runtime.
+- Stroma provides an initial tested Nostr wire-format library for Acorn's
+  incremental migration away from a general social-client dependency.
 - Grove provides working local and hosted encrypted blob storage.
 - Spurline provides a tested local Nostr relay foundation.
 - Clear provides an experimental non-Lightning Cashu mint for bounded local
@@ -35,6 +37,7 @@ the flagship reference for how the sibling products fit together.
 - [Mainstay](https://github.com/trbouma/mainstay)
 - [Safebox Web](https://github.com/trbouma/safebox-web)
 - [Acorn](https://github.com/trbouma/safebox-acorn)
+- [Stroma](https://github.com/trbouma/stroma)
 - [Grove](https://github.com/trbouma/grove)
 - [Spurline](https://github.com/trbouma/spurline)
 - [Clear](https://github.com/trbouma/clear)

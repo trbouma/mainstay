@@ -114,6 +114,10 @@ coherent.
   <img src="assets/acorn-logo.png" alt="Acorn">
   <strong>Acorn</strong><span>Portable authority</span>
 </a>
+<a class="family-mark" href="https://trbouma.github.io/stroma/">
+  <img src="assets/stroma-logo.png" alt="Stroma">
+  <strong>Stroma</strong><span>Nostr wire format</span>
+</a>
 <a class="family-mark" href="https://trbouma.github.io/grove/">
   <img src="assets/grove-logo.png" alt="Grove">
   <strong>Grove</strong><span>Encrypted blobs</span>

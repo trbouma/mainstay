@@ -41,6 +41,20 @@ application layer.
 
 <article class="product-card" markdown>
 
+<img src="../assets/stroma-logo.png" alt="Stroma">
+
+## Stroma
+
+The narrow Nostr wire-format library beneath Acorn. Stroma owns keys and event
+encoding, signatures, NIP-44 encryption, NIP-59 gift wrapping, and bounded
+relay exchange without taking ownership of wallet, record, or payment meaning.
+
+[Website](https://trbouma.github.io/stroma/) · [Source](https://github.com/trbouma/stroma)
+
+</article>
+
+<article class="product-card" markdown>
+
 <img src="../assets/grove-logo.png" alt="Grove">
 
 ## Grove
@@ -123,8 +137,11 @@ which provenance, integrity, presentation, and control history matter.
                               |
                         +-----+-----+
                         |           |
-                    Spurline      Grove
-                     events       blobs
+                     Stroma       Grove
+                  Nostr wire      blobs
+                        |
+                    Spurline
+                  event relay
 
                    Lockbox runs the stack locally
 
@@ -143,6 +160,11 @@ Mainstay with a control graph: signed evidence about record origin,
 attestation, transfer, and termination. Mainstay can present that evidence
 alongside a safeguarded record while leaving the legitimacy judgment with the
 people, organizations, and authorities that recognize it.
+
+Stroma is not another application or hosted infrastructure service. It is the
+small protocol layer Acorn uses to speak Nostr without importing social-client
+behavior into the wallet kernel. Spurline and other compatible relays remain
+independent services on the other side of that wire boundary.
 
 ## Clear and local economies
 

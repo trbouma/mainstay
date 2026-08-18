@@ -2,7 +2,7 @@
 
 Mainstay is the future unified local-first application for records, identity,
 payments, and community resource coordination. It brings the Safebox, Acorn,
-Grove, Spurline, and Clear product family into one coherent experience across
+Stroma, Grove, Spurline, and Clear product family into one coherent experience across
 connected and disrupted conditions.
 
 Mainstay is the application. Lockbox is the appliance. Continuity is the

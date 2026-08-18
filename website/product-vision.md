@@ -74,9 +74,10 @@ institution, community, or recognized authority still determines what is
 legitimate and authoritative.
 
 That distinction allows the app to evolve without trapping the user. Acorn
-keys and proofs remain portable. Grove blobs remain content-addressed.
-Spurline events remain standard Nostr events. Clear currencies retain their
-own governance and ledgers.
+keys and proofs remain portable. Stroma keeps the Nostr wire boundary narrow
+and replaceable. Grove blobs remain content-addressed. Spurline events remain
+standard Nostr events. Clear currencies retain their own governance and
+ledgers.
 
 ## Direction
 
