@@ -107,6 +107,8 @@ family without replacing their protocol boundaries.
 
 <article class="product-card" markdown>
 
+<img src="../assets/openetr-logo.png" alt="OpenETR">
+
 ## OpenETR
 
 The control and provenance layer for records. OpenETR provides a way to examine
