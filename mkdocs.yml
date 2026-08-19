@@ -1,6 +1,6 @@
 site_name: Mainstay
 site_description: A unified local-first application for keys, records, payments, and community continuity.
-site_url: https://trbouma.github.io/mainstay/
+site_url: https://mainstay.safebox.dev/
 repo_url: https://github.com/trbouma/mainstay
 repo_name: trbouma/mainstay
 
@@ -9,6 +9,7 @@ site_dir: site
 
 theme:
   name: material
+  custom_dir: overrides
   language: en
   logo: assets/mainstay-logo.svg
   favicon: assets/mainstay-logo.svg
