@@ -38,12 +38,19 @@ temporarily inaccessible. The underlying institutions may still exist and the
 problem may be resolved in a few hours or days. Until then, people still need
 to carry out day-to-day business.
 
-They also need to transact fairly and securely. When a national payment system
-goes down, a coffee shop might resort to paper IOUs or handwritten customer
-tabs so that trade can continue. That works at a very small scale, but it is
-easy to lose, alter, duplicate, or misunderstand an obligation. A community
-needs a simple way to issue, hold, transfer, and clear local obligations while
-the wider money network is unavailable—and to distinguish those obligations
+Community members also need to transact fairly and securely. Trust may be
+assumed at the outset, but it can be stretched and eventually exhausted when
+it is not supported by fair, secure accounting that simply works. Informal
+arrangements may be manageable within a small local community; as that
+community grows or develops wider connections at the global edge, ambiguity
+compounds quickly and hard-won trust can erode.
+
+When a national payment system goes down, a coffee shop might resort to paper
+IOUs or handwritten customer tabs so that trade can continue. That works at a
+very small scale, but it is easy to lose, alter, duplicate, or misunderstand an
+obligation. A community needs a simple way to issue, hold, transfer, and clear
+local obligations while the wider money network is unavailable—and to
+distinguish those obligations
 from payments that have already reached final settlement. When connectivity
 returns, the local activity can be reconciled with the wider network rather
 than reconstructed from scraps of paper and memory.
