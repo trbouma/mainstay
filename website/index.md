@@ -24,19 +24,60 @@ description: A local-first application for keys, records, payments, and communit
 
 </div>
 
-## When distant infrastructure disappears
+## Institutional preparedness
 
-A satellite link goes down. A distant cloud service starts behaving
-unpredictably. A tornado takes out the local registry office and bank. Solar
-power and backup systems are keeping the electricity on, but the community has
-lost access to much of what it needs to function: payment services, critical
-records, local evidence, and the remote systems used to coordinate them.
+Emergency preparedness helps people get through a disruption. Business
+continuity helps organizations keep operating. **Institutional preparedness**
+helps a community preserve the practical capabilities it needs to function:
+access to keys, funds, records, evidence, payments, and trusted local services.
 
-The people, funds, and records have not disappeared. The paths used to reach
-them have. Mainstay is intended to provide a local point of continuity: keeping
-nearby records and payment capabilities understandable and usable, supporting
-community coordination, and reconciling with external systems when
-connectivity returns.
+This does not require an apocalyptic scenario. It begins with an ordinary
+discovery: the electricity is off, a cloud service cannot be reached, a payment
+provider is unavailable, or the records needed to complete today's work are
+temporarily inaccessible. The underlying institutions may still exist and the
+problem may be resolved in a few hours or days. Until then, people still need
+to carry out day-to-day business.
+
+They also need to transact fairly and securely. When a national payment system
+goes down, a coffee shop might resort to paper IOUs or handwritten customer
+tabs so that trade can continue. That works at a very small scale, but it is
+easy to lose, alter, duplicate, or misunderstand an obligation. A community
+needs a simple way to issue, hold, transfer, and clear local obligations while
+the wider money network is unavailable—and to distinguish those obligations
+from payments that have already reached final settlement. When connectivity
+returns, the local activity can be reconciled with the wider network rather
+than reconstructed from scraps of paper and memory.
+
+Records present the same problem. A doctor, lawyer, notary, or other locally
+recognized professional may need to attest an existing PDF, image, or document
+while a national registry or health-record system is unavailable. That
+attestation does not have to pretend to replace the authoritative system. It
+can identify what was presented, who examined it, what they were prepared to
+affirm, and when they did so. This gives the community practical assurance and
+reduces uncertainty until the original authority is reachable and the record
+can be checked or reconciled through its normal channels.
+
+A community may eventually decide to maintain this capacity at the edge
+permanently. That does not mean withdrawing from the law, rejecting wider
+institutions, or going rogue. It means being able to meet daily needs when
+national and global systems fail repeatedly, reconnecting to those systems
+when they are useful and available without making every local action depend on
+them. This can be especially important for remote and Indigenous communities
+that want the benefits of digital tools while retaining local authority and
+avoiding fragile digital tethers to distant platforms and providers.
+
+Over time, the same need becomes more important as infrastructure grows more
+distributed. Some services may remain global, while electricity, data centres,
+communications, and operational support increasingly come from regional and
+local providers. Communities need institutions that can operate at that level,
+cooperate with wider networks when available, and preserve continuity when a
+distant dependency is not.
+
+Mainstay is intended to provide a local point of continuity. It keeps nearby
+records and payment capabilities understandable and usable, supports community
+coordination, and reconciles with external systems when connectivity returns.
+The people, funds, and records have not disappeared; Mainstay helps preserve a
+path to them while the usual path is being restored.
 
 ## Local-first, not local-only
 
