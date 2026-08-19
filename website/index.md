@@ -20,11 +20,17 @@ description: A local-first application for keys, records, payments, and communit
 
 <div class="mainstay-formula" markdown>
 
-**Mainstay is the application. Lockbox is the appliance. Continuity is the capability.**
+**Continuity is the capability.**
 
 </div>
 
 ## Institutional preparedness
+
+Continuity is easy to take for granted. Electricity arrives, payments clear,
+records can be retrieved, and familiar institutions remain within reach—until
+one of those connections is suddenly unavailable. At that moment, continuity
+stops being an abstract property and becomes an immediate practical need. That
+is where continuity meets preparedness.
 
 Emergency preparedness helps people get through a disruption. Business
 continuity helps organizations keep operating. **Institutional preparedness**
