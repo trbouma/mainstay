@@ -115,10 +115,6 @@
   margin: 0 0 1rem;
 }
 
-.product-card--mainstay {
-  border-color: color-mix(in srgb, var(--mainstay-amber) 58%, transparent);
-}
-
 .family-strip {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

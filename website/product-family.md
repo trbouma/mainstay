@@ -13,13 +13,15 @@ and understood on its own.
 
 <article class="product-card" markdown>
 
-<img src="../assets/safebox-logo.png" alt="Safebox Web">
+<a href="https://github.com/trbouma/safebox-web" aria-label="Safebox Web source repository">
+  <img src="../assets/safebox-logo.png" alt="Safebox Web">
+</a>
 
 ## Safebox Web
 
-The current standalone user app for records, payments, recovery, handles, and
-everyday wallet workflows. It is the practical application foundation for
-Mainstay.
+The standalone user app for records, payments, recovery, handles, and everyday
+wallet workflows. Safebox Web provides the practical application foundation
+from which Mainstay is evolving.
 
 [Website](https://trbouma.github.io/safebox-web/) · [Source](https://github.com/trbouma/safebox-web)
 
@@ -27,12 +29,14 @@ Mainstay.
 
 <article class="product-card" markdown>
 
-<img src="../assets/acorn-logo.png" alt="Acorn">
+<a href="https://github.com/trbouma/safebox-acorn" aria-label="Acorn source repository">
+  <img src="../assets/acorn-logo.png" alt="Acorn">
+</a>
 
 ## Acorn
 
-The protocol-first component for safeguarding user-controlled keys, funds, and
-records. Acorn keeps portable signing, recovery, and wallet authority below the
+The protocol-first component for user-controlled keys, funds, and records.
+Acorn keeps portable signing, recovery, and wallet authority below the
 application layer.
 
 [Website](https://trbouma.github.io/safebox-acorn/) · [Source](https://github.com/trbouma/safebox-acorn)
@@ -41,13 +45,15 @@ application layer.
 
 <article class="product-card" markdown>
 
-<img src="../assets/stroma-logo.png" alt="Stroma">
+<a href="https://github.com/trbouma/stroma" aria-label="Stroma source repository">
+  <img src="../assets/stroma-logo.png" alt="Stroma">
+</a>
 
 ## Stroma
 
-The narrow Nostr wire-format library beneath Acorn. Stroma owns keys and event
+The focused Nostr wire-format library beneath Acorn. Stroma handles keys, event
 encoding, signatures, NIP-44 encryption, NIP-59 gift wrapping, and bounded
-relay exchange without taking ownership of wallet, record, or payment meaning.
+relay exchange without owning application meaning.
 
 [Website](https://trbouma.github.io/stroma/) · [Source](https://github.com/trbouma/stroma)
 
@@ -55,12 +61,15 @@ relay exchange without taking ownership of wallet, record, or payment meaning.
 
 <article class="product-card" markdown>
 
-<img src="../assets/grove-logo.png" alt="Grove">
+<a href="https://github.com/trbouma/grove" aria-label="Grove source repository">
+  <img src="../assets/grove-logo.png" alt="Grove">
+</a>
 
 ## Grove
 
 A local-first Blossom server for opaque, content-addressed encrypted blobs and
-attachments. Grove preserves bytes without needing to understand plaintext.
+attachments. Grove preserves and retrieves bytes without needing to understand
+their plaintext or application meaning.
 
 [Website](https://trbouma.github.io/grove/) · [Source](https://github.com/trbouma/grove)
 
@@ -68,12 +77,15 @@ attachments. Grove preserves bytes without needing to understand plaintext.
 
 <article class="product-card" markdown>
 
-<img src="../assets/spurline-logo.svg" alt="Spurline">
+<a href="https://github.com/trbouma/spurline" aria-label="Spurline source repository">
+  <img src="../assets/spurline-logo.svg" alt="Spurline">
+</a>
 
 ## Spurline
 
-A local-first Nostr relay for event continuity, selective synchronization, and
-future community mesh operation.
+A local-first Nostr relay for durable event storage, selective synchronization,
+and future community mesh operation. Spurline keeps signed events available
+across connected and disrupted conditions.
 
 [Website](https://trbouma.github.io/spurline/) · [Source](https://github.com/trbouma/spurline)
 
@@ -81,44 +93,31 @@ future community mesh operation.
 
 <article class="product-card" markdown>
 
-<img src="../assets/clear-logo.svg" alt="Clear">
+<a href="https://github.com/trbouma/clear" aria-label="Clear source repository">
+  <img src="../assets/clear-logo.svg" alt="Clear">
+</a>
 
 ## Clear
 
-An optional local-first Cashu mint for independently governed points, vouchers,
-and internal economies without Bitcoin or Lightning settlement.
+The issuance, circulation and redemption machinery for organization-defined
+transferable units. Clear uses private Cashu bearer notes without requiring
+Bitcoin or Lightning settlement.
 
 [Website](https://trbouma.github.io/clear/) · [Source](https://github.com/trbouma/clear)
 
 </article>
 
-<article class="product-card product-card--mainstay" markdown>
-
-<img src="../assets/mainstay-logo.svg" alt="Mainstay">
-
-## Mainstay
-
-The unified application and primary user entry point. Mainstay coordinates the
-family without replacing their protocol boundaries.
-
-[Source](https://github.com/trbouma/mainstay)
-
-</article>
-
 <article class="product-card" markdown>
 
-<img src="../assets/openetr-logo.png" alt="OpenETR">
+<a href="https://github.com/trbouma/openetr" aria-label="OpenETR source repository">
+  <img src="../assets/openetr-logo.png" alt="OpenETR">
+</a>
 
 ## OpenETR
 
-The control and provenance layer for records. OpenETR provides a way to examine
-where a record originated, who issued or attested it, whether it remains
-unchanged, and how control has moved or ended over time.
-
-Mainstay is being designed to work in conjunction with OpenETR so records can
-be assessed for legitimacy rather than merely stored and retrieved. This
-relationship also enables digital trade documentation and other workflows in
-which provenance, integrity, presentation, and control history matter.
+The control and provenance layer for transferable records. OpenETR preserves
+signed evidence of origin, integrity, attestation, transfer, and termination so
+applications can assess control history.
 
 [Website](https://trbouma.github.io/openetr/) · [Source](https://github.com/trbouma/openetr)
 

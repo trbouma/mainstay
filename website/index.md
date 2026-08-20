@@ -184,6 +184,10 @@ coherent.
   <img src="assets/clear-logo.svg" alt="Clear">
   <strong>Clear</strong><span>Local currencies</span>
 </a>
+<a class="family-mark" href="https://trbouma.github.io/openetr/">
+  <img src="assets/openetr-logo.png" alt="OpenETR">
+  <strong>OpenETR</strong><span>Transferable records</span>
+</a>
 
 </div>
 
