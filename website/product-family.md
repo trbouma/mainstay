@@ -13,7 +13,7 @@ and understood on its own.
 
 <article class="product-card" markdown>
 
-<a href="https://github.com/trbouma/safebox-web" aria-label="Safebox Web source repository">
+<a href="https://trbouma.github.io/safebox-web/" aria-label="Visit the Safebox Web website">
   <img src="../assets/safebox-logo.png" alt="Safebox Web">
 </a>
 
@@ -23,13 +23,13 @@ The standalone user app for records, payments, recovery, handles, and everyday
 wallet workflows. Safebox Web provides the practical application foundation
 from which Mainstay is evolving.
 
-[Website](https://trbouma.github.io/safebox-web/) · [Source](https://github.com/trbouma/safebox-web)
+[Visit Safebox Web](https://trbouma.github.io/safebox-web/)
 
 </article>
 
 <article class="product-card" markdown>
 
-<a href="https://github.com/trbouma/safebox-acorn" aria-label="Acorn source repository">
+<a href="https://trbouma.github.io/safebox-acorn/" aria-label="Visit the Acorn website">
   <img src="../assets/acorn-logo.png" alt="Acorn">
 </a>
 
@@ -39,13 +39,13 @@ The protocol-first component for user-controlled keys, funds, and records.
 Acorn keeps portable signing, recovery, and wallet authority below the
 application layer.
 
-[Website](https://trbouma.github.io/safebox-acorn/) · [Source](https://github.com/trbouma/safebox-acorn)
+[Visit Acorn](https://trbouma.github.io/safebox-acorn/)
 
 </article>
 
 <article class="product-card" markdown>
 
-<a href="https://github.com/trbouma/stroma" aria-label="Stroma source repository">
+<a href="https://trbouma.github.io/stroma/" aria-label="Visit the Stroma website">
   <img src="../assets/stroma-logo.png" alt="Stroma">
 </a>
 
@@ -55,13 +55,13 @@ The focused Nostr wire-format library beneath Acorn. Stroma handles keys, event
 encoding, signatures, NIP-44 encryption, NIP-59 gift wrapping, and bounded
 relay exchange without owning application meaning.
 
-[Website](https://trbouma.github.io/stroma/) · [Source](https://github.com/trbouma/stroma)
+[Visit Stroma](https://trbouma.github.io/stroma/)
 
 </article>
 
 <article class="product-card" markdown>
 
-<a href="https://github.com/trbouma/grove" aria-label="Grove source repository">
+<a href="https://trbouma.github.io/grove/" aria-label="Visit the Grove website">
   <img src="../assets/grove-logo.png" alt="Grove">
 </a>
 
@@ -71,13 +71,13 @@ A local-first Blossom server for opaque, content-addressed encrypted blobs and
 attachments. Grove preserves and retrieves bytes without needing to understand
 their plaintext or application meaning.
 
-[Website](https://trbouma.github.io/grove/) · [Source](https://github.com/trbouma/grove)
+[Visit Grove](https://trbouma.github.io/grove/)
 
 </article>
 
 <article class="product-card" markdown>
 
-<a href="https://github.com/trbouma/spurline" aria-label="Spurline source repository">
+<a href="https://trbouma.github.io/spurline/" aria-label="Visit the Spurline website">
   <img src="../assets/spurline-logo.svg" alt="Spurline">
 </a>
 
@@ -87,13 +87,13 @@ A local-first Nostr relay for durable event storage, selective synchronization,
 and future community mesh operation. Spurline keeps signed events available
 across connected and disrupted conditions.
 
-[Website](https://trbouma.github.io/spurline/) · [Source](https://github.com/trbouma/spurline)
+[Visit Spurline](https://trbouma.github.io/spurline/)
 
 </article>
 
 <article class="product-card" markdown>
 
-<a href="https://github.com/trbouma/clear" aria-label="Clear source repository">
+<a href="https://trbouma.github.io/clear/" aria-label="Visit the Clear website">
   <img src="../assets/clear-logo.svg" alt="Clear">
 </a>
 
@@ -103,13 +103,13 @@ The issuance, circulation and redemption machinery for organization-defined
 transferable units. Clear uses private Cashu bearer notes without requiring
 Bitcoin or Lightning settlement.
 
-[Website](https://trbouma.github.io/clear/) · [Source](https://github.com/trbouma/clear)
+[Visit Clear](https://trbouma.github.io/clear/)
 
 </article>
 
 <article class="product-card" markdown>
 
-<a href="https://github.com/trbouma/openetr" aria-label="OpenETR source repository">
+<a href="https://trbouma.github.io/openetr/" aria-label="Visit the OpenETR website">
   <img src="../assets/openetr-logo.png" alt="OpenETR">
 </a>
 
@@ -119,7 +119,7 @@ The control and provenance layer for transferable records. OpenETR preserves
 signed evidence of origin, integrity, attestation, transfer, and termination so
 applications can assess control history.
 
-[Website](https://trbouma.github.io/openetr/) · [Source](https://github.com/trbouma/openetr)
+[Visit OpenETR](https://trbouma.github.io/openetr/)
 
 </article>
 
