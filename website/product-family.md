@@ -115,9 +115,9 @@ Bitcoin or Lightning settlement.
 
 ## OpenETR
 
-The control and provenance layer for transferable records. OpenETR preserves
-signed evidence of origin, integrity, attestation, transfer, and termination so
-applications can assess control history.
+The consequential-state and evidence layer for transferable records. OpenETR
+preserves end-verifiable evidence of anchoring, integrity, attestation,
+transfer, and termination so applications can derive consequential state.
 
 [Visit OpenETR](https://trbouma.github.io/openetr/)
 
@@ -157,10 +157,10 @@ storage providers visible enough that convenience never becomes false
 equivalence.
 
 OpenETR is not another storage provider or system of record. It complements
-Mainstay with a control graph: signed evidence about record origin,
-attestation, transfer, and termination. Mainstay can present that evidence
-alongside a safeguarded record while leaving the legitimacy judgment with the
-people, organizations, and authorities that recognize it.
+Mainstay with a Digital Controllable Record: end-verifiable evidence about a
+record's anchoring, attestation, transfer, and termination. Mainstay can present
+that evidence alongside a safeguarded record while leaving the legitimacy
+judgment with the people, organizations, and authorities that recognize it.
 
 Stroma is not another application or hosted infrastructure service. It is the
 small protocol layer Acorn uses to speak Nostr without importing social-client
