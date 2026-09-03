@@ -46,9 +46,9 @@ Stroma is packaged with the software that uses it rather than operated as a
 separate appliance service. It keeps Acorn's Nostr protocol dependency small
 and inspectable while Spurline remains an independently replaceable relay.
 
-## Local authority
+## Local Approval
 
-> Network services can assist. Local presence controls authority.
+> Network services can assist. Sensitive actions stay locally approved.
 
 Remote services may improve availability, but high-risk local actions should
 eventually be constrained by hardware-backed policy and physical approval. The

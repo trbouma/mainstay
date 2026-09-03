@@ -27,22 +27,22 @@ description: A local-first application for keys, records, payments, and communit
 ## Institutional preparedness
 
 Continuity is easy to take for granted. Electricity arrives, payments clear,
-records can be retrieved, and familiar institutions remain within reach—until
-one of those connections is suddenly unavailable. At that moment, continuity
-stops being an abstract property and becomes an immediate practical need. That
-is where continuity meets preparedness.
+records can be retrieved, and familiar institutions remain within reach. When
+one of those connections is temporarily unavailable, continuity stops being an
+abstract property and becomes an immediate practical need. That is where
+continuity meets preparedness.
 
 Emergency preparedness helps people get through a disruption. Business
 continuity helps organizations keep operating. **Institutional preparedness**
 helps a community preserve the practical capabilities it needs to function:
 access to keys, funds, records, evidence, payments, and trusted local services.
 
-This does not require an apocalyptic scenario. It begins with an ordinary
-discovery: the electricity is off, a cloud service cannot be reached, a payment
-provider is unavailable, or the records needed to complete today's work are
-temporarily inaccessible. The underlying institutions may still exist and the
-problem may be resolved in a few hours or days. Until then, people still need
-to carry out day-to-day business.
+This begins with ordinary operating realities: the electricity is intermittent,
+a cloud service cannot be reached, a payment provider is unavailable, or the
+records needed to complete today's work are temporarily inaccessible. The
+underlying institutions may still exist and the problem may be resolved in a
+few hours or days. Until then, people still need to carry out day-to-day
+business.
 
 Community members also need to transact fairly and securely. Trust may be
 assumed at the outset, but it can be stretched and eventually exhausted when
@@ -51,12 +51,12 @@ arrangements may be manageable within a small local community; as that
 community grows or develops wider connections at the global edge, ambiguity
 compounds quickly and hard-won trust can erode.
 
-When a national payment system goes down, a coffee shop might resort to paper
-IOUs or handwritten customer tabs so that trade can continue. That works at a
-very small scale, but it is easy to lose, alter, duplicate, or misunderstand an
-obligation. A community needs a simple way to issue, hold, transfer, and clear
-local obligations while the wider money network is unavailable—and to
-distinguish those obligations
+A community, resort, campus, or co-working facility may already use informal
+tabs, paper passes, desk credits, meal vouchers, or staff allowances so that
+local activity can continue when a payment provider or booking system is
+unavailable. That can work at a small scale, but it is easy to lose, alter,
+duplicate, or misunderstand an obligation. Communities need a simple way to
+issue, hold, transfer, and clear local obligations while keeping them distinct
 from payments that have already reached final settlement. When connectivity
 returns, the local activity can be reconciled with the wider network rather
 than reconstructed from scraps of paper and memory.
@@ -71,13 +71,12 @@ reduces uncertainty until the original authority is reachable and the record
 can be checked or reconciled through its normal channels.
 
 A community may eventually decide to maintain this capacity at the edge
-permanently. That does not mean withdrawing from the law, rejecting wider
-institutions, or going rogue. It means being able to meet daily needs when
-national and global systems fail repeatedly, reconnecting to those systems
-when they are useful and available without making every local action depend on
-them. This can be especially important for remote and Indigenous communities
-that want the benefits of digital tools while retaining local authority and
-avoiding fragile digital tethers to distant platforms and providers.
+permanently. This is a cooperative local capacity: communities continue
+ordinary work close to where people live and gather, then reconnect with wider
+institutions when those systems are useful and available. This can be
+especially important for remote and Indigenous communities that want digital
+tools aligned with local governance, trusted relationships, language, service
+realities, and cooperative links to regional and national systems.
 
 Over time, the same need becomes more important as infrastructure grows more
 distributed. Some services may remain global, while electricity, data centres,
@@ -96,9 +95,9 @@ path to them while the usual path is being restored.
 
 Mainstay can use helpful hosted services in ordinary conditions. It is designed
 so the user experience can also move toward local infrastructure when a
-provider, mint, satellite link, or wider network becomes unavailable.
+provider, mint, regional link, or wider network becomes unavailable.
 
-The goal is not isolation. It is practical control over the records, keys,
+The goal is not isolation. It is practical stewardship of the records, keys,
 funds, evidence, and local services people need to continue operating.
 
 <div class="mainstay-grid mainstay-grid--four" markdown>
@@ -124,7 +123,7 @@ Reach nearby Lockbox services directly when upstream access is unavailable.
 
 ### Mobile
 
-Use a phone or nearby device as a temporary bridge while local authority stays
+Use a phone or nearby device as a temporary bridge while local approval stays
 close.
 
 </article>

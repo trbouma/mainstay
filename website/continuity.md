@@ -5,13 +5,14 @@ description: How Mainstay keeps records and payments understandable across chang
 
 # Continuity
 
-## When distant infrastructure disappears
+## When Outside Services Are Unavailable
 
-A satellite link goes down. A distant cloud service starts behaving
-unpredictably. A tornado takes out the local registry office and bank. Solar
-power and backup systems are keeping the electricity on, but the community has
-lost access to much of what it needs to function: payment services, critical
-records, local evidence, and the remote systems used to coordinate them.
+A community, resort, campus, or co-working facility may still have people,
+staff, devices, local power, and a local network even when outside services are
+slow or unavailable. A payment provider may be unreachable. A booking or access
+system may be offline. A registry, health-record system, or cloud application
+may be temporarily inaccessible. The community still needs to coordinate the
+work in front of it.
 
 The people, funds, and records have not disappeared. The paths used to reach
 them have. Mainstay is intended to provide a local point of continuity: keeping
@@ -86,8 +87,8 @@ mint-level finality for that bounded currency while the local mint remains
 reachable.
 
 This is useful for resorts, ships, campuses, remote communities, food-bank
-networks, and emergency operations that retain a local network during an
-upstream outage.
+networks, and shared facilities that retain a local network during an upstream
+outage.
 
 ## Honest status is a feature
 

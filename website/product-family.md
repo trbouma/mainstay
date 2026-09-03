@@ -170,14 +170,14 @@ independent services on the other side of that wire boundary.
 ## Clear and local economies
 
 Clear adds an optional local economic layer. A church, food-bank network,
-campus, event, emergency operation, or resort can operate a bounded currency
-recognized by participating people and providers.
+campus, event, resort, co-working facility, or Indigenous community program can
+operate bounded credits recognized by participating people and providers.
 
-A resort could issue guest credits, staff allowances, activity vouchers, or
-emergency value on its own network. Acorn holds the proofs, Mainstay presents
-the experience, Spurline carries signed local events, and Lockbox can host the
-runtime. The resort treasury remains responsible for issuance and provider
-settlement.
+A resort could issue guest credits, staff allowances, activity vouchers, meal
+credits, or local service credits on its own network. Acorn holds the proofs,
+Mainstay presents the experience, Spurline carries signed local events, and
+Lockbox can host the runtime. The resort treasury remains responsible for
+issuance and provider settlement.
 
 These currencies are voluntary, limited-recognition instruments rather than
 legal tender. Mainstay must keep every currency and its governing organization
