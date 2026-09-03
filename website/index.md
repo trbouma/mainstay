@@ -11,7 +11,7 @@ description: A local-first application for keys, records, payments, and communit
 
 <p class="mainstay-tagline">A dependable place for keys, records, payments, and community continuity.</p>
 
-<p class="mainstay-intro">A unified local-first application that keeps essential information and value understandable and usable when conditions change.</p>
+<p class="mainstay-intro">A unified local-first application that keeps essential information and value available and usable when conditions change.</p>
 
 [Explore the vision](product-vision.md){ .md-button .md-button--primary }
 [Meet the product family](product-family.md){ .md-button }
