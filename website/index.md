@@ -24,72 +24,76 @@ description: A local-first application for keys, records, payments, and communit
 
 </div>
 
-## Institutional preparedness
+## Cooperative local operations
 
-Continuity is easy to take for granted. Electricity arrives, payments clear,
-records can be retrieved, and familiar institutions remain within reach. When
-one of those connections is temporarily unavailable, continuity stops being an
-abstract property and becomes an immediate practical need. That is where
-continuity meets preparedness.
+Mainstay starts with an ordinary need: people should be able to use important
+records, service credits, approvals, and payment capabilities close to where
+daily work happens. A community office, resort, campus, co-working facility, or
+local service network may already coordinate members, guests, staff, providers,
+records, and benefits across several tools. Mainstay is intended to give those
+capabilities a dependable local home while keeping them connected to the wider
+systems that already matter.
+
+The goal is cooperative independence, not separation. A local deployment can
+work with hosted services, regional providers, national registries, outside
+mints, and ordinary payment networks when those services are useful and
+available. It can also keep local work understandable when one of those systems
+is slow, unavailable, or waiting to reconcile.
+
+This is especially relevant for remote and Indigenous communities that want
+digital tools aligned with local governance, trusted relationships, language,
+service realities, and cooperative links to regional and national systems. The
+same pattern also fits hospitality resorts, cruise ships, campuses, and
+co-working facilities that need smooth local operations without turning every
+interaction into a dependency on a distant platform.
+
+## Records, credits, and trusted local work
+
+Mainstay is intended to keep several practical questions clear:
+
+- Which records are available here?
+- Which local services can be reached now?
+- Which credits, vouchers, or balances are confirmed?
+- Which transfers or attestations are pending wider reconciliation?
+- Which organization, issuer, professional, or community gives a record or
+  credit its meaning?
+
+A resort might issue guest credits, staff allowances, activity vouchers, or
+meal credits that are recognized by shops, restaurants, and services on its
+own network. A co-working facility might issue desk credits, boardroom hours,
+printing credits, locker access, or event passes. An Indigenous community
+program might issue locally governed service credits or preserve records and
+attestations according to its own procedures while maintaining cooperative
+links to external institutions.
+
+In each case, Mainstay should keep the local instrument bounded and legible.
+It should not imply that a resort credit is legal tender, that two community
+programs are interchangeable, or that a local attestation replaces the
+institution normally responsible for a record. It should show who issued the
+thing, who recognizes it, what can be done locally, and what still needs to be
+checked or finalized elsewhere.
+
+## Preparedness as a benefit
+
+The same local-first capacity also supports preparedness.
 
 Emergency preparedness helps people get through a disruption. Business
 continuity helps organizations keep operating. **Institutional preparedness**
 helps a community preserve the practical capabilities it needs to function:
 access to keys, funds, records, evidence, payments, and trusted local services.
 
-This begins with ordinary operating realities: the electricity is intermittent,
-a cloud service cannot be reached, a payment provider is unavailable, or the
-records needed to complete today's work are temporarily inaccessible. The
-underlying institutions may still exist and the problem may be resolved in a
-few hours or days. Until then, people still need to carry out day-to-day
-business.
+This does not need to begin with a crisis. It begins with ordinary operating
+realities: intermittent electricity, limited connectivity, an unavailable cloud
+service, a payment provider outage, or records that cannot be reached at the
+moment work needs to continue. The underlying institutions may still exist and
+the problem may be resolved in a few hours or days. Until then, people still
+need to carry out day-to-day business.
 
-Community members also need to transact fairly and securely. Trust may be
-assumed at the outset, but it can be stretched and eventually exhausted when
-it is not supported by fair, secure accounting that simply works. Informal
-arrangements may be manageable within a small local community; as that
-community grows or develops wider connections at the global edge, ambiguity
-compounds quickly and hard-won trust can erode.
-
-A community, resort, campus, or co-working facility may already use informal
-tabs, paper passes, desk credits, meal vouchers, or staff allowances so that
-local activity can continue when a payment provider or booking system is
-unavailable. That can work at a small scale, but it is easy to lose, alter,
-duplicate, or misunderstand an obligation. Communities need a simple way to
-issue, hold, transfer, and clear local obligations while keeping them distinct
-from payments that have already reached final settlement. When connectivity
-returns, the local activity can be reconciled with the wider network rather
-than reconstructed from scraps of paper and memory.
-
-Records present the same problem. A doctor, lawyer, notary, or other locally
-recognized professional may need to attest an existing PDF, image, or document
-while a national registry or health-record system is unavailable. That
-attestation does not have to pretend to replace the authoritative system. It
-can identify what was presented, who examined it, what they were prepared to
-affirm, and when they did so. This gives the community practical assurance and
-reduces uncertainty until the original authority is reachable and the record
-can be checked or reconciled through its normal channels.
-
-A community may eventually decide to maintain this capacity at the edge
-permanently. This is a cooperative local capacity: communities continue
-ordinary work close to where people live and gather, then reconnect with wider
-institutions when those systems are useful and available. This can be
-especially important for remote and Indigenous communities that want digital
-tools aligned with local governance, trusted relationships, language, service
-realities, and cooperative links to regional and national systems.
-
-Over time, the same need becomes more important as infrastructure grows more
-distributed. Some services may remain global, while electricity, data centres,
-communications, and operational support increasingly come from regional and
-local providers. Communities need institutions that can operate at that level,
-cooperate with wider networks when available, and preserve continuity when a
-distant dependency is not.
-
-Mainstay is intended to provide a local point of continuity. It keeps nearby
-records and payment capabilities understandable and usable, supports community
-coordination, and reconciles with external systems when connectivity returns.
-The people, funds, and records have not disappeared; Mainstay helps preserve a
-path to them while the usual path is being restored.
+When connectivity returns, local activity can be reconciled with the wider
+network rather than reconstructed from paper notes, memory, screenshots, or
+fragmented application logs. Mainstay helps preserve a clear path between what
+happened locally and the external systems that later confirm, recognize, or
+settle it.
 
 ## Local-first, not local-only
 
