@@ -1,13 +1,16 @@
 [tool.poetry]
-name = "mainstay-site"
+name = "mainstay-local"
 version = "0.1.0"
-description = "The flagship product site for the Mainstay local-first product family"
+description = "Local-first control plane for the Mainstay product family"
 authors = ["Tim Bouma"]
 license = "MIT"
 readme = "README.md"
-package-mode = false
 homepage = "https://trbouma.github.io/mainstay/"
 repository = "https://github.com/trbouma/mainstay"
+packages = [{ include = "app" }]
+
+[tool.poetry.scripts]
+mainstay-local = "app.cli:main"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
@@ -16,6 +19,21 @@ python = ">=3.11,<3.14"
 mkdocs = ">=1.6.0,<2.0.0"
 mkdocs-material = ">=9.5.0,<10.0.0"
 pymdown-extensions = ">=10.0.0,<11.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.3.0,<10.0.0"
+ruff = ">=0.16.0,<1.0.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
