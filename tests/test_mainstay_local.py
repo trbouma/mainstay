@@ -31,7 +31,14 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertEqual(spurline.health_url, "http://spurline:8080/health")
         self.assertFalse(bundle.require_service("safebox_web").enabled)
         self.assertFalse(bundle.require_service("clear").enabled)
-        self.assertFalse(bundle.require_service("grove").enabled)
+
+    def test_grove_uses_the_private_runtime_namespace(self) -> None:
+        grove = BundleConfig.default().require_service("grove")
+
+        self.assertTrue(grove.enabled)
+        self.assertEqual(grove.local_url, "http://grove:8000")
+        self.assertEqual(grove.advertised_url, "http://grove:8000")
+        self.assertEqual(grove.health_url, "http://grove:8000/health")
 
     def test_dashboard_lists_services_and_api_endpoints(self) -> None:
         page = render_dashboard(BundleConfig.default())

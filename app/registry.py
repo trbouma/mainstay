@@ -94,8 +94,7 @@ class BundleConfig:
                     kind="blossom",
                     local_url="http://grove:8000",
                     advertised_url="http://grove:8000",
-                    enabled=False,
-                    health_url="http://127.0.0.1:8001/health",
+                    health_url="http://grove:8000/health",
                 ),
                 "spurline": ServiceEndpoint(
                     name="spurline",

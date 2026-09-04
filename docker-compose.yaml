@@ -58,6 +58,33 @@ services:
       - no-new-privileges:true
     stop_grace_period: 30s
 
+  grove:
+    image: ${MAINSTAY_GROVE_IMAGE:-mainstay-local-grove:local}
+    build:
+      context: ../grove
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      GROVE_DATA_DIR: /data
+      GROVE_PUBLIC_URL: http://grove:8000
+      GROVE_SERVER_NAME: grove
+      GROVE_MAX_BLOB_SIZE: "${GROVE_MAX_BLOB_SIZE:-104857600}"
+      GROVE_AUTH_CLOCK_SKEW_SECONDS: "${GROVE_AUTH_CLOCK_SKEW_SECONDS:-30}"
+    expose:
+      - "8000"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    volumes:
+      - grove-data:/data
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+
 volumes:
   mainstay-local-data:
   spurline-data:
+  grove-data:

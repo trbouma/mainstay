@@ -68,11 +68,11 @@ safebox-web/deploy/local-first/
 `mainstay-local` should eventually absorb the orchestration model, not the
 Safebox Web application code.
 
-Mainstay is absorbing that model incrementally. Spurline is the first service
-in the Mainstay Compose project. Its container port is private by default, its
-data volume is scoped to the Compose project, and an optional overlay publishes
-a loopback diagnostic port. The existing standalone Spurline deployment is not
-joined, renamed, or modified.
+Mainstay is absorbing that model incrementally. Spurline and Grove are the
+first services in the Mainstay Compose project. Their container ports are
+private by default, their data volumes are scoped to the Compose project, and
+an optional overlay publishes loopback diagnostic ports. Existing standalone
+deployments are not joined, renamed, or modified.
 
 The first prototype lives in `app/` and is intentionally small:
 
@@ -142,6 +142,12 @@ the runtime URL may later become a jail address, LAN address, FIPS-derived IPv6
 address, or gateway endpoint. Health checks executed inside the control-plane
 container must use the runtime namespace (`http://spurline:8080/health`), not a
 host-loopback diagnostic URL.
+
+Grove follows the same rule at `http://grove:8000`. During the private Docker
+phase, this is both its runtime origin and its BUD-11 authorization server name.
+Publishing `127.0.0.1:8001` through the debug overlay provides host diagnostics
+only; it does not create another advertised Blossom identity. A future gateway
+must update Grove's advertised origin and authorization name together.
 
 ## FIPS Direction
 
@@ -257,7 +263,7 @@ authorization boundaries.
 
 1. Continue moving the proven Docker services from
    `safebox-web/deploy/local-first` into Mainstay one at a time; Spurline is the
-   first managed service.
+   first managed service, followed by Grove.
 2. Add a `mainstay-local` endpoint-registry document or schema.
 3. Inventory Safebox Web locations where one URL currently does double duty as
    both internal endpoint and advertised endpoint.
