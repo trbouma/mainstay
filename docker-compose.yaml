@@ -6,7 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: mainstay-local
     restart: unless-stopped
     init: true
     command:
@@ -33,9 +32,32 @@ services:
       - no-new-privileges:true
     stop_grace_period: 30s
 
+  spurline:
+    image: ${MAINSTAY_SPURLINE_IMAGE:-mainstay-local-spurline:local}
+    build:
+      context: ../spurline
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      SPURLINE_HOST: 0.0.0.0
+      SPURLINE_PORT: 8080
+      SPURLINE_DATABASE: /data/spurline.sqlite3
+      SPURLINE_VERIFY_SIGNATURES: "${SPURLINE_VERIFY_SIGNATURES:-true}"
+      SPURLINE_PUBLIC_URL: ws://spurline:8080
+    expose:
+      - "8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    volumes:
+      - spurline-data:/data
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+
 volumes:
   mainstay-local-data:
-
-networks:
-  default:
-    name: mainstay-local
+  spurline-data:

@@ -8,24 +8,24 @@ cd "$repo_dir"
 printf '%s\n' 'Pulling the latest changes...'
 git pull
 
-printf '%s\n' 'Building Mainstay Local container image...'
+printf '%s\n' 'Building the Mainstay Local service images...'
 docker compose build
 
-printf '%s\n' 'Recreating Mainstay Local container...'
+printf '%s\n' 'Recreating the Mainstay Local service bundle...'
 docker compose up --force-recreate --detach
 
-printf '%s\n' 'Mainstay Local container refreshed.'
+printf '%s\n' 'Mainstay Local service bundle refreshed.'
 docker compose ps
 
-printf '%s\n' 'Waiting for the Mainstay Local health check...'
+printf '%s\n' 'Waiting for the managed service status check...'
 attempt=1
 max_attempts=30
 while ! docker compose exec -T mainstay-local python -c \
-    "import json, urllib.request; response = json.load(urllib.request.urlopen('http://127.0.0.1:8788/health', timeout=3)); assert response.get('status') == 'ok'" \
+    "import json, urllib.request; response = json.load(urllib.request.urlopen('http://127.0.0.1:8788/status', timeout=3)); assert response.get('status') == 'ok'" \
     >/dev/null 2>&1
 do
     if [ "$attempt" -ge "$max_attempts" ]; then
-        printf '%s\n' 'Mainstay Local health check failed after 60 seconds.' >&2
+        printf '%s\n' 'Managed service status check failed after 60 seconds.' >&2
         docker compose ps >&2
         exit 1
     fi
@@ -33,4 +33,4 @@ do
     sleep 2
 done
 
-printf '%s\n' 'Mainstay Local health check passed: status=ok'
+printf '%s\n' 'Managed service status check passed: status=ok'

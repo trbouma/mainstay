@@ -22,6 +22,17 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('"name": "mainstay-local"', text)
         self.assertIn('"fips_npub"', text)
 
+    def test_spurline_uses_the_private_runtime_namespace(self) -> None:
+        bundle = BundleConfig.default()
+        spurline = bundle.require_service("spurline")
+
+        self.assertTrue(spurline.enabled)
+        self.assertEqual(spurline.local_url, "ws://spurline:8080")
+        self.assertEqual(spurline.health_url, "http://spurline:8080/health")
+        self.assertFalse(bundle.require_service("safebox_web").enabled)
+        self.assertFalse(bundle.require_service("clear").enabled)
+        self.assertFalse(bundle.require_service("grove").enabled)
+
     def test_dashboard_lists_services_and_api_endpoints(self) -> None:
         page = render_dashboard(BundleConfig.default())
 

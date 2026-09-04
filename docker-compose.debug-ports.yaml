@@ -1,0 +1,4 @@
+services:
+  spurline:
+    ports:
+      - "${SPURLINE_DEBUG_BIND_ADDRESS:-127.0.0.1}:${SPURLINE_DEBUG_PORT:-8780}:8080"

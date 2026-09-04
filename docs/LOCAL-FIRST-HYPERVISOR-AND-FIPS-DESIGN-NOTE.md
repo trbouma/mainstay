@@ -68,6 +68,12 @@ safebox-web/deploy/local-first/
 `mainstay-local` should eventually absorb the orchestration model, not the
 Safebox Web application code.
 
+Mainstay is absorbing that model incrementally. Spurline is the first service
+in the Mainstay Compose project. Its container port is private by default, its
+data volume is scoped to the Compose project, and an optional overlay publishes
+a loopback diagnostic port. The existing standalone Spurline deployment is not
+joined, renamed, or modified.
+
 The first prototype lives in `app/` and is intentionally small:
 
 ```text
@@ -129,6 +135,13 @@ Safebox Web currently accepts URLs through environment variables.
 startup. That gives Mainstay room to move from Docker DNS to loopback, LAN,
 Tailscale, `.fips`, FIPS-derived IPv6, or jail-local addresses without
 rewriting Safebox Web routes.
+
+In the Docker phase, `spurline` is a network-scoped resolution label, not a
+durable service identity. Mainstay's logical service key remains stable while
+the runtime URL may later become a jail address, LAN address, FIPS-derived IPv6
+address, or gateway endpoint. Health checks executed inside the control-plane
+container must use the runtime namespace (`http://spurline:8080/health`), not a
+host-loopback diagnostic URL.
 
 ## FIPS Direction
 
@@ -242,8 +255,9 @@ authorization boundaries.
 
 ## Next Steps
 
-1. Keep the current Docker prototype in `safebox-web/deploy/local-first` until
-   it proves the service graph.
+1. Continue moving the proven Docker services from
+   `safebox-web/deploy/local-first` into Mainstay one at a time; Spurline is the
+   first managed service.
 2. Add a `mainstay-local` endpoint-registry document or schema.
 3. Inventory Safebox Web locations where one URL currently does double duty as
    both internal endpoint and advertised endpoint.

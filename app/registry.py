@@ -76,6 +76,7 @@ class BundleConfig:
                     kind="app",
                     local_url="http://safebox-web:8000",
                     advertised_url="http://127.0.0.1:8000",
+                    enabled=False,
                     bind_address="127.0.0.1",
                     port=8000,
                     health_url="http://127.0.0.1:8000/health",
@@ -85,6 +86,7 @@ class BundleConfig:
                     kind="clear-mint",
                     local_url="http://clear:3339",
                     advertised_url="http://clear:3339",
+                    enabled=False,
                     health_url="http://127.0.0.1:3339/health",
                 ),
                 "grove": ServiceEndpoint(
@@ -92,6 +94,7 @@ class BundleConfig:
                     kind="blossom",
                     local_url="http://grove:8000",
                     advertised_url="http://grove:8000",
+                    enabled=False,
                     health_url="http://127.0.0.1:8001/health",
                 ),
                 "spurline": ServiceEndpoint(
@@ -99,7 +102,7 @@ class BundleConfig:
                     kind="nostr-relay",
                     local_url="ws://spurline:8080",
                     advertised_url="ws://spurline:8080",
-                    health_url="http://127.0.0.1:8780/health",
+                    health_url="http://spurline:8080/health",
                 ),
             },
         )
