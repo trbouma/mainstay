@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
+from app.cli import DEFAULT_COMPOSE_PATH, _up
 from app.env import render_safebox_env
 from app.registry import BundleConfig, ServiceEndpoint
 from app.server import render_dashboard
 
 
 class MainstayLocalTests(unittest.TestCase):
+    def test_compose_is_owned_by_mainstay(self) -> None:
+        self.assertEqual(DEFAULT_COMPOSE_PATH, Path("docker-compose.yaml"))
+
     def test_default_registry_renders_safebox_env(self) -> None:
         env = render_safebox_env(BundleConfig.default())
 
@@ -75,6 +81,55 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertNotIn("service<script>", page)
         self.assertIn("&lt;unsafe&gt;", page)
         self.assertIn("app&amp;tool", page)
+
+    def test_up_does_not_enable_safebox_web_by_default(self) -> None:
+        bundle = BundleConfig.default()
+        with (
+            patch("app.cli.BundleConfig.from_json", return_value=bundle),
+            patch("app.cli._config"),
+            patch("app.cli.subprocess.call", return_value=0) as call,
+        ):
+            result = _up(
+                Path("mainstay-local.json"),
+                Path("docker-compose.yaml"),
+                Path("safebox-web.env"),
+                True,
+            )
+
+        self.assertEqual(result, 0)
+        command = call.call_args.args[0]
+        self.assertNotIn("--profile", command)
+
+    def test_up_enables_safebox_web_only_when_registry_enables_it(self) -> None:
+        original = BundleConfig.default()
+        services = dict(original.services)
+        current = services["safebox_web"]
+        services["safebox_web"] = ServiceEndpoint(
+            name=current.name,
+            kind=current.kind,
+            local_url=current.local_url,
+            advertised_url=current.advertised_url,
+            enabled=True,
+            bind_address=current.bind_address,
+            port=current.port,
+            health_url=current.health_url,
+        )
+        bundle = BundleConfig(services=services)
+        with (
+            patch("app.cli.BundleConfig.from_json", return_value=bundle),
+            patch("app.cli._config"),
+            patch("app.cli.subprocess.call", return_value=0) as call,
+        ):
+            _up(
+                Path("mainstay-local.json"),
+                Path("docker-compose.yaml"),
+                Path("safebox-web.env"),
+                False,
+            )
+
+        command = call.call_args.args[0]
+        self.assertIn("--profile", command)
+        self.assertIn("safebox-web", command)
 
 
 if __name__ == "__main__":

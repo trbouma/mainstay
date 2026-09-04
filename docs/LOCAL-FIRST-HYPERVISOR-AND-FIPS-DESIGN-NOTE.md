@@ -59,14 +59,17 @@ Only Safebox Web should be published by default. Clear, Grove, and Spurline
 should be private infrastructure unless the operator explicitly enables debug
 ports or external service origins.
 
-The current prototype lives in the Safebox Web repo:
+The integration prototype now lives in the Mainstay repo:
 
 ```text
-safebox-web/deploy/local-first/
+mainstay/docker-compose.yaml
 ```
 
-`mainstay-local` should eventually absorb the orchestration model, not the
-Safebox Web application code.
+Safebox Web and its service-Acorn worker are an explicit Compose profile. The
+profile is disabled by default so Mainstay can manage local infrastructure
+without taking over or conflicting with an independently deployed Safebox Web
+instance. Mainstay owns the orchestration model, not the Safebox Web
+application code.
 
 Mainstay is absorbing that model incrementally. Spurline, Grove, and Clear are
 the first services in the Mainstay Compose project. Their container ports are
@@ -84,8 +87,22 @@ python -m app up
 ```
 
 It creates a JSON endpoint registry, renders Safebox Web environment settings,
-checks service health, and can hand the generated env file to the Safebox Web
-local-first Compose prototype.
+checks service health, and can enable the Safebox Web profile when the endpoint
+registry deliberately marks that application as enabled.
+
+## Independent Safebox Web Safety
+
+Safebox Web retains its standalone `docker-compose.yaml` and deployment
+settings. Moving the integration profile into Mainstay does not alter that
+file, its Compose project, its containers, or its persistent volume.
+
+The Mainstay profile is opt-in and uses Mainstay-scoped container and volume
+names. A default `docker compose up` in Mainstay therefore starts only the
+Mainstay control plane and its managed infrastructure. An operator must use
+`--profile safebox-web` or enable Safebox Web in the Mainstay endpoint registry
+before Mainstay creates another instance. Host-port conflicts remain visible
+and fail closed at container startup; Mainstay does not replace a running
+standalone container.
 
 ## Endpoint Model
 
@@ -275,10 +292,9 @@ authorization boundaries.
 
 ## Next Steps
 
-1. Continue moving the proven Docker services from
-   `safebox-web/deploy/local-first` into Mainstay one at a time; Spurline is the
-   first managed service, followed by Grove and Clear.
-2. Add a `mainstay-local` endpoint-registry document or schema.
+1. Smoke-test the opt-in Safebox Web profile against Mainstay-managed Spurline,
+   Grove, and Clear without changing the standalone deployment.
+2. Refine the existing endpoint registry into a documented schema.
 3. Inventory Safebox Web locations where one URL currently does double duty as
    both internal endpoint and advertised endpoint.
 4. Add missing Safebox Web configuration seams before introducing Mainstay

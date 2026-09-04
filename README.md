@@ -73,7 +73,9 @@ curl http://127.0.0.1:8788/health
 ```
 
 The `spurline`, `grove`, and `clear` checkouts must be beside the `mainstay`
-checkout because Compose builds them from sibling directories.
+checkout because Compose builds them from sibling directories. The default
+deployment does not start Safebox Web and cannot replace, stop, or alter an
+independently running Safebox Web Compose project.
 
 Spurline is reachable by Mainstay containers as `ws://spurline:8080`, Grove as
 `http://grove:8000`, and Clear as `http://clear:3339`. None publishes a host
@@ -93,7 +95,30 @@ durable service identities. Containers and volumes use Compose project-scoped
 names, allowing these instances to coexist with separately deployed
 containers. Debug ports do not change Grove's bundle origin or the canonical
 Clear URL encoded into Mint Notes. Safebox Web remains registered but disabled
-until it is added to the Mainstay Compose project.
+until its explicit profile is enabled.
+
+## Optional Safebox Web Profile
+
+Mainstay now owns the local integration bundle, but Safebox Web remains an
+independently deployable application. To test it inside the Mainstay service
+graph, keep the `safebox-web` checkout beside this repository, generate
+`SAFEBOX_COOKIE_KEY`, and deliberately enable the profile:
+
+```bash
+python3 -c "import base64,secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"
+docker compose --profile safebox-web up --build --detach
+```
+
+Without `--profile safebox-web`, neither `safebox-web` nor
+`service-acorn-worker` is created. The optional profile uses the
+`mainstay-local` Compose project, a separate named volume, and a loopback host
+binding by default. It does not reuse the standalone Safebox Web project's
+container or data volume. Do not enable the profile on a host where its chosen
+`SAFEBOX_PORT` is already occupied; either keep using the independent
+deployment or assign the Mainstay profile another port. If the profile is
+enabled without `SAFEBOX_COOKIE_KEY`, Safebox Web fails closed during startup;
+the unused profile does not make the default Mainstay bundle depend on that
+secret.
 
 Mainstay starts Clear in root-bootstrap mode but does not commission it, issue
 Mint Notes, or enable treasury activity. The formal Clear commissioning state

@@ -15,7 +15,7 @@ DEFAULT_CONFIG_PATH = Path(
     os.getenv("MAINSTAY_LOCAL_CONFIG", "mainstay-local.json")
 )
 DEFAULT_ENV_PATH = Path("build/mainstay-local/safebox-web.env")
-DEFAULT_COMPOSE_PATH = Path("../safebox-web/deploy/local-first/compose.yaml")
+DEFAULT_COMPOSE_PATH = Path("docker-compose.yaml")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -166,6 +166,7 @@ def _up(
     env_path: Path,
     detach: bool,
 ) -> int:
+    bundle = BundleConfig.from_json(config_path)
     _config(config_path, env_path)
     command = [
         "docker",
@@ -174,9 +175,11 @@ def _up(
         str(env_path),
         "-f",
         str(compose_path),
-        "up",
-        "--build",
     ]
+    safebox_web = bundle.services.get("safebox_web")
+    if safebox_web is not None and safebox_web.enabled:
+        command.extend(["--profile", "safebox-web"])
+    command.extend(["up", "--build"])
     if detach:
         command.append("--detach")
     return subprocess.call(command)

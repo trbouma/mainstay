@@ -32,6 +32,110 @@ services:
       - no-new-privileges:true
     stop_grace_period: 30s
 
+  safebox-web:
+    profiles: ["safebox-web"]
+    image: ${SAFEBOX_IMAGE:-safebox-web:local}
+    build:
+      context: ../safebox-web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --proxy-headers
+      - --forwarded-allow-ips
+      - "${FORWARDED_ALLOW_IPS:-127.0.0.1}"
+      - --workers
+      - "${SAFEBOX_WEB_WORKERS:-1}"
+    depends_on:
+      clear:
+        condition: service_healthy
+      grove:
+        condition: service_healthy
+      spurline:
+        condition: service_healthy
+    environment:
+      # Keep this optional at Compose interpolation time so the disabled
+      # profile cannot block the default Mainstay bundle. Safebox Web itself
+      # fails closed at startup if the profile is enabled without a key.
+      SAFEBOX_COOKIE_KEY: "${SAFEBOX_COOKIE_KEY:-}"
+      SAFEBOX_SESSION_TTL_HOURS: "${SAFEBOX_SESSION_TTL_HOURS:-720}"
+      SAFEBOX_WALLET_LOAD_TIMEOUT_SECONDS: "${SAFEBOX_WALLET_LOAD_TIMEOUT_SECONDS:-20}"
+      SAFEBOX_WALLET_HOME_SNAPSHOT_TIMEOUT_SECONDS: "${SAFEBOX_WALLET_HOME_SNAPSHOT_TIMEOUT_SECONDS:-3}"
+      SAFEBOX_RECORD_CATALOG_TIMEOUT_SECONDS: "${SAFEBOX_RECORD_CATALOG_TIMEOUT_SECONDS:-10}"
+      SAFEBOX_PAYMENT_TIMEOUT_SECONDS: "${SAFEBOX_PAYMENT_TIMEOUT_SECONDS:-90}"
+      SAFEBOX_BACKGROUND_JOB_THREADS: "${SAFEBOX_BACKGROUND_JOB_THREADS:-2}"
+      SAFEBOX_DEFAULT_BOOTSTRAP_RELAY: "${SAFEBOX_DEFAULT_BOOTSTRAP_RELAY:-ws://spurline:8080}"
+      SAFEBOX_ALLOWED_WS_RELAYS: "${SAFEBOX_ALLOWED_WS_RELAYS:-ws://spurline:8080}"
+      SAFEBOX_DEFAULT_HOME_MINT: "${SAFEBOX_DEFAULT_HOME_MINT:-http://clear:3339}"
+      SAFEBOX_BLOSSOM_HOME_SERVER: "${SAFEBOX_BLOSSOM_HOME_SERVER:-http://grove:8000}"
+      SAFEBOX_DATABASE_URL: "${SAFEBOX_DATABASE_URL:-sqlite:///data/database.db}"
+      SAFEBOX_CLEAR_RECEIVE_ENABLED: "${SAFEBOX_CLEAR_RECEIVE_ENABLED:-true}"
+      SAFEBOX_CLEAR_MINTS: "${SAFEBOX_CLEAR_MINTS:-http://clear:3339}"
+      SAFEBOX_CLEAR_UNITS: "${SAFEBOX_CLEAR_UNITS:-}"
+      SAFEBOX_PROVIDER_INVOICE_WAIT_SECONDS: "${SAFEBOX_PROVIDER_INVOICE_WAIT_SECONDS:-10}"
+      SAFEBOX_NIP57_REQUIRE_DESCRIPTION_HASH: "${SAFEBOX_NIP57_REQUIRE_DESCRIPTION_HASH:-false}"
+      SAFEBOX_CURRENCY_RATES_ENABLED: "${SAFEBOX_CURRENCY_RATES_ENABLED:-false}"
+      SAFEBOX_SERVICE_ACORN_HOME_RELAY: "${SAFEBOX_SERVICE_ACORN_HOME_RELAY:-ws://spurline:8080}"
+      SAFEBOX_SERVICE_ACORN_HOME_MINT: "${SAFEBOX_SERVICE_ACORN_HOME_MINT:-http://clear:3339}"
+      SAFEBOX_SERVICE_ACORN_ENABLED: "${SAFEBOX_SERVICE_ACORN_ENABLED:-true}"
+      SAFEBOX_SERVICE_ACORN_GIFT_WRAP_RETENTION_SECONDS: "${SAFEBOX_SERVICE_ACORN_GIFT_WRAP_RETENTION_SECONDS:-604800}"
+      FORWARDED_ALLOW_IPS: "${FORWARDED_ALLOW_IPS:-127.0.0.1}"
+    ports:
+      - "${SAFEBOX_BIND_ADDRESS:-127.0.0.1}:${SAFEBOX_PORT:-8000}:8000"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - safebox-web-data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 120s
+
+  service-acorn-worker:
+    profiles: ["safebox-web"]
+    image: ${SAFEBOX_IMAGE:-safebox-web:local}
+    command: ["python", "-m", "app.service_acorn_worker", "run"]
+    restart: unless-stopped
+    init: true
+    depends_on:
+      safebox-web:
+        condition: service_healthy
+      clear:
+        condition: service_healthy
+      spurline:
+        condition: service_healthy
+    environment:
+      SAFEBOX_WALLET_LOAD_TIMEOUT_SECONDS: "${SAFEBOX_WALLET_LOAD_TIMEOUT_SECONDS:-20}"
+      SAFEBOX_PAYMENT_TIMEOUT_SECONDS: "${SAFEBOX_PAYMENT_TIMEOUT_SECONDS:-90}"
+      SAFEBOX_DATABASE_URL: "${SAFEBOX_DATABASE_URL:-sqlite:///data/database.db}"
+      SAFEBOX_SERVICE_ACORN_POLL_SECONDS: "${SAFEBOX_SERVICE_ACORN_POLL_SECONDS:-0.5}"
+      SAFEBOX_SERVICE_ACORN_DELIVERY_RETRY_ATTEMPTS: "${SAFEBOX_SERVICE_ACORN_DELIVERY_RETRY_ATTEMPTS:-4}"
+      SAFEBOX_SERVICE_ACORN_DELIVERY_RETRY_BASE_SECONDS: "${SAFEBOX_SERVICE_ACORN_DELIVERY_RETRY_BASE_SECONDS:-2}"
+      SAFEBOX_SERVICE_ACORN_DELIVERY_RETRY_MAX_SECONDS: "${SAFEBOX_SERVICE_ACORN_DELIVERY_RETRY_MAX_SECONDS:-60}"
+      SAFEBOX_SERVICE_ACORN_ENABLED: "${SAFEBOX_SERVICE_ACORN_ENABLED:-true}"
+      SAFEBOX_SERVICE_ACORN_MIGRATE: "${SAFEBOX_SERVICE_ACORN_MIGRATE:-false}"
+      SAFEBOX_SERVICE_ACORN_HOME_RELAY: "${SAFEBOX_SERVICE_ACORN_HOME_RELAY:-ws://spurline:8080}"
+      SAFEBOX_ALLOWED_WS_RELAYS: "${SAFEBOX_ALLOWED_WS_RELAYS:-ws://spurline:8080}"
+      SAFEBOX_SERVICE_ACORN_HOME_MINT: "${SAFEBOX_SERVICE_ACORN_HOME_MINT:-http://clear:3339}"
+      SAFEBOX_SERVICE_ACORN_STATE_FILE: "${SAFEBOX_SERVICE_ACORN_STATE_FILE:-data/service-acorn.json}"
+      SAFEBOX_SERVICE_ACORN_GIFT_WRAP_RETENTION_SECONDS: "${SAFEBOX_SERVICE_ACORN_GIFT_WRAP_RETENTION_SECONDS:-604800}"
+      SAFEBOX_NIP57_REQUIRE_DESCRIPTION_HASH: "${SAFEBOX_NIP57_REQUIRE_DESCRIPTION_HASH:-false}"
+      SAFEBOX_CURRENCY_RATES_ENABLED: "${SAFEBOX_CURRENCY_RATES_ENABLED:-false}"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - safebox-web-data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+
   spurline:
     image: ${MAINSTAY_SPURLINE_IMAGE:-mainstay-local-spurline:local}
     build:
@@ -130,6 +234,7 @@ services:
 
 volumes:
   mainstay-local-data:
+  safebox-web-data:
   spurline-data:
   grove-data:
   clear-data:
