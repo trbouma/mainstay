@@ -8,6 +8,9 @@ def render_safebox_env(bundle: BundleConfig) -> str:
     clear = bundle.require_service("clear")
     grove = bundle.require_service("grove")
     spurline = bundle.require_service("spurline")
+    clear_internal = clear.require_url("internal", purpose="mint")
+    grove_internal = grove.require_url("internal", purpose="blossom")
+    spurline_internal = spurline.require_url("internal", purpose="relay")
 
     values = {
         "SAFEBOX_COOKIE_KEY": bundle.secrets.get("safebox_cookie_key", ""),
@@ -16,17 +19,17 @@ def render_safebox_env(bundle: BundleConfig) -> str:
         "SAFEBOX_BIND_ADDRESS": safebox_web.bind_address or "127.0.0.1",
         "SAFEBOX_PORT": str(safebox_web.port or 8000),
         "FORWARDED_ALLOW_IPS": bundle.forwarded_allow_ips,
-        "SAFEBOX_DEFAULT_BOOTSTRAP_RELAY": spurline.local_url,
-        "SAFEBOX_ALLOWED_WS_RELAYS": spurline.local_url,
-        "SAFEBOX_SERVICE_ACORN_HOME_RELAY": spurline.local_url,
-        "SPURLINE_PUBLIC_URL": spurline.advertised_url,
-        "SAFEBOX_DEFAULT_HOME_MINT": clear.local_url,
-        "SAFEBOX_SERVICE_ACORN_HOME_MINT": clear.local_url,
+        "SAFEBOX_DEFAULT_BOOTSTRAP_RELAY": spurline_internal,
+        "SAFEBOX_ALLOWED_WS_RELAYS": spurline_internal,
+        "SAFEBOX_SERVICE_ACORN_HOME_RELAY": spurline_internal,
+        "SPURLINE_PUBLIC_URL": spurline.preferred_url(purpose="relay"),
+        "SAFEBOX_DEFAULT_HOME_MINT": clear_internal,
+        "SAFEBOX_SERVICE_ACORN_HOME_MINT": clear_internal,
         "SAFEBOX_CLEAR_RECEIVE_ENABLED": "true" if clear.enabled else "false",
-        "SAFEBOX_CLEAR_MINTS": clear.local_url if clear.enabled else "",
-        "CLEAR_MINT_URL": clear.advertised_url,
-        "SAFEBOX_BLOSSOM_HOME_SERVER": grove.local_url,
-        "GROVE_PUBLIC_URL": grove.advertised_url,
+        "SAFEBOX_CLEAR_MINTS": clear_internal if clear.enabled else "",
+        "CLEAR_MINT_URL": clear.preferred_url(purpose="mint"),
+        "SAFEBOX_BLOSSOM_HOME_SERVER": grove_internal,
+        "GROVE_PUBLIC_URL": grove.preferred_url(purpose="blossom"),
         "SAFEBOX_CURRENCY_RATES_ENABLED": "false",
         "CLEAR_CURRENCY_NAME": bundle.clear_currency_name,
     }

@@ -5,41 +5,96 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+ENDPOINT_SCOPES = {"internal", "local", "external"}
+LEGACY_PURPOSES = {
+    "app": "web",
+    "clear-mint": "mint",
+    "blossom": "blossom",
+    "nostr-relay": "relay",
+}
+
+
+@dataclass(frozen=True)
+class EndpointAddress:
+    scope: str
+    purpose: str
+    url: str
+    priority: int = 100
+
+    def __post_init__(self) -> None:
+        if self.scope not in ENDPOINT_SCOPES:
+            raise ValueError(f"unsupported endpoint scope: {self.scope}")
+        if not self.purpose:
+            raise ValueError("endpoint purpose must not be empty")
+        if not self.url:
+            raise ValueError("endpoint URL must not be empty")
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> EndpointAddress:
+        return cls(
+            scope=str(data["scope"]),
+            purpose=str(data.get("purpose", "service")),
+            url=str(data["url"]),
+            priority=int(data.get("priority", 100)),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "scope": self.scope,
+            "purpose": self.purpose,
+            "url": self.url,
+            "priority": self.priority,
+        }
+
 
 @dataclass(frozen=True)
 class ServiceEndpoint:
     name: str
     kind: str
-    local_url: str
-    advertised_url: str
+    endpoints: tuple[EndpointAddress, ...]
     enabled: bool = True
     bind_address: str | None = None
     port: int | None = None
     fips_npub: str | None = None
     fips_port: int | None = None
     health_url: str | None = None
+    homepage_url: str | None = None
 
     @classmethod
     def from_dict(cls, name: str, data: dict[str, Any]) -> ServiceEndpoint:
+        endpoint_data = data.get("endpoints")
+        if endpoint_data is None:
+            endpoints = _legacy_endpoints(data)
+        else:
+            if not isinstance(endpoint_data, list):
+                raise ValueError(f"services.{name}.endpoints must be a list")
+            endpoints = tuple(
+                EndpointAddress.from_dict(endpoint)
+                for endpoint in endpoint_data
+                if isinstance(endpoint, dict)
+            )
+            if len(endpoints) != len(endpoint_data):
+                raise ValueError(
+                    f"services.{name}.endpoints entries must be mappings"
+                )
         return cls(
             name=name,
             kind=str(data["kind"]),
-            local_url=str(data["local_url"]),
-            advertised_url=str(data.get("advertised_url") or data["local_url"]),
+            endpoints=endpoints,
             enabled=bool(data.get("enabled", True)),
             bind_address=data.get("bind_address"),
             port=data.get("port"),
             fips_npub=data.get("fips_npub"),
             fips_port=data.get("fips_port"),
             health_url=data.get("health_url"),
+            homepage_url=data.get("homepage_url"),
         )
 
     def to_dict(self) -> dict[str, Any]:
         data: dict[str, Any] = {
             "kind": self.kind,
             "enabled": self.enabled,
-            "local_url": self.local_url,
-            "advertised_url": self.advertised_url,
+            "endpoints": [endpoint.to_dict() for endpoint in self.endpoints],
             "fips_npub": self.fips_npub,
             "fips_port": self.fips_port,
         }
@@ -49,7 +104,66 @@ class ServiceEndpoint:
             data["port"] = self.port
         if self.health_url is not None:
             data["health_url"] = self.health_url
+        if self.homepage_url is not None:
+            data["homepage_url"] = self.homepage_url
         return data
+
+    def url_for(self, scope: str, *, purpose: str | None = None) -> str | None:
+        candidates = [
+            endpoint
+            for endpoint in self.endpoints
+            if endpoint.scope == scope
+            and (purpose is None or endpoint.purpose == purpose)
+        ]
+        if not candidates:
+            return None
+        return min(candidates, key=lambda endpoint: endpoint.priority).url
+
+    def require_url(self, scope: str, *, purpose: str | None = None) -> str:
+        url = self.url_for(scope, purpose=purpose)
+        if url is None:
+            qualifier = f" {purpose}" if purpose else ""
+            raise ValueError(
+                f"service {self.name} has no {scope}{qualifier} endpoint"
+            )
+        return url
+
+    def preferred_url(
+        self,
+        scopes: tuple[str, ...] = ("external", "local", "internal"),
+        *,
+        purpose: str | None = None,
+    ) -> str:
+        for scope in scopes:
+            url = self.url_for(scope, purpose=purpose)
+            if url is not None:
+                return url
+        qualifier = f" {purpose}" if purpose else ""
+        raise ValueError(f"service {self.name} has no{qualifier} endpoint")
+
+
+def _legacy_endpoints(data: dict[str, Any]) -> tuple[EndpointAddress, ...]:
+    endpoints = []
+    purpose = LEGACY_PURPOSES.get(str(data.get("kind")), "service")
+    if data.get("local_url"):
+        endpoints.append(
+            EndpointAddress(
+                scope="internal",
+                purpose=purpose,
+                url=str(data["local_url"]),
+                priority=10,
+            )
+        )
+    if data.get("advertised_url"):
+        endpoints.append(
+            EndpointAddress(
+                scope="local",
+                purpose=purpose,
+                url=str(data["advertised_url"]),
+                priority=20,
+            )
+        )
+    return tuple(endpoints)
 
 
 @dataclass(frozen=True)
@@ -74,33 +188,52 @@ class BundleConfig:
                 "safebox_web": ServiceEndpoint(
                     name="safebox_web",
                     kind="app",
-                    local_url="http://safebox-web:8000",
-                    advertised_url="http://127.0.0.1:8000",
+                    endpoints=(
+                        EndpointAddress(
+                            "internal", "web", "http://safebox-web:8000", 10
+                        ),
+                        EndpointAddress(
+                            "local", "web", "http://127.0.0.1:8000", 20
+                        ),
+                    ),
                     enabled=False,
                     bind_address="127.0.0.1",
                     port=8000,
                     health_url="http://127.0.0.1:8000/health",
+                    homepage_url="http://safebox-web:8000/",
                 ),
                 "clear": ServiceEndpoint(
                     name="clear",
                     kind="clear-mint",
-                    local_url="http://clear:3339",
-                    advertised_url="http://clear:3339",
+                    endpoints=(
+                        EndpointAddress(
+                            "internal", "mint", "http://clear:3339", 10
+                        ),
+                    ),
                     health_url="http://clear:3339/health",
+                    homepage_url="http://clear:3339/",
                 ),
                 "grove": ServiceEndpoint(
                     name="grove",
                     kind="blossom",
-                    local_url="http://grove:8000",
-                    advertised_url="http://grove:8000",
+                    endpoints=(
+                        EndpointAddress(
+                            "internal", "blossom", "http://grove:8000", 10
+                        ),
+                    ),
                     health_url="http://grove:8000/health",
+                    homepage_url="http://grove:8000/",
                 ),
                 "spurline": ServiceEndpoint(
                     name="spurline",
                     kind="nostr-relay",
-                    local_url="ws://spurline:8080",
-                    advertised_url="ws://spurline:8080",
+                    endpoints=(
+                        EndpointAddress(
+                            "internal", "relay", "ws://spurline:8080", 10
+                        ),
+                    ),
                     health_url="http://spurline:8080/health",
+                    homepage_url="http://spurline:8080/",
                 ),
             },
         )

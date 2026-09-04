@@ -34,7 +34,10 @@ poetry run mainstay-local status
 It starts as a thin endpoint registry and lifecycle wrapper. The Mainstay
 Compose project is being assembled one service at a time, beginning with
 Spurline, Grove, and Clear. Safebox Web remains one managed app inside the
-local runtime.
+local runtime. The dashboard checks each enabled service and, when it is
+running, shows a bounded report from its internal homepage. Registry endpoints
+are scoped as `internal`, `local`, or `external`; Safebox dependencies use
+internal endpoints even when a service also publishes another route.
 
 Run the local control-plane HTTP surface directly:
 

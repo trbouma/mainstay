@@ -108,6 +108,12 @@ def render_dashboard(bundle: BundleConfig) -> str:
     .address-label {{ color: var(--muted); }}
     code {{ font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }}
     .service-state {{ display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 13px; }}
+    .service-report {{ grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 14px; }}
+    .service-report summary {{ color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 650; }}
+    .report-grid {{ display: grid; grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1fr); gap: 7px 18px; margin: 14px 0 2px; }}
+    .report-grid dt {{ color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }}
+    .report-grid dd {{ margin: 0; font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }}
+    .report-error {{ margin: 12px 0 0; color: var(--warning); font-size: 12px; }}
     .service[data-enabled="false"] {{ opacity: 0.58; }}
     .detail {{ margin-top: 20px; color: var(--muted); font-size: 12px; }}
     .detail span + span::before {{ content: " / "; color: #a3aaa5; }}
@@ -116,6 +122,8 @@ def render_dashboard(bundle: BundleConfig) -> str:
       .overview {{ align-items: flex-start; flex-direction: column; gap: 12px; }}
       .service {{ grid-template-columns: 1fr; gap: 12px; }}
       .service-state {{ justify-content: flex-start; }}
+      .report-grid {{ grid-template-columns: 1fr; gap: 2px; }}
+      .report-grid dd + dt {{ margin-top: 7px; }}
     }}
   </style>
 </head>
@@ -155,8 +163,8 @@ def render_dashboard(bundle: BundleConfig) -> str:
   </main>
   <script>
     const loopbackHosts = new Set(["127.0.0.1", "localhost", "::1"]);
-    document.querySelectorAll("[data-advertised-url]").forEach((link) => {{
-      const url = new URL(link.dataset.advertisedUrl);
+    document.querySelectorAll("[data-local-url]").forEach((link) => {{
+      const url = new URL(link.dataset.localUrl);
       if (loopbackHosts.has(url.hostname) && !loopbackHosts.has(window.location.hostname)) {{
         url.hostname = window.location.hostname;
         link.href = url.toString();
@@ -180,6 +188,7 @@ def render_dashboard(bundle: BundleConfig) -> str:
           dot.className = `dot ${{result.ok ? "ok" : "error"}}`;
           label.textContent = result.ok ? "Available" : "Unavailable";
           row.title = result.detail || "";
+          renderHomepage(row.querySelector(".service-report"), result.homepage);
         }});
         const healthy = payload.status === "ok";
         bundleDot.className = `dot ${{healthy ? "ok" : "error"}}`;
@@ -193,6 +202,58 @@ def render_dashboard(bundle: BundleConfig) -> str:
       }}
     }}
 
+    function renderHomepage(container, homepage) {{
+      if (!homepage) {{
+        container.hidden = true;
+        return;
+      }}
+      container.hidden = false;
+      const summary = container.querySelector("summary");
+      const report = container.querySelector(".report-content");
+      report.replaceChildren();
+      if (!homepage.ok) {{
+        summary.textContent = "Service report unavailable";
+        const message = document.createElement("p");
+        message.className = "report-error";
+        message.textContent = homepage.detail || "The homepage could not be read.";
+        report.append(message);
+        return;
+      }}
+
+      summary.textContent = "Service report";
+      const fields = flattenReport(homepage.report);
+      const list = document.createElement("dl");
+      list.className = "report-grid";
+      fields.forEach(([name, value]) => {{
+        const term = document.createElement("dt");
+        const description = document.createElement("dd");
+        term.textContent = name;
+        description.textContent = formatReportValue(value);
+        list.append(term, description);
+      }});
+      report.append(list);
+    }}
+
+    function flattenReport(value, prefix = "") {{
+      if (value && typeof value === "object" && !Array.isArray(value)) {{
+        return Object.entries(value).flatMap(([key, child]) => {{
+          const name = prefix ? `${{prefix}}.${{key}}` : key;
+          if (child && typeof child === "object" && !Array.isArray(child)) {{
+            return flattenReport(child, name);
+          }}
+          return [[name, child]];
+        }});
+      }}
+      return [[prefix || "response", value]];
+    }}
+
+    function formatReportValue(value) {{
+      if (value === null) return "null";
+      if (Array.isArray(value)) return value.map(formatReportValue).join(", ");
+      if (typeof value === "object") return JSON.stringify(value);
+      return String(value);
+    }}
+
     refreshStatus();
     window.setInterval(refreshStatus, 15000);
   </script>
@@ -202,16 +263,10 @@ def render_dashboard(bundle: BundleConfig) -> str:
 
 
 def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
-    advertised_url = endpoint.advertised_url
-    advertised = escape(advertised_url)
-    scheme = urlsplit(advertised_url).scheme
-    if scheme in {"http", "https"}:
-        advertised_markup = (
-            f'<a href="{advertised}" data-advertised-url="{advertised}">'
-            f"{advertised}</a>"
-        )
-    else:
-        advertised_markup = f"<code>{advertised}</code>"
+    endpoint_rows = "\n".join(
+        _render_endpoint_address(address.scope, address.url)
+        for address in endpoint.endpoints
+    )
 
     initial_state = "Disabled" if not endpoint.enabled else "Checking"
     return f"""<article class="service" data-service="{escape(name)}" data-enabled="{str(endpoint.enabled).lower()}">
@@ -220,11 +275,31 @@ def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
           <span class="kind">{escape(endpoint.kind)}</span>
         </div>
         <div class="addresses">
-          <div class="address"><span class="address-label">Advertised</span><span>{advertised_markup}</span></div>
-          <div class="address"><span class="address-label">Internal</span><code>{escape(endpoint.local_url)}</code></div>
+          {endpoint_rows}
         </div>
         <div class="service-state"><span class="dot"></span><span class="state-label">{initial_state}</span></div>
+        <details class="service-report" hidden>
+          <summary>Service report</summary>
+          <div class="report-content"></div>
+        </details>
       </article>"""
+
+
+def _render_endpoint_address(scope: str, url: str) -> str:
+    escaped_url = escape(url)
+    scheme = urlsplit(url).scheme
+    if scope in {"local", "external"} and scheme in {"http", "https"}:
+        data_attribute = (
+            f' data-local-url="{escaped_url}"' if scope == "local" else ""
+        )
+        markup = f'<a href="{escaped_url}"{data_attribute}>{escaped_url}</a>'
+    else:
+        markup = f"<code>{escaped_url}</code>"
+    return (
+        '<div class="address">'
+        f'<span class="address-label">{escape(scope.title())}</span>'
+        f"<span>{markup}</span></div>"
+    )
 
 
 def serve(bundle: BundleConfig, *, host: str, port: int) -> None:
@@ -262,6 +337,11 @@ def _handler_for(bundle: BundleConfig) -> type[BaseHTTPRequestHandler]:
                                 "target": result.target,
                                 "ok": result.ok,
                                 "detail": result.detail,
+                                "homepage": (
+                                    result.homepage.to_dict()
+                                    if result.homepage is not None
+                                    else None
+                                ),
                             }
                             for result in results
                         ],

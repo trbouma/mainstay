@@ -110,8 +110,7 @@ The central abstraction `mainstay-local` needs is an endpoint registry. It shoul
 separate:
 
 - service identity;
-- local runtime address;
-- advertised address;
+- scoped internal, local, and external addresses;
 - protocol kind;
 - transport substrate; and
 - authorization policy.
@@ -122,27 +121,47 @@ Sketch:
 services:
   safebox_web:
     kind: app
-    local_url: http://safebox-web:8000
-    advertised_url: http://127.0.0.1:8000
+    endpoints:
+      - scope: internal
+        purpose: web
+        url: http://safebox-web:8000
+        priority: 10
+      - scope: local
+        purpose: web
+        url: http://127.0.0.1:8000
+        priority: 20
+    homepage_url: http://safebox-web:8000/
 
   clear:
     kind: clear-mint
-    local_url: http://clear:3339
-    advertised_url: http://clear:3339
+    endpoints:
+      - scope: internal
+        purpose: mint
+        url: http://clear:3339
+        priority: 10
+    homepage_url: http://clear:3339/
     fips_npub: npub...
     fips_port: 3339
 
   grove:
     kind: blossom
-    local_url: http://grove:8000
-    advertised_url: http://grove:8000
+    endpoints:
+      - scope: internal
+        purpose: blossom
+        url: http://grove:8000
+        priority: 10
+    homepage_url: http://grove:8000/
     fips_npub: npub...
     fips_port: 8000
 
   spurline:
     kind: nostr-relay
-    local_url: ws://spurline:8080
-    advertised_url: ws://spurline:8080
+    endpoints:
+      - scope: internal
+        purpose: relay
+        url: ws://spurline:8080
+        priority: 10
+    homepage_url: http://spurline:8080/
     fips_npub: npub...
     fips_port: 8080
 ```
@@ -152,6 +171,28 @@ Safebox Web currently accepts URLs through environment variables.
 startup. That gives Mainstay room to move from Docker DNS to loopback, LAN,
 Tailscale, `.fips`, FIPS-derived IPv6, or jail-local addresses without
 rewriting Safebox Web routes.
+
+Each endpoint declares a reachability scope. `internal` is private to the
+Mainstay runtime, `local` is deliberately reachable on a trusted host, LAN, or
+VPN, and `external` is intended for access beyond that local environment. The
+dashboard renders only configured scopes. Clear, Grove, and Spurline begin with
+internal endpoints only. Safebox always receives their internal endpoints;
+service-generated routing hints may prefer an explicitly configured external
+or local endpoint while retaining the internal endpoint as a fallback.
+When more than one endpoint has the same scope and purpose, the lowest
+`priority` value is selected first.
+
+Endpoint URLs are locations, not durable service identities. In particular,
+Clear Mint Notes retain their complete keyset ID as the stable CMU identity;
+an endpoint carried in a token remains a routing hint. The registry accepts
+legacy `local_url` and `advertised_url` fields during migration, mapping them to
+`internal` and `local` scopes respectively, but newly generated registries emit
+only scoped endpoints.
+
+The registry also gives the Mainstay dashboard an explicit HTTP homepage to
+inspect. For a running service, the control plane requests JSON when available
+and exposes a bounded, sanitized summary. HTML homepages contribute only title
+and description metadata; Mainstay does not embed service-supplied markup.
 
 In the Docker phase, `spurline` is a network-scoped resolution label, not a
 durable service identity. Mainstay's logical service key remains stable while
@@ -214,7 +255,7 @@ prioritize these Safebox Web changes:
 | Need | Safebox Web change |
 | --- | --- |
 | Local-first defaults | Keep all relay, mint, Blossom, Clear, and provider-worker endpoints configurable by environment |
-| Internal vs advertised addresses | Add explicit support where one URL is used both for service calls and externally embedded references |
+| Endpoint scopes | Keep internal service calls separate from deliberately configured local and external routes |
 | FIPS metadata | Allow endpoint records to carry FIPS npubs and ports beside URLs |
 | Internet independence | Make external conveniences disable cleanly, including fiat rates and public Bitcoin lookups |
 | Operator-generated config | Accept a generated config bundle or env file without product-code changes |
@@ -294,9 +335,9 @@ authorization boundaries.
 
 1. Smoke-test the opt-in Safebox Web profile against Mainstay-managed Spurline,
    Grove, and Clear without changing the standalone deployment.
-2. Refine the existing endpoint registry into a documented schema.
+2. Extend the scoped endpoint registry with authenticated keyset and FIPS discovery.
 3. Inventory Safebox Web locations where one URL currently does double duty as
-   both internal endpoint and advertised endpoint.
+   both an internal endpoint and a local or external routing hint.
 4. Add missing Safebox Web configuration seams before introducing Mainstay
    runtime code.
 5. Build a minimal `mainstay-local config` command that emits a Safebox Web env
