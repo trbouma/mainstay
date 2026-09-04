@@ -13,6 +13,7 @@ home.
 Design notes:
 
 - [mainstay-local Hypervisor and FIPS](docs/LOCAL-FIRST-HYPERVISOR-AND-FIPS-DESIGN-NOTE.md)
+- [Address Spaces, Endpoint Scopes, and FIPS](docs/ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
 
 ## Prototype App
 

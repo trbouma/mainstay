@@ -106,6 +106,9 @@ standalone container.
 
 ## Endpoint Model
 
+The detailed scope and transport rules are defined in
+[Address Spaces, Endpoint Scopes, and FIPS](ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md).
+
 The central abstraction `mainstay-local` needs is an endpoint registry. It should
 separate:
 
