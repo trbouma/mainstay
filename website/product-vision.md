@@ -50,13 +50,14 @@ or synchronization protocols to know what is available and what to do next.
 ```text
 Mainstay is the application.
 Lockbox is the appliance.
-Continuity is the capability.
+There's no place like home.
 ```
 
 Mainstay is the primary user entry point. Lockbox is the preferred integrated
 deployment when durable local operation, appliance simplicity, and
-hardware-backed controls matter. Continuity is the shared capability across
-keys, records, storage, events, and payments.
+hardware-backed controls matter. Continuity is the shared result across keys,
+records, storage, events, and payments: the important things remain close
+enough to use.
 
 ## What Mainstay does not become
 

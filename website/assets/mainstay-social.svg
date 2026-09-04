@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Mainstay</title>
-  <desc id="desc">The Mainstay shelter and waypoint logo with the words Continuity is the capability.</desc>
+  <desc id="desc">The Mainstay shelter and waypoint logo with the words There's no place like home.</desc>
   <rect width="1200" height="630" fill="#edf3ff"/>
   <rect y="610" width="1200" height="20" fill="#e4a53a"/>
   <g transform="translate(118 105) scale(.82)">
@@ -9,5 +9,5 @@
     <path fill="#e4a53a" d="M280 246h96l38 34-38 34h-96z"/>
   </g>
   <text x="575" y="278" fill="#173b78" font-family="Arial, Helvetica, sans-serif" font-size="94" font-weight="700">Mainstay</text>
-  <text x="580" y="356" fill="#2f66d8" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="600">Continuity is the capability.</text>
+  <text x="580" y="356" fill="#2f66d8" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="600">There's no place like home.</text>
 </svg>

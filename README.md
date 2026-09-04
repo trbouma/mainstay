@@ -5,8 +5,8 @@ payments, and community resource coordination. It brings the Safebox, Acorn,
 Stroma, Grove, Spurline, and Clear product family into one coherent experience across
 connected and disrupted conditions.
 
-Mainstay is the application. Lockbox is the appliance. Continuity is the
-capability.
+Mainstay is the application. Lockbox is the appliance. There's no place like
+home.
 
 ## Documentation
 

@@ -1,6 +1,6 @@
 ---
 title: Mainstay
-description: A local-first application for keys, records, payments, and community continuity.
+description: There's no place like home. Mainstay is a local-first application for keys, records, payments, and community continuity.
 ---
 
 <section class="mainstay-hero" markdown>
@@ -9,7 +9,7 @@ description: A local-first application for keys, records, payments, and communit
 
 # Mainstay
 
-<p class="mainstay-tagline">A dependable place for keys, records, payments, and community continuity.</p>
+<p class="mainstay-tagline">There's no place like home.</p>
 
 <p class="mainstay-intro">A unified local-first application that keeps essential information and value available and usable when conditions change.</p>
 
@@ -20,7 +20,7 @@ description: A local-first application for keys, records, payments, and communit
 
 <div class="mainstay-formula" markdown>
 
-**Continuity is the capability.**
+**A dependable place for keys, records, payments, and community continuity.**
 
 </div>
 
