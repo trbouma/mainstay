@@ -65,13 +65,14 @@ mint, the relay, the institutional ledger, or the holder of every authority
 key. It presents and coordinates state preserved by the underlying components
 without claiming that the application itself is the final authority.
 
-Working in conjunction with OpenETR, however, Mainstay can support a system of
-record that needs continuity of its records. OpenETR contributes signed
-evidence about origin, attestation, integrity, transfer, and termination;
-Mainstay keeps that evidence and its associated records understandable and
-available across connected and disrupted conditions. The responsible
-institution, community, or recognized authority still determines what is
-legitimate and authoritative.
+Working in conjunction with OpenETR, however, Mainstay can help an institution
+or community preserve independently verifiable records without making the app
+their source of authority. OpenETR identifies exact Digital Artifacts, preserves
+signed evidence in Digital Controllable Records, and derives consequential
+state under defined rules. Mainstay keeps the artifacts, evidence, and resulting
+state understandable and available when conditions change. The responsible
+institution, community, or relying party still decides whether to recognize
+that state and what practical or legal effect to give it.
 
 That distinction allows the app to evolve without trapping the user. Acorn
 keys and proofs remain portable. Stroma keeps the Nostr wire boundary narrow
