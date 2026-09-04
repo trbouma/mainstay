@@ -84,7 +84,52 @@ services:
       - no-new-privileges:true
     stop_grace_period: 30s
 
+  clear:
+    image: ${MAINSTAY_CLEAR_IMAGE:-mainstay-local-clear:local}
+    build:
+      context: ../clear
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    command:
+      - clear
+      - --host
+      - 0.0.0.0
+      - --port
+      - "3339"
+      - --database
+      - /app/data/clear.sqlite3
+      - --mint-url
+      - "${CLEAR_MINT_URL:-http://clear:3339}"
+      - --log-level
+      - "${CLEAR_LOG_LEVEL:-info}"
+    environment:
+      CLEAR_MASTER_SECRET: "${CLEAR_MASTER_SECRET:?Set CLEAR_MASTER_SECRET in .env}"
+      CLEAR_OPERATOR_TOKEN: "${CLEAR_OPERATOR_TOKEN:?Set CLEAR_OPERATOR_TOKEN in .env}"
+      CLEAR_DATABASE: /app/data/clear.sqlite3
+      CLEAR_MINT_URL: "${CLEAR_MINT_URL:-http://clear:3339}"
+      CLEAR_CURRENCY_NAME: "${CLEAR_CURRENCY_NAME:-Mainstay Local Credits}"
+      CLEAR_CURRENCY_ALIAS: "${CLEAR_CURRENCY_ALIAS:-Local Credits}"
+      CLEAR_CURRENCY_UNIT_ALIAS: "${CLEAR_CURRENCY_UNIT_ALIAS:-credits}"
+      CLEAR_MAX_ORDER: "${CLEAR_MAX_ORDER:-20}"
+      CLEAR_ROOT_AUTHORITY_NPUB: "${CLEAR_ROOT_AUTHORITY_NPUB:-}"
+      CLEAR_ROOT_WALLET: /app/data/clear-root-wallet.json
+      CLEAR_ROOT_API_URL: http://127.0.0.1:3339
+    expose:
+      - "3339"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - clear-data:/app/data
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+
 volumes:
   mainstay-local-data:
   spurline-data:
   grove-data:
+  clear-data:

@@ -33,8 +33,8 @@ poetry run mainstay-local status
 
 It starts as a thin endpoint registry and lifecycle wrapper. The Mainstay
 Compose project is being assembled one service at a time, beginning with
-Spurline and Grove. Safebox Web remains one managed app inside the local
-runtime.
+Spurline, Grove, and Clear. Safebox Web remains one managed app inside the
+local runtime.
 
 Run the local control-plane HTTP surface directly:
 
@@ -59,36 +59,59 @@ poetry run ruff check .
 
 ## Run with Docker
 
-Create `.env` from `.env.example`, then start the local control plane with its
-private Spurline relay and Grove Blossom server. The `spurline` and `grove`
-checkouts must be beside the `mainstay` checkout because Compose builds them
-from sibling directories:
+Create `.env` from `.env.example`, then set `CLEAR_MASTER_SECRET` and
+`CLEAR_OPERATOR_TOKEN` to two independently generated values:
 
 ```bash
 cp .env.example .env
+openssl rand -hex 32
+openssl rand -hex 32
+# Put the two generated values into their corresponding .env entries.
 docker compose up --build --detach
 docker compose ps
 curl http://127.0.0.1:8788/health
 ```
 
-Spurline is reachable by Mainstay containers as `ws://spurline:8080`; Grove is
-reachable as `http://grove:8000`. Neither publishes a host port in the default
-deployment. For direct diagnostics from the Docker host, apply the debug
-overlay:
+The `spurline`, `grove`, and `clear` checkouts must be beside the `mainstay`
+checkout because Compose builds them from sibling directories.
+
+Spurline is reachable by Mainstay containers as `ws://spurline:8080`, Grove as
+`http://grove:8000`, and Clear as `http://clear:3339`. None publishes a host
+port in the default deployment. For direct diagnostics from the Docker host,
+apply the debug overlay:
 
 ```bash
 docker compose -f docker-compose.yaml \
   -f docker-compose.debug-ports.yaml up --build --detach
 curl http://127.0.0.1:8780/health
 curl http://127.0.0.1:8001/health
+curl http://127.0.0.1:3340/health
 ```
 
-The names `spurline` and `grove` are Compose network aliases, not durable
-service identities. Containers and volumes use Compose project-scoped names,
-allowing these instances to coexist with separately deployed containers.
-Grove's debug port does not change its bundle origin or BUD-11 server name.
-Safebox Web and Clear remain registered but disabled until each is added to the
-Mainstay Compose project.
+The names `spurline`, `grove`, and `clear` are Compose network aliases, not
+durable service identities. Containers and volumes use Compose project-scoped
+names, allowing these instances to coexist with separately deployed
+containers. Debug ports do not change Grove's bundle origin or the canonical
+Clear URL encoded into Mint Notes. Safebox Web remains registered but disabled
+until it is added to the Mainstay Compose project.
+
+Mainstay starts Clear in root-bootstrap mode but does not commission it, issue
+Mint Notes, or enable treasury activity. The formal Clear commissioning state
+machine is not implemented yet. Before issuing anything beyond disposable test
+value, choose the canonical `CLEAR_MINT_URL` and optional root authority, then
+preserve the database, `CLEAR_MASTER_SECRET`, and root-authority relationship
+together. Do not change those values to reconnect an existing database.
+
+The image includes the privileged root CLI, which talks only to Clear's
+container loopback interface:
+
+```bash
+docker compose exec clear clear-root info
+docker compose exec clear clear-root wallet balance
+```
+
+Connecting Mainstay to an established external Clear mint is a separate
+registry mode and does not reuse this managed-mint volume.
 
 The Docker default publishes port `8788` on `0.0.0.0` so another trusted
 machine on the LAN or VPN can reach Mainstay Local:

@@ -6,3 +6,7 @@ services:
   grove:
     ports:
       - "${GROVE_DEBUG_BIND_ADDRESS:-127.0.0.1}:${GROVE_DEBUG_PORT:-8001}:8000"
+
+  clear:
+    ports:
+      - "${CLEAR_DEBUG_BIND_ADDRESS:-127.0.0.1}:${CLEAR_DEBUG_PORT:-3340}:3339"

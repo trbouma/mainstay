@@ -86,8 +86,7 @@ class BundleConfig:
                     kind="clear-mint",
                     local_url="http://clear:3339",
                     advertised_url="http://clear:3339",
-                    enabled=False,
-                    health_url="http://127.0.0.1:3339/health",
+                    health_url="http://clear:3339/health",
                 ),
                 "grove": ServiceEndpoint(
                     name="grove",

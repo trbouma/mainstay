@@ -68,8 +68,8 @@ safebox-web/deploy/local-first/
 `mainstay-local` should eventually absorb the orchestration model, not the
 Safebox Web application code.
 
-Mainstay is absorbing that model incrementally. Spurline and Grove are the
-first services in the Mainstay Compose project. Their container ports are
+Mainstay is absorbing that model incrementally. Spurline, Grove, and Clear are
+the first services in the Mainstay Compose project. Their container ports are
 private by default, their data volumes are scoped to the Compose project, and
 an optional overlay publishes loopback diagnostic ports. Existing standalone
 deployments are not joined, renamed, or modified.
@@ -148,6 +148,20 @@ phase, this is both its runtime origin and its BUD-11 authorization server name.
 Publishing `127.0.0.1:8001` through the debug overlay provides host diagnostics
 only; it does not create another advertised Blossom identity. A future gateway
 must update Grove's advertised origin and authorization name together.
+
+Clear runs at `http://clear:3339` inside the Docker phase. This first managed
+profile creates a new root-bootstrap mint from operator-supplied secrets and a
+project-scoped database volume. Mainstay must never silently regenerate
+`CLEAR_MASTER_SECRET`, change `CLEAR_ROOT_AUTHORITY_NPUB`, or attach an existing
+database to different identity inputs. The optional host debug port is not a
+new canonical mint URL and must not be encoded into Mint Notes.
+
+Process health is not commissioning. The current Clear implementation does not
+yet provide the accepted root verification state machine or treasury readiness
+gate. Mainstay may report the process as available, but must not label the mint
+commissioned or enable treasury operations. Connecting to an established mint
+will be a separate external-service registry mode rather than another startup
+path for this managed container.
 
 ## FIPS Direction
 
@@ -263,7 +277,7 @@ authorization boundaries.
 
 1. Continue moving the proven Docker services from
    `safebox-web/deploy/local-first` into Mainstay one at a time; Spurline is the
-   first managed service, followed by Grove.
+   first managed service, followed by Grove and Clear.
 2. Add a `mainstay-local` endpoint-registry document or schema.
 3. Inventory Safebox Web locations where one URL currently does double duty as
    both internal endpoint and advertised endpoint.
