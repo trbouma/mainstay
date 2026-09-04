@@ -68,6 +68,17 @@ docker compose ps
 curl http://127.0.0.1:8788/health
 ```
 
+The Docker default publishes port `8788` on `0.0.0.0` so another trusted
+machine on the LAN or VPN can reach Mainstay Local:
+
+```text
+http://<host-address>:8788/
+http://<host-address>:8788/status
+```
+
+Use a host firewall or VPN ACL when the host has interfaces that should not
+reach the control plane.
+
 On a deployment host, pull, rebuild, recreate, and health-check Mainstay Local
 with:
 

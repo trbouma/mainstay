@@ -23,7 +23,7 @@ services:
       MAINSTAY_LOCAL_PORT: 8788
       MAINSTAY_LOCAL_CONFIG: /app/data/mainstay-local.json
     ports:
-      - "${MAINSTAY_LOCAL_BIND_ADDRESS:-127.0.0.1}:${MAINSTAY_LOCAL_PORT:-8788}:8788"
+      - "${MAINSTAY_LOCAL_BIND_ADDRESS:-0.0.0.0}:${MAINSTAY_LOCAL_PORT:-8788}:8788"
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=16m
