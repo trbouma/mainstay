@@ -18,16 +18,20 @@ description: There's no place like home. Mainstay is a local-first application f
 
 </section>
 
+<figure class="mainstay-home-image">
+  <img src="assets/mainstay-home-refuge-sign.jpg" alt="A welcoming country house with a broad porch, garden, pastoral landscape, and a small Mainstay trail marker">
+</figure>
+
 <div class="mainstay-formula" markdown>
 
 **A dependable place for keys, records, payments, and community continuity.**
 
 </div>
 
-## Cooperative local operations
+## A local-first approach
 
 Mainstay starts with an ordinary need: people should be able to use important
-records, service credits, approvals, and payment capabilities close to where
+records, service credits, approvals, and payment capabilities locally, where
 daily work happens. A community office, resort, campus, co-working facility, or
 local service network may already coordinate members, guests, staff, providers,
 records, and benefits across several tools. Mainstay is intended to give those

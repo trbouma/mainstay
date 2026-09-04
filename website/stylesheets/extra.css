@@ -72,6 +72,18 @@
   line-height: 1.55;
 }
 
+.mainstay-home-image {
+  margin: 0 0 1.5rem;
+}
+
+.mainstay-home-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 847 / 464;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
 .mainstay-formula {
   margin: 0 0 2.5rem;
   padding: 1.2rem;
