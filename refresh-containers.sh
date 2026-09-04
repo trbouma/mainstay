@@ -8,6 +8,8 @@ cd "$repo_dir"
 printf '%s\n' 'Pulling the latest changes...'
 git pull
 
+"$repo_dir/init-env.sh"
+
 printf '%s\n' 'Building the Mainstay Local service images...'
 docker compose build
 

@@ -59,18 +59,22 @@ poetry run ruff check .
 
 ## Run with Docker
 
-Create `.env` from `.env.example`, then set `CLEAR_MASTER_SECRET` and
-`CLEAR_OPERATOR_TOKEN` to two independently generated values:
+Initialize `.env`, then start the local bundle:
 
 ```bash
-cp .env.example .env
-openssl rand -hex 32
-openssl rand -hex 32
-# Put the two generated values into their corresponding .env entries.
+./init-env.sh
 docker compose up --build --detach
 docker compose ps
 curl http://127.0.0.1:8788/health
 ```
+
+`init-env.sh` copies `.env.example` when `.env` is absent and generates
+independent `CLEAR_MASTER_SECRET` and `CLEAR_OPERATOR_TOKEN` values without
+printing them. It also fills those entries in an older `.env` when they are
+missing. The command is idempotent and restricts `.env` to the current user.
+If the project-scoped Clear data volume already exists, it refuses to generate
+a missing master secret; recover the original secret instead of assigning a
+new identity to an existing mint database.
 
 The `spurline`, `grove`, and `clear` checkouts must be beside the `mainstay`
 checkout because Compose builds them from sibling directories. The default
@@ -155,6 +159,10 @@ bundle with:
 ```bash
 ./refresh-containers.sh
 ```
+
+The refresh script runs `init-env.sh` after pulling changes, so a new deployment
+gets its environment automatically and an existing pre-Clear environment gains
+the missing secrets before Compose evaluates the bundle.
 
 Install and preview the MkDocs site locally:
 
