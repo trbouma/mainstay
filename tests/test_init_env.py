@@ -68,13 +68,19 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
     assert result.stdout == "Created .env with generated Mainstay secrets.\n"
     assert len(values["CLEAR_MASTER_SECRET"]) == 64
     assert len(values["CLEAR_OPERATOR_TOKEN"]) == 64
+    assert len(values["CLEAR_MINT_SERVICE_NSEC"]) == 64
     assert len(values["SAFEBOX_COOKIE_KEY"]) == 44
     assert values["SAFEBOX_COOKIE_KEY"].endswith("=")
     assert len(values["SAFEBOX_ONBOARD_INVITE_CODE"]) == 32
     assert values["CLEAR_MASTER_SECRET"] != values["CLEAR_OPERATOR_TOKEN"]
+    assert values["CLEAR_MINT_SERVICE_NSEC"] not in {
+        values["CLEAR_MASTER_SECRET"],
+        values["CLEAR_OPERATOR_TOKEN"],
+    }
     assert stat.S_IMODE(env_file.stat().st_mode) == 0o600
     assert values["CLEAR_MASTER_SECRET"] not in result.stdout
     assert values["CLEAR_OPERATOR_TOKEN"] not in result.stdout
+    assert values["CLEAR_MINT_SERVICE_NSEC"] not in result.stdout
     assert values["SAFEBOX_COOKIE_KEY"] not in result.stdout
     assert values["SAFEBOX_ONBOARD_INVITE_CODE"] not in result.stdout
 
@@ -105,6 +111,7 @@ def test_init_env_refuses_new_cookie_key_for_existing_safebox_volume(
     env_file.write_text(
         "CLEAR_MASTER_SECRET=existing-master\n"
         "CLEAR_OPERATOR_TOKEN=existing-operator\n"
+        "CLEAR_MINT_SERVICE_NSEC=existing-service-key\n"
         "SAFEBOX_COOKIE_KEY=\n"
         "SAFEBOX_ONBOARD_INVITE_CODE=existing-invite\n",
         encoding="utf-8",
@@ -130,6 +137,7 @@ def test_init_env_fills_missing_secrets_in_existing_file(tmp_path: Path) -> None
         "MAINSTAY_LOCAL_PORT=9876\n"
         "CLEAR_MASTER_SECRET=\n"
         "CLEAR_OPERATOR_TOKEN=\n"
+        "CLEAR_MINT_SERVICE_NSEC=\n"
         "SAFEBOX_COOKIE_KEY=\n"
         "SAFEBOX_ONBOARD_INVITE_CODE=\n",
         encoding="utf-8",
@@ -148,6 +156,7 @@ def test_init_env_fills_missing_secrets_in_existing_file(tmp_path: Path) -> None
     assert values["MAINSTAY_LOCAL_PORT"] == "9876"
     assert len(values["CLEAR_MASTER_SECRET"]) == 64
     assert len(values["CLEAR_OPERATOR_TOKEN"]) == 64
+    assert len(values["CLEAR_MINT_SERVICE_NSEC"]) == 64
     assert len(values["SAFEBOX_COOKIE_KEY"]) == 44
     assert len(values["SAFEBOX_ONBOARD_INVITE_CODE"]) == 32
     assert stat.S_IMODE(env_file.stat().st_mode) == 0o600
@@ -169,3 +178,30 @@ def test_init_env_is_idempotent(tmp_path: Path) -> None:
 
     assert result.stdout == ".env already contains the required Mainstay secrets.\n"
     assert env_file.read_text(encoding="utf-8") == original
+
+
+def test_init_env_assigns_first_service_identity_to_existing_clear_volume(
+    tmp_path: Path,
+) -> None:
+    script, environment = _stage_helper(tmp_path)
+    environment["MOCK_CLEAR_VOLUME_EXISTS"] = "1"
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "CLEAR_MASTER_SECRET=existing-master\n"
+        "CLEAR_OPERATOR_TOKEN=existing-operator\n"
+        "SAFEBOX_COOKIE_KEY=existing-cookie\n"
+        "SAFEBOX_ONBOARD_INVITE_CODE=existing-invite\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [str(script)],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    values = _read_env(env_file)
+    assert len(values["CLEAR_MINT_SERVICE_NSEC"]) == 64
+    assert values["CLEAR_MINT_SERVICE_NSEC"] not in result.stdout

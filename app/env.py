@@ -25,6 +25,10 @@ def render_safebox_env(bundle: BundleConfig) -> str:
         "SAFEBOX_ALLOW_INSECURE_HTTP": "true",
         "CLEAR_MASTER_SECRET": bundle.secrets.get("clear_master_secret", ""),
         "CLEAR_OPERATOR_TOKEN": bundle.secrets.get("clear_operator_token", ""),
+        "CLEAR_MINT_SERVICE_NSEC": bundle.secrets.get(
+            "clear_mint_service_nsec", ""
+        ),
+        "CLEAR_MINT_SERVICE_MANAGEMENT": "mainstay-managed",
         "MAINSTAY_SAFEBOX_BIND_ADDRESS": safebox_web.bind_address or "0.0.0.0",
         "MAINSTAY_SAFEBOX_PORT": str(safebox_web.port or 8888),
         "FORWARDED_ALLOW_IPS": bundle.forwarded_allow_ips,

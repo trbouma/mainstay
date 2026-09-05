@@ -188,6 +188,12 @@ docker compose exec clear clear-root info
 docker compose exec clear clear-root wallet balance
 ```
 
+`init-env.sh` also creates `CLEAR_MINT_SERVICE_NSEC`. Clear derives a stable
+mint-service `npub`, records that public identity with its database, and shows
+it in `clear-root info` and the Mainstay service report. The identity starts as
+`uncommissioned`; it is not the currency root and does not yet authorize a
+keyset-to-service binding. Preserve `.env` with the `clear-data` volume.
+
 Connecting Mainstay to an established external Clear mint is a separate
 registry mode and does not reuse this managed-mint volume.
 

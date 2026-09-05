@@ -49,6 +49,10 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('SAFEBOX_BLOSSOM_HOME_SERVER="http://grove:8000"', env)
         self.assertIn('SPURLINE_PUBLIC_URL="ws://spurline:8080"', env)
         self.assertIn('CLEAR_MINT_URL="http://clear:3339"', env)
+        self.assertIn("CLEAR_MINT_SERVICE_NSEC=", env)
+        self.assertIn(
+            'CLEAR_MINT_SERVICE_MANAGEMENT="mainstay-managed"', env
+        )
         self.assertIn('GROVE_PUBLIC_URL="http://grove:8000"', env)
         self.assertIn('CLEAR_CURRENCY_NAME="Mainstay Local Credits"', env)
 
@@ -66,6 +70,7 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('"homepage_url": "http://clear:3339/"', text)
         self.assertIn('"scope": "internal"', text)
         self.assertNotIn('"local_url"', text)
+        self.assertNotIn("secrets", original.to_dict())
 
     def test_spurline_uses_the_private_runtime_namespace(self) -> None:
         bundle = BundleConfig.default()
@@ -104,6 +109,12 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIsNone(clear.url_for("external"))
         self.assertEqual(clear.health_url, "http://clear:3339/health")
         self.assertEqual(clear.homepage_url, "http://clear:3339/")
+
+        compose = (Path(__file__).parents[1] / DEFAULT_COMPOSE_PATH).read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("CLEAR_MINT_SERVICE_NSEC", compose)
+        self.assertIn('CLEAR_MINT_SERVICE_MANAGEMENT: "mainstay-managed"', compose)
 
     def test_grove_uses_the_private_runtime_namespace(self) -> None:
         grove = BundleConfig.default().require_service("grove")

@@ -215,6 +215,8 @@ services:
     environment:
       CLEAR_MASTER_SECRET: "${CLEAR_MASTER_SECRET:?Set CLEAR_MASTER_SECRET in .env}"
       CLEAR_OPERATOR_TOKEN: "${CLEAR_OPERATOR_TOKEN:?Set CLEAR_OPERATOR_TOKEN in .env}"
+      CLEAR_MINT_SERVICE_NSEC: "${CLEAR_MINT_SERVICE_NSEC:?Run ./init-env.sh to generate CLEAR_MINT_SERVICE_NSEC}"
+      CLEAR_MINT_SERVICE_MANAGEMENT: "mainstay-managed"
       CLEAR_DATABASE: /app/data/clear.sqlite3
       CLEAR_MINT_URL: "${CLEAR_MINT_URL:-http://clear:3339}"
       CLEAR_CURRENCY_NAME: "${CLEAR_CURRENCY_NAME:-Mainstay Local Credits}"

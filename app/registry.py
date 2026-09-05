@@ -186,6 +186,7 @@ class BundleConfig:
                 "safebox_onboard_invite_code": "",
                 "clear_master_secret": "",
                 "clear_operator_token": "",
+                "clear_mint_service_nsec": "",
             },
             services={
                 "safebox_web": ServiceEndpoint(

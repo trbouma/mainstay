@@ -31,10 +31,12 @@ read_value() {
 
 master_secret=$(read_value CLEAR_MASTER_SECRET)
 operator_token=$(read_value CLEAR_OPERATOR_TOKEN)
+mint_service_nsec=$(read_value CLEAR_MINT_SERVICE_NSEC)
 cookie_key=$(read_value SAFEBOX_COOKIE_KEY)
 invite_code=$(read_value SAFEBOX_ONBOARD_INVITE_CODE)
 
 if [ -n "$master_secret" ] && [ -n "$operator_token" ] && \
+    [ -n "$mint_service_nsec" ] && \
     [ -n "$cookie_key" ] && [ -n "$invite_code" ]; then
     chmod 600 "$env_file"
     printf '%s\n' '.env already contains the required Mainstay secrets.'
@@ -78,6 +80,10 @@ if [ -z "$operator_token" ]; then
     operator_token=$(openssl rand -hex 32)
 fi
 
+if [ -z "$mint_service_nsec" ]; then
+    mint_service_nsec=$(openssl rand -hex 32)
+fi
+
 if [ -z "$cookie_key" ]; then
     if docker volume inspect "$safebox_volume" >/dev/null 2>&1; then
         printf '%s\n' \
@@ -103,11 +109,13 @@ trap cleanup EXIT HUP INT TERM
 awk \
     -v master_secret="$master_secret" \
     -v operator_token="$operator_token" \
+    -v mint_service_nsec="$mint_service_nsec" \
     -v cookie_key="$cookie_key" \
     -v invite_code="$invite_code" '
     BEGIN {
         found_master = 0
         found_operator = 0
+        found_mint_service = 0
         found_cookie = 0
         found_invite = 0
     }
@@ -122,6 +130,13 @@ awk \
         if (!found_operator) {
             print "CLEAR_OPERATOR_TOKEN=" operator_token
             found_operator = 1
+        }
+        next
+    }
+    /^CLEAR_MINT_SERVICE_NSEC=/ {
+        if (!found_mint_service) {
+            print "CLEAR_MINT_SERVICE_NSEC=" mint_service_nsec
+            found_mint_service = 1
         }
         next
     }
@@ -146,6 +161,9 @@ awk \
         }
         if (!found_operator) {
             print "CLEAR_OPERATOR_TOKEN=" operator_token
+        }
+        if (!found_mint_service) {
+            print "CLEAR_MINT_SERVICE_NSEC=" mint_service_nsec
         }
         if (!found_cookie) {
             print "SAFEBOX_COOKIE_KEY=" cookie_key

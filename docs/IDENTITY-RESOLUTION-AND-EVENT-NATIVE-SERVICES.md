@@ -976,9 +976,11 @@ it as authoritative. No public relay publication, new Nostr event kind, FIPS
 runtime, event-native mint operation, or change to Cashu REST compatibility is
 required for this experiment.
 
-This scope is a future implementation proposal only. The current Mainstay
-bootstrap and service repositories do not yet create or consume these service
-identity variables.
+The first managed Clear identity slice is implemented: Mainstay bootstrap
+creates `CLEAR_MINT_SERVICE_NSEC`, Clear records the derived service `npub` as
+a database sentinel, and the public service metadata reports that identity as
+`uncommissioned`. Root-authorized keyset binding, signed descriptors, Acorn
+resolution, and the remaining service identities are still future work.
 
 ### Success criteria
 
