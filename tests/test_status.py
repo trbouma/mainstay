@@ -60,7 +60,7 @@ class ServiceStatusTests(unittest.TestCase):
             self.assertEqual(timeout, 1.0)
             if isinstance(target, Request):
                 self.assertEqual(target.full_url, service.homepage_url)
-                self.assertIn("application/json", target.get_header("Accept"))
+                self.assertEqual(target.get_header("Accept"), "application/json")
                 return FakeResponse(homepage)
             self.assertEqual(target, service.health_url)
             return FakeResponse()

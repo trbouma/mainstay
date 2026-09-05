@@ -88,7 +88,7 @@ def inspect_homepage(target: str, *, timeout: float) -> HomepageResult:
     request = Request(
         target,
         headers={
-            "Accept": "application/json, text/html;q=0.8",
+            "Accept": "application/json",
             "User-Agent": "mainstay-local",
         },
     )
