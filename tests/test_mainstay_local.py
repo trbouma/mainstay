@@ -38,7 +38,14 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn(
             'MAINSTAY_LIGHTNING_MINT_URL="https://mint.safebox.dev"', env
         )
-        self.assertIn('SAFEBOX_CLEAR_MINTS="http://clear:3339"', env)
+        self.assertIn(
+            'MAINSTAY_EXTERNAL_CLEAR_MINT_URL="https://clear.safebox.dev"',
+            env,
+        )
+        self.assertIn(
+            'SAFEBOX_CLEAR_MINTS="http://clear:3339,https://clear.safebox.dev"',
+            env,
+        )
         self.assertIn('SAFEBOX_BLOSSOM_HOME_SERVER="http://grove:8000"', env)
         self.assertIn('SPURLINE_PUBLIC_URL="ws://spurline:8080"', env)
         self.assertIn('CLEAR_MINT_URL="http://clear:3339"', env)
@@ -51,6 +58,9 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('"name": "mainstay-local"', text)
         self.assertIn(
             '"lightning_mint_url": "https://mint.safebox.dev"', text
+        )
+        self.assertIn(
+            '"external_clear_mint_url": "https://clear.safebox.dev"', text
         )
         self.assertIn('"fips_npub"', text)
         self.assertIn('"homepage_url": "http://clear:3339/"', text)

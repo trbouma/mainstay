@@ -174,6 +174,7 @@ class BundleConfig:
     forwarded_allow_ips: str = "127.0.0.1"
     clear_currency_name: str = "Mainstay Local Credits"
     lightning_mint_url: str = "https://mint.safebox.dev"
+    external_clear_mint_url: str = "https://clear.safebox.dev"
     secrets: dict[str, str] = field(default_factory=dict)
     services: dict[str, ServiceEndpoint] = field(default_factory=dict)
 
@@ -265,6 +266,12 @@ class BundleConfig:
             lightning_mint_url=str(
                 raw.get("lightning_mint_url", "https://mint.safebox.dev")
             ),
+            external_clear_mint_url=str(
+                raw.get(
+                    "external_clear_mint_url",
+                    "https://clear.safebox.dev",
+                )
+            ),
             secrets=dict(raw.get("secrets") or {}),
             services=services,
         )
@@ -277,6 +284,7 @@ class BundleConfig:
             "forwarded_allow_ips": self.forwarded_allow_ips,
             "clear_currency_name": self.clear_currency_name,
             "lightning_mint_url": self.lightning_mint_url,
+            "external_clear_mint_url": self.external_clear_mint_url,
             "secrets": self.secrets,
             "services": {
                 name: endpoint.to_dict()

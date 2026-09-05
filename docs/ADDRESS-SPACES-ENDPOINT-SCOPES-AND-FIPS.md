@@ -113,6 +113,14 @@ services:
         purpose: mint
         url: https://mint.safebox.dev
         priority: 10
+
+  external_clear_mint:
+    kind: clear-mint
+    endpoints:
+      - scope: external
+        purpose: mint
+        url: https://clear.safebox.dev
+        priority: 10
 ```
 
 Lower priority numbers are preferred within the same scope and purpose.
@@ -136,6 +144,13 @@ This rule applies to co-resident dependencies such as Clear, Grove, and
 Spurline. An Acorn's Lightning-backed home mint is a different service class:
 it is external to Mainstay and defaults to `https://mint.safebox.dev`. The
 internal Clear mint appears only in Safebox's Clear-specific configuration.
+
+Mainstay currently supplies `https://clear.safebox.dev` as the default
+external Clear discovery endpoint alongside the managed internal Clear mint.
+Adding this route authorizes Safebox to request its keyset metadata; it does
+not make the URL a currency identity or make different CMUs interchangeable.
+Mainstay must retain every discovered `cmu-<keyset-id>` as a separate balance
+and eventual acceptance decision.
 
 ### Routing hints produced by a service
 
@@ -164,6 +179,47 @@ The dashboard shows only endpoints present in the registry:
 Health and homepage probes are control-plane diagnostics. They currently have
 explicit URLs and normally use the internal runtime namespace. They do not by
 themselves publish a service into the local or external scope.
+
+## Payment Identity and Discovery
+
+Mainstay must keep payment identity separate from payment discovery and
+settlement. An Acorn's Nostr public key is its durable identity. A domain name,
+Lightning address, LNURL endpoint, mint URL, IP address, or FIPS locator is a
+route or discovery hint associated with that identity; none should silently
+replace it.
+
+A local Safebox can receive Lightning payments without advertising a Lightning
+address. It can request an invoice from its configured external
+Lightning-backed mint, present that invoice directly, and let the service Acorn
+complete settlement and recipient delivery. This path depends on the external
+mint but does not require the local Safebox instance to own a public DNS name
+or HTTPS certificate.
+
+A conventional Lightning address is a separate convenience interface. An
+address such as `alice@example.org` requires DNS resolution and an externally
+reachable HTTPS `/.well-known/lnurlp/alice` endpoint. It is useful for
+interoperability with existing wallets, but it introduces domain and
+certificate lifecycle dependencies that are not necessary for local invoice
+receipt. Mainstay should therefore treat a Lightning address as optional
+external discovery metadata, not as the Acorn identity or a prerequisite for
+receiving payments.
+
+Future payment discovery may include several parallel routes:
+
+- a directly presented Lightning invoice;
+- an optional DNS and HTTPS Lightning address;
+- a Nostr request addressed to an Acorn or service `npub`;
+- a FIPS IPv6-adapter route associated with an `npub`; and
+- a native FIPS locator when that application interface is stable.
+
+The current implementation intentionally does not introduce a public Safebox
+base URL or Lightning-address domain setting. Before adding one, the design
+must decide how an advertised payment endpoint is bound to an Acorn or service
+identity, how that binding is verified, and how non-DNS discovery coexists
+with conventional LNURL clients. FIPS is expected to reduce location coupling,
+but it does not by itself redefine the Lightning address protocol or remove
+the need for a compatibility gateway when an ordinary Lightning wallet expects
+DNS and HTTPS.
 
 ## How FIPS Fits
 

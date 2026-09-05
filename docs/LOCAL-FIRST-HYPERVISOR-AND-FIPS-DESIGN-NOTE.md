@@ -157,6 +157,14 @@ services:
         url: https://mint.safebox.dev
         priority: 10
 
+  external_clear_mint:
+    kind: clear-mint
+    endpoints:
+      - scope: external
+        purpose: mint
+        url: https://clear.safebox.dev
+        priority: 10
+
   grove:
     kind: blossom
     endpoints:
@@ -192,6 +200,11 @@ and transfers. A newly created Acorn instead uses the external
 `https://mint.safebox.dev` Cashu mint as its home mint. Mainstay must not put
 the Clear endpoint into `SAFEBOX_DEFAULT_HOME_MINT` or
 `SAFEBOX_SERVICE_ACORN_HOME_MINT`.
+
+Mainstay initially configures `https://clear.safebox.dev` as an external Clear
+discovery endpoint in addition to the managed local mint. One endpoint may
+advertise multiple CMUs, but every complete keyset ID remains an independent
+unit and trust record.
 
 Each endpoint declares a reachability scope. `internal` is private to the
 Mainstay runtime, `local` is deliberately reachable on a trusted host, LAN, or

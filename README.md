@@ -142,6 +142,21 @@ New Acorns use the external Lightning-backed mint at
 `https://mint.safebox.dev`. The project-private Clear endpoint remains
 separate in `SAFEBOX_CLEAR_MINTS`; it is not used as the Acorn home mint.
 
+Safebox also discovers Clear CMUs from the default external mint at
+`https://clear.safebox.dev`. Mainstay supplies both that endpoint and the
+managed `http://clear:3339` endpoint through `SAFEBOX_CLEAR_MINTS`. Configure a
+different external default with `MAINSTAY_EXTERNAL_CLEAR_MINT_URL`. Registering
+the endpoint does not merge its CMUs: balances and trust decisions remain
+bound to each complete `cmu-<keyset-id>`.
+
+Generated Lightning invoices do not require the local Safebox instance to have
+a Lightning address. Conventional Lightning addresses remain optional external
+discovery hints because they require DNS and an HTTPS LNURL endpoint. Mainstay
+treats the Acorn `npub` as the durable identity and leaves room for Nostr and
+FIPS payment discovery without making a domain part of that identity. The open
+design questions are recorded under **Payment Identity and Discovery** in the
+[address-spaces and FIPS note](docs/ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md#payment-identity-and-discovery).
+
 The singleton service-Acorn worker starts with the default bundle. On its first
 successful start it creates a provider Acorn against the internal Spurline
 relay and external Lightning mint, then stores its recovery state as

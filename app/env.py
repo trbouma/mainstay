@@ -9,6 +9,11 @@ def render_safebox_env(bundle: BundleConfig) -> str:
     grove = bundle.require_service("grove")
     spurline = bundle.require_service("spurline")
     clear_internal = clear.require_url("internal", purpose="mint")
+    clear_mints = ",".join(
+        mint
+        for mint in (clear_internal, bundle.external_clear_mint_url)
+        if mint
+    )
     grove_internal = grove.require_url("internal", purpose="blossom")
     spurline_internal = spurline.require_url("internal", purpose="relay")
 
@@ -32,7 +37,8 @@ def render_safebox_env(bundle: BundleConfig) -> str:
         "SAFEBOX_DEFAULT_HOME_MINT": bundle.lightning_mint_url,
         "SAFEBOX_SERVICE_ACORN_HOME_MINT": bundle.lightning_mint_url,
         "SAFEBOX_CLEAR_RECEIVE_ENABLED": "true" if clear.enabled else "false",
-        "SAFEBOX_CLEAR_MINTS": clear_internal if clear.enabled else "",
+        "MAINSTAY_EXTERNAL_CLEAR_MINT_URL": bundle.external_clear_mint_url,
+        "SAFEBOX_CLEAR_MINTS": clear_mints if clear.enabled else "",
         "CLEAR_MINT_URL": clear.preferred_url(purpose="mint"),
         "SAFEBOX_BLOSSOM_HOME_SERVER": grove_internal,
         "GROVE_PUBLIC_URL": grove.preferred_url(purpose="blossom"),
