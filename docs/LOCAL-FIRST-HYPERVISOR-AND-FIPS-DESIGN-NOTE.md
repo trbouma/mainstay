@@ -96,13 +96,15 @@ Safebox Web retains its standalone `docker-compose.yaml` and deployment
 settings. Moving the integration profile into Mainstay does not alter that
 file, its Compose project, its containers, or its persistent volume.
 
-The Mainstay profile is opt-in and uses Mainstay-scoped container and volume
-names. A default `docker compose up` in Mainstay therefore starts only the
-Mainstay control plane and its managed infrastructure. An operator must use
-`--profile safebox-web` or enable Safebox Web in the Mainstay endpoint registry
-before Mainstay creates another instance. Host-port conflicts remain visible
-and fail closed at container startup; Mainstay does not replace a running
-standalone container.
+The Mainstay integration uses Mainstay-scoped container and volume names. A
+default `docker compose up` in Mainstay starts the Mainstay control
+plane, its managed infrastructure, and a Mainstay-owned Safebox Web instance.
+Safebox publishes host port `8888` by default so trusted LAN or VPN clients can
+reach it over explicitly enabled local HTTP and so it can coexist with a
+standalone instance on `8000`. Host-port conflicts remain visible and fail
+closed at container startup; Mainstay does not replace a running standalone
+container or reuse its data volume. The service-Acorn worker remains a separate
+profile while its private Clear URL contract is resolved.
 
 ## Endpoint Model
 
@@ -131,7 +133,7 @@ services:
         priority: 10
       - scope: local
         purpose: web
-        url: http://127.0.0.1:8000
+        url: http://127.0.0.1:8888
         priority: 20
     homepage_url: http://safebox-web:8000/
 

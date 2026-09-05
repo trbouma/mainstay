@@ -181,6 +181,7 @@ class BundleConfig:
         return cls(
             secrets={
                 "safebox_cookie_key": "",
+                "safebox_onboard_invite_code": "",
                 "clear_master_secret": "",
                 "clear_operator_token": "",
             },
@@ -193,13 +194,13 @@ class BundleConfig:
                             "internal", "web", "http://safebox-web:8000", 10
                         ),
                         EndpointAddress(
-                            "local", "web", "http://127.0.0.1:8000", 20
+                            "local", "web", "http://127.0.0.1:8888", 20
                         ),
                     ),
-                    enabled=False,
-                    bind_address="127.0.0.1",
-                    port=8000,
-                    health_url="http://127.0.0.1:8000/health",
+                    enabled=True,
+                    bind_address="0.0.0.0",
+                    port=8888,
+                    health_url="http://safebox-web:8000/health",
                     homepage_url="http://safebox-web:8000/",
                 ),
                 "clear": ServiceEndpoint(

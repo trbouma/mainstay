@@ -166,7 +166,7 @@ def _up(
     env_path: Path,
     detach: bool,
 ) -> int:
-    bundle = BundleConfig.from_json(config_path)
+    BundleConfig.from_json(config_path)
     _config(config_path, env_path)
     command = [
         "docker",
@@ -176,9 +176,6 @@ def _up(
         "-f",
         str(compose_path),
     ]
-    safebox_web = bundle.services.get("safebox_web")
-    if safebox_web is not None and safebox_web.enabled:
-        command.extend(["--profile", "safebox-web"])
     command.extend(["up", "--build"])
     if detach:
         command.append("--detach")

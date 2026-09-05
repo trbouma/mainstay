@@ -181,10 +181,14 @@ transport: fips-ipv6
 url: http://npub1example.fips:3339
 ```
 
-This path minimizes application changes, but it may rely on the FIPS DNS
-adapter to prime the identity cache before traffic reaches `fips0`. The derived
-IPv6 address is an overlay address and should not be mistaken for an ordinary
-public IPv6 route.
+This path minimizes application changes. Resolving the `npub...fips` name
+through the FIPS DNS source is required before traffic is sent to `fips0`. FIPS
+deterministically derives the overlay IPv6 address from the npub and primes its
+local identity cache during that lookup. The translation is local,
+instantaneous, and generates no network or mesh traffic. It is still required
+because the derived IPv6 address alone cannot be reversed to recover the npub
+needed for routing. The resulting address is an overlay address and should not
+be mistaken for an ordinary public IPv6 route.
 
 ### Native FIPS path
 
@@ -296,10 +300,14 @@ Before exposing Clear or Grove beyond one Mainstay instance, decide:
 5. how route changes are discovered and distributed without making DNS the
    permanent identity anchor.
 
+The final point concerns public or infrastructure DNS as an identity anchor.
+It does not remove the required local `.fips` DNS translation used by the FIPS
+IPv6 adapter; that resolver is part of FIPS address preparation rather than an
+external discovery dependency.
+
 ## References
 
 - [FIPS design overview](https://github.com/jmcorgan/fips/blob/master/docs/design/README.md)
 - [FIPS architecture and identity](https://github.com/jmcorgan/fips/blob/master/docs/design/fips-architecture.md)
 - [FIPS IPv6 adapter](https://github.com/jmcorgan/fips/blob/master/docs/design/fips-ipv6-adapter.md)
 - [FIPS native API](https://github.com/jmcorgan/fips/blob/master/docs/design/fips-native-api.md)
-

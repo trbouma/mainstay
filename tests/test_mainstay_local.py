@@ -18,6 +18,10 @@ class MainstayLocalTests(unittest.TestCase):
         env = render_safebox_env(BundleConfig.default())
 
         self.assertIn('SAFEBOX_DEFAULT_BOOTSTRAP_RELAY="ws://spurline:8080"', env)
+        self.assertIn("SAFEBOX_ONBOARD_INVITE_CODE=", env)
+        self.assertIn('SAFEBOX_ALLOW_INSECURE_HTTP="true"', env)
+        self.assertIn('MAINSTAY_SAFEBOX_BIND_ADDRESS="0.0.0.0"', env)
+        self.assertIn('MAINSTAY_SAFEBOX_PORT="8888"', env)
         self.assertIn('SAFEBOX_DEFAULT_HOME_MINT="http://clear:3339"', env)
         self.assertIn('SAFEBOX_BLOSSOM_HOME_SERVER="http://grove:8000"', env)
         self.assertIn('SPURLINE_PUBLIC_URL="ws://spurline:8080"', env)
@@ -47,7 +51,17 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertEqual(spurline.homepage_url, "http://spurline:8080/")
         self.assertIsNone(spurline.url_for("local"))
         self.assertIsNone(spurline.url_for("external"))
-        self.assertFalse(bundle.require_service("safebox_web").enabled)
+        safebox_web = bundle.require_service("safebox_web")
+        self.assertTrue(safebox_web.enabled)
+        self.assertEqual(safebox_web.port, 8888)
+        self.assertEqual(safebox_web.bind_address, "0.0.0.0")
+        self.assertEqual(
+            safebox_web.require_url("local", purpose="web"),
+            "http://127.0.0.1:8888",
+        )
+        self.assertEqual(
+            safebox_web.health_url, "http://safebox-web:8000/health"
+        )
 
     def test_clear_uses_the_private_runtime_namespace(self) -> None:
         clear = BundleConfig.default().require_service("clear")
@@ -118,7 +132,7 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn("&lt;unsafe&gt;", page)
         self.assertIn("app&amp;tool", page)
 
-    def test_up_does_not_enable_safebox_web_by_default(self) -> None:
+    def test_up_uses_the_default_service_set_without_a_profile(self) -> None:
         bundle = BundleConfig.default()
         with (
             patch("app.cli.BundleConfig.from_json", return_value=bundle),
@@ -135,36 +149,6 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertEqual(result, 0)
         command = call.call_args.args[0]
         self.assertNotIn("--profile", command)
-
-    def test_up_enables_safebox_web_only_when_registry_enables_it(self) -> None:
-        original = BundleConfig.default()
-        services = dict(original.services)
-        current = services["safebox_web"]
-        services["safebox_web"] = ServiceEndpoint(
-            name=current.name,
-            kind=current.kind,
-            endpoints=current.endpoints,
-            enabled=True,
-            bind_address=current.bind_address,
-            port=current.port,
-            health_url=current.health_url,
-        )
-        bundle = BundleConfig(services=services)
-        with (
-            patch("app.cli.BundleConfig.from_json", return_value=bundle),
-            patch("app.cli._config"),
-            patch("app.cli.subprocess.call", return_value=0) as call,
-        ):
-            _up(
-                Path("mainstay-local.json"),
-                Path("docker-compose.yaml"),
-                Path("safebox-web.env"),
-                False,
-            )
-
-        command = call.call_args.args[0]
-        self.assertIn("--profile", command)
-        self.assertIn("safebox-web", command)
 
     def test_legacy_registry_urls_migrate_to_scoped_endpoints(self) -> None:
         service = ServiceEndpoint.from_dict(

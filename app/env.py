@@ -14,10 +14,14 @@ def render_safebox_env(bundle: BundleConfig) -> str:
 
     values = {
         "SAFEBOX_COOKIE_KEY": bundle.secrets.get("safebox_cookie_key", ""),
+        "SAFEBOX_ONBOARD_INVITE_CODE": bundle.secrets.get(
+            "safebox_onboard_invite_code", ""
+        ),
+        "SAFEBOX_ALLOW_INSECURE_HTTP": "true",
         "CLEAR_MASTER_SECRET": bundle.secrets.get("clear_master_secret", ""),
         "CLEAR_OPERATOR_TOKEN": bundle.secrets.get("clear_operator_token", ""),
-        "SAFEBOX_BIND_ADDRESS": safebox_web.bind_address or "127.0.0.1",
-        "SAFEBOX_PORT": str(safebox_web.port or 8000),
+        "MAINSTAY_SAFEBOX_BIND_ADDRESS": safebox_web.bind_address or "0.0.0.0",
+        "MAINSTAY_SAFEBOX_PORT": str(safebox_web.port or 8888),
         "FORWARDED_ALLOW_IPS": bundle.forwarded_allow_ips,
         "SAFEBOX_DEFAULT_BOOTSTRAP_RELAY": spurline_internal,
         "SAFEBOX_ALLOWED_WS_RELAYS": spurline_internal,

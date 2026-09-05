@@ -33,9 +33,8 @@ poetry run mainstay-local status
 ```
 
 It starts as a thin endpoint registry and lifecycle wrapper. The Mainstay
-Compose project is being assembled one service at a time, beginning with
-Spurline, Grove, and Clear. Safebox Web remains one managed app inside the
-local runtime. The dashboard checks each enabled service and, when it is
+Compose project's current default set is Spurline, Grove, Clear, and Safebox
+Web. The dashboard checks each enabled service and, when it is
 running, shows a bounded report from its internal homepage. Registry endpoints
 are scoped as `internal`, `local`, or `external`; Safebox dependencies use
 internal endpoints even when a service also publishes another route.
@@ -73,22 +72,26 @@ curl http://127.0.0.1:8788/health
 ```
 
 `init-env.sh` copies `.env.example` when `.env` is absent and generates
-independent `CLEAR_MASTER_SECRET` and `CLEAR_OPERATOR_TOKEN` values without
-printing them. It also fills those entries in an older `.env` when they are
-missing. The command is idempotent and restricts `.env` to the current user.
+independent Clear master/operator secrets, a valid Safebox cookie-encryption
+key, and a private Safebox onboarding invite code without printing them. It
+also fills those entries in an older `.env` when they are missing. The command
+is idempotent and restricts `.env` to the current user.
 If the project-scoped Clear data volume already exists, it refuses to generate
 a missing master secret; recover the original secret instead of assigning a
-new identity to an existing mint database.
+new identity to an existing mint database. It likewise refuses to generate a
+missing cookie key over an existing Safebox data volume, avoiding accidental
+session-key rotation during environment recovery.
 
-The `spurline`, `grove`, and `clear` checkouts must be beside the `mainstay`
-checkout because Compose builds them from sibling directories. The default
-deployment does not start Safebox Web and cannot replace, stop, or alter an
-independently running Safebox Web Compose project.
+The `spurline`, `grove`, `clear`, and `safebox-web` checkouts must be beside the
+`mainstay` checkout because Compose builds them from sibling directories. The default
+deployment starts its own Safebox Web container and cannot replace, stop, or
+alter an independently running Safebox Web Compose project.
 
 Spurline is reachable by Mainstay containers as `ws://spurline:8080`, Grove as
-`http://grove:8000`, and Clear as `http://clear:3339`. None publishes a host
-port in the default deployment. For direct diagnostics from the Docker host,
-apply the debug overlay:
+`http://grove:8000`, and Clear as `http://clear:3339`. None of those
+infrastructure services publishes a host port in the default deployment.
+Safebox Web alone publishes host port `8888`. For direct diagnostics from the
+Docker host, apply the debug overlay:
 
 ```bash
 docker compose -f docker-compose.yaml \
@@ -102,31 +105,43 @@ The names `spurline`, `grove`, and `clear` are Compose network aliases, not
 durable service identities. Containers and volumes use Compose project-scoped
 names, allowing these instances to coexist with separately deployed
 containers. Debug ports do not change Grove's bundle origin or the canonical
-Clear URL encoded into Mint Notes. Safebox Web remains registered but disabled
-until its explicit profile is enabled.
+Clear URL encoded into Mint Notes. Safebox Web is registered as an enabled
+default service.
 
-## Optional Safebox Web Profile
+## Mainstay Safebox Web
 
-Mainstay now owns the local integration bundle, but Safebox Web remains an
-independently deployable application. To test it inside the Mainstay service
-graph, keep the `safebox-web` checkout beside this repository, generate
-`SAFEBOX_COOKIE_KEY`, and deliberately enable the profile:
+Mainstay starts Safebox Web as one app in the local service graph. It publishes
+the Mainstay-owned instance on host port `8888` by default, leaving a
+standalone deployment's usual `8000` port untouched:
 
 ```bash
-python3 -c "import base64,secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"
-docker compose --profile safebox-web up --build --detach
+./init-env.sh
+docker compose up --build --detach
+docker compose ps safebox-web
 ```
 
-Without `--profile safebox-web`, neither `safebox-web` nor
-`service-acorn-worker` is created. The optional profile uses the
-`mainstay-local` Compose project, a separate named volume, and a loopback host
-binding by default. It does not reuse the standalone Safebox Web project's
-container or data volume. Do not enable the profile on a host where its chosen
-`SAFEBOX_PORT` is already occupied; either keep using the independent
-deployment or assign the Mainstay profile another port. If the profile is
-enabled without `SAFEBOX_COOKIE_KEY`, Safebox Web fails closed during startup;
-the unused profile does not make the default Mainstay bundle depend on that
-secret.
+The `mainstay-local` Compose project gives this instance its own container and
+named data volume; it does not reuse a standalone Safebox Web project's state.
+Set `MAINSTAY_SAFEBOX_PORT` to another unused host port if `8888` is occupied.
+
+Safebox Web initializes and migrates its SQLite database during application
+startup. Mainstay bootstrap owns the secrets that must exist first:
+`SAFEBOX_COOKIE_KEY` protects browser sessions and
+`SAFEBOX_ONBOARD_INVITE_CODE` controls the initial onboarding route. Preserve
+`.env` with the Safebox data volume. The generated invite code can be read by
+the operator from `.env`; it is never printed by the helper.
+
+Port `8888` binds to `0.0.0.0`, and Mainstay explicitly enables Safebox's local
+HTTP mode. Another trusted machine can therefore open
+`http://<host-address>:8888/`. This mode uses non-`Secure` session cookies and
+must be limited to a trusted LAN or VPN with a host firewall. Disable
+`SAFEBOX_ALLOW_INSECURE_HTTP` and use a TLS-terminating reverse proxy before
+exposing Safebox across an untrusted network.
+
+The service-Acorn worker is not part of this first web-only start. Its current
+mint URL validation does not yet accept the private Docker name
+`http://clear:3339`; it remains behind the `service-acorn` profile until that
+addressing contract is resolved.
 
 Mainstay starts Clear in root-bootstrap mode but does not commission it, issue
 Mint Notes, or enable treasury activity. The formal Clear commissioning state
@@ -165,8 +180,8 @@ bundle with:
 ```
 
 The refresh script runs `init-env.sh` after pulling changes, so a new deployment
-gets its environment automatically and an existing pre-Clear environment gains
-the missing secrets before Compose evaluates the bundle.
+gets its environment automatically and an older environment gains missing
+Clear and Safebox secrets before Compose evaluates the bundle.
 
 Install and preview the MkDocs site locally:
 
