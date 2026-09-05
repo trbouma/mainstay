@@ -43,7 +43,17 @@ class ServiceStatusTests(unittest.TestCase):
             homepage_url="http://clear:3339/",
         )
         homepage = json.dumps(
-            {"name": "Clear", "currency": {"name": "Mainstay Local Credits"}}
+            {
+                "name": "Clear",
+                "service_identity": {
+                    "npub": "npub1clearservice",
+                    "type": "clear-mint",
+                    "management": "mainstay-managed",
+                    "state": "uncommissioned",
+                    "nsec": "nsec1must-not-escape",
+                },
+                "currency": {"name": "Mainstay Local Credits"},
+            }
         ).encode()
 
         def open_response(target: str | Request, *, timeout: float) -> FakeResponse:
@@ -64,6 +74,16 @@ class ServiceStatusTests(unittest.TestCase):
         self.assertTrue(result.homepage.ok)
         self.assertEqual(result.homepage.format, "json")
         self.assertEqual(result.homepage.report["name"], "Clear")
+        self.assertEqual(
+            result.homepage.report["service_identity"],
+            {
+                "npub": "npub1clearservice",
+                "type": "clear-mint",
+                "management": "mainstay-managed",
+                "state": "uncommissioned",
+            },
+        )
+        self.assertNotIn("nsec", json.dumps(result.homepage.to_dict()))
 
     def test_html_homepage_uses_metadata_without_returning_markup(self) -> None:
         body = b"""<!doctype html><html><head>

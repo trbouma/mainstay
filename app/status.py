@@ -14,6 +14,7 @@ MAX_HOMEPAGE_BYTES = 64 * 1024
 MAX_REPORT_DEPTH = 4
 MAX_REPORT_ITEMS = 24
 MAX_REPORT_STRING = 500
+SERVICE_IDENTITY_FIELDS = ("npub", "type", "management", "state")
 
 
 @dataclass(frozen=True)
@@ -140,10 +141,15 @@ def _normalize_report(value: Any, *, depth: int = 0) -> Any:
         return "..."
     if isinstance(value, dict):
         items = list(value.items())
-        report = {
-            str(key)[:100]: _normalize_report(item, depth=depth + 1)
-            for key, item in items[:MAX_REPORT_ITEMS]
-        }
+        report = {}
+        for key, item in items[:MAX_REPORT_ITEMS]:
+            normalized_key = str(key)[:100]
+            if depth == 0 and normalized_key == "service_identity":
+                report[normalized_key] = _normalize_service_identity(item)
+            else:
+                report[normalized_key] = _normalize_report(
+                    item, depth=depth + 1
+                )
         if len(items) > MAX_REPORT_ITEMS:
             report["_truncated"] = True
         return report
@@ -160,6 +166,20 @@ def _normalize_report(value: Any, *, depth: int = 0) -> Any:
     if value is None or isinstance(value, (bool, int, float)):
         return value
     return str(value)[:MAX_REPORT_STRING]
+
+
+def _normalize_service_identity(value: Any) -> dict[str, str | None]:
+    if not isinstance(value, dict):
+        return {}
+    return {
+        field: (
+            None
+            if value[field] is None
+            else str(value[field])[:MAX_REPORT_STRING]
+        )
+        for field in SERVICE_IDENTITY_FIELDS
+        if field in value
+    }
 
 
 class _HomepageHTMLParser(HTMLParser):

@@ -108,6 +108,10 @@ def render_dashboard(bundle: BundleConfig) -> str:
     .address-label {{ color: var(--muted); }}
     code {{ font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }}
     .service-state {{ display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 13px; }}
+    .service-identity {{ grid-column: 1 / -1; display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; border-top: 1px solid var(--line); padding-top: 14px; }}
+    .service-identity[hidden] {{ display: none; }}
+    .identity-label, .identity-meta {{ color: var(--muted); font-size: 12px; }}
+    .identity-npub {{ min-width: 0; }}
     .service-report {{ grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 14px; }}
     .service-report summary {{ color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 650; }}
     .report-grid {{ display: grid; grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1fr); gap: 7px 18px; margin: 14px 0 2px; }}
@@ -122,6 +126,7 @@ def render_dashboard(bundle: BundleConfig) -> str:
       .overview {{ align-items: flex-start; flex-direction: column; gap: 12px; }}
       .service {{ grid-template-columns: 1fr; gap: 12px; }}
       .service-state {{ justify-content: flex-start; }}
+      .service-identity {{ grid-template-columns: 1fr; gap: 3px; }}
       .report-grid {{ grid-template-columns: 1fr; gap: 2px; }}
       .report-grid dd + dt {{ margin-top: 7px; }}
     }}
@@ -188,6 +193,7 @@ def render_dashboard(bundle: BundleConfig) -> str:
           dot.className = `dot ${{result.ok ? "ok" : "error"}}`;
           label.textContent = result.ok ? "Available" : "Unavailable";
           row.title = result.detail || "";
+          renderIdentity(row.querySelector(".service-identity"), result.homepage);
           renderHomepage(row.querySelector(".service-report"), result.homepage);
         }});
         const healthy = payload.status === "ok";
@@ -200,6 +206,30 @@ def render_dashboard(bundle: BundleConfig) -> str:
         document.getElementById("last-checked").textContent =
           `Checked ${{new Date().toLocaleTimeString([], {{ hour: "2-digit", minute: "2-digit" }})}}`;
       }}
+    }}
+
+    function renderIdentity(container, homepage) {{
+      const identity = homepage?.ok && homepage.report &&
+        typeof homepage.report === "object" && !Array.isArray(homepage.report)
+          ? homepage.report.service_identity
+          : null;
+      const npub = identity && typeof identity.npub === "string"
+        ? identity.npub.trim()
+        : "";
+      if (!npub.startsWith("npub1")) {{
+        container.hidden = true;
+        container.querySelector(".identity-npub").textContent = "";
+        container.querySelector(".identity-meta").textContent = "";
+        return;
+      }}
+      container.hidden = false;
+      const publicKey = container.querySelector(".identity-npub");
+      publicKey.textContent = npub;
+      publicKey.title = npub;
+      container.querySelector(".identity-meta").textContent =
+        [identity.type, identity.management, identity.state]
+          .filter((value) => typeof value === "string" && value.trim())
+          .join(", ");
     }}
 
     function renderHomepage(container, homepage) {{
@@ -221,7 +251,19 @@ def render_dashboard(bundle: BundleConfig) -> str:
       }}
 
       summary.textContent = "Service report";
-      const fields = flattenReport(homepage.report);
+      const reportValue = homepage.report &&
+        typeof homepage.report === "object" && !Array.isArray(homepage.report)
+          ? Object.fromEntries(
+              Object.entries(homepage.report).filter(
+                ([name]) => name !== "service_identity"
+              )
+            )
+          : homepage.report;
+      const fields = flattenReport(reportValue);
+      if (!fields.length) {{
+        container.hidden = true;
+        return;
+      }}
       const list = document.createElement("dl");
       list.className = "report-grid";
       fields.forEach(([name, value]) => {{
@@ -278,6 +320,11 @@ def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
           {endpoint_rows}
         </div>
         <div class="service-state"><span class="dot"></span><span class="state-label">{initial_state}</span></div>
+        <div class="service-identity" hidden>
+          <span class="identity-label">Identity</span>
+          <code class="identity-npub"></code>
+          <span class="identity-meta"></span>
+        </div>
         <details class="service-report" hidden>
           <summary>Service report</summary>
           <div class="report-content"></div>
