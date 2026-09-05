@@ -148,6 +148,14 @@ services:
     fips_npub: npub...
     fips_port: 3339
 
+  lightning_mint:
+    kind: cashu-lightning-mint
+    endpoints:
+      - scope: external
+        purpose: mint
+        url: https://mint.safebox.dev
+        priority: 10
+
   grove:
     kind: blossom
     endpoints:
@@ -176,6 +184,13 @@ Safebox Web currently accepts URLs through environment variables.
 startup. That gives Mainstay room to move from Docker DNS to loopback, LAN,
 Tailscale, `.fips`, FIPS-derived IPv6, or jail-local addresses without
 rewriting Safebox Web routes.
+
+Clear and Lightning-backed Cashu mints are separate service classes. Mainstay
+provides Clear at the internal `http://clear:3339` endpoint for Clear balances
+and transfers. A newly created Acorn instead uses the external
+`https://mint.safebox.dev` Cashu mint as its home mint. Mainstay must not put
+the Clear endpoint into `SAFEBOX_DEFAULT_HOME_MINT` or
+`SAFEBOX_SERVICE_ACORN_HOME_MINT`.
 
 Each endpoint declares a reachability scope. `internal` is private to the
 Mainstay runtime, `local` is deliberately reachable on a trusted host, LAN, or

@@ -105,10 +105,14 @@ services:
         purpose: mint
         url: http://clear:3339
         priority: 10
+
+  lightning_mint:
+    kind: cashu-lightning-mint
+    endpoints:
       - scope: external
         purpose: mint
         url: https://mint.safebox.dev
-        priority: 30
+        priority: 10
 ```
 
 Lower priority numbers are preferred within the same scope and purpose.
@@ -127,6 +131,11 @@ Mainstay selects endpoints according to the caller and purpose.
 Safebox and other services inside the bundle must use an endpoint with
 `scope: internal`. Mainstay must not silently replace it with a local or
 external route merely because that route has a lower numeric priority.
+
+This rule applies to co-resident dependencies such as Clear, Grove, and
+Spurline. An Acorn's Lightning-backed home mint is a different service class:
+it is external to Mainstay and defaults to `https://mint.safebox.dev`. The
+internal Clear mint appears only in Safebox's Clear-specific configuration.
 
 ### Routing hints produced by a service
 

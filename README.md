@@ -138,15 +138,13 @@ must be limited to a trusted LAN or VPN with a host firewall. Disable
 `SAFEBOX_ALLOW_INSECURE_HTTP` and use a TLS-terminating reverse proxy before
 exposing Safebox across an untrusted network.
 
-Mainstay also enables `SAFEBOX_ALLOW_INSECURE_MINTS` so a newly created Acorn
-can use the project-private Clear endpoint at `http://clear:3339`. This is
-separate from browser HTTP permission and should remain limited to the managed
-local network.
+New Acorns use the external Lightning-backed mint at
+`https://mint.safebox.dev`. The project-private Clear endpoint remains
+separate in `SAFEBOX_CLEAR_MINTS`; it is not used as the Acorn home mint.
 
-The service-Acorn worker is not part of this first web-only start. Its current
-mint URL validation does not yet accept the private Docker name
-`http://clear:3339`; it remains behind the `service-acorn` profile until that
-addressing contract is resolved.
+The service-Acorn worker is not part of this first web-only start. It remains
+behind the `service-acorn` profile until Mainstay explicitly commissions that
+provider role.
 
 Mainstay starts Clear in root-bootstrap mode but does not commission it, issue
 Mint Notes, or enable treasury activity. The formal Clear commissioning state

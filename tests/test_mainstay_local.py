@@ -20,10 +20,15 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('SAFEBOX_DEFAULT_BOOTSTRAP_RELAY="ws://spurline:8080"', env)
         self.assertIn("SAFEBOX_ONBOARD_INVITE_CODE=", env)
         self.assertIn('SAFEBOX_ALLOW_INSECURE_HTTP="true"', env)
-        self.assertIn('SAFEBOX_ALLOW_INSECURE_MINTS="true"', env)
         self.assertIn('MAINSTAY_SAFEBOX_BIND_ADDRESS="0.0.0.0"', env)
         self.assertIn('MAINSTAY_SAFEBOX_PORT="8888"', env)
-        self.assertIn('SAFEBOX_DEFAULT_HOME_MINT="http://clear:3339"', env)
+        self.assertIn(
+            'SAFEBOX_DEFAULT_HOME_MINT="https://mint.safebox.dev"', env
+        )
+        self.assertIn(
+            'MAINSTAY_LIGHTNING_MINT_URL="https://mint.safebox.dev"', env
+        )
+        self.assertIn('SAFEBOX_CLEAR_MINTS="http://clear:3339"', env)
         self.assertIn('SAFEBOX_BLOSSOM_HOME_SERVER="http://grove:8000"', env)
         self.assertIn('SPURLINE_PUBLIC_URL="ws://spurline:8080"', env)
         self.assertIn('CLEAR_MINT_URL="http://clear:3339"', env)
@@ -34,6 +39,9 @@ class MainstayLocalTests(unittest.TestCase):
         original = BundleConfig.default()
         text = original.to_json()
         self.assertIn('"name": "mainstay-local"', text)
+        self.assertIn(
+            '"lightning_mint_url": "https://mint.safebox.dev"', text
+        )
         self.assertIn('"fips_npub"', text)
         self.assertIn('"homepage_url": "http://clear:3339/"', text)
         self.assertIn('"scope": "internal"', text)
@@ -171,7 +179,7 @@ class MainstayLocalTests(unittest.TestCase):
         )
         self.assertNotIn("local_url", service.to_dict())
 
-    def test_external_clear_hint_does_not_change_safebox_internal_url(self) -> None:
+    def test_external_clear_hint_does_not_replace_the_lightning_mint(self) -> None:
         original = BundleConfig.default()
         services = dict(original.services)
         clear = services["clear"]
@@ -181,7 +189,7 @@ class MainstayLocalTests(unittest.TestCase):
             endpoints=clear.endpoints
             + (
                 EndpointAddress(
-                    "external", "mint", "https://mint.safebox.dev", 30
+                    "external", "mint", "https://clear.example", 30
                 ),
             ),
             health_url=clear.health_url,
@@ -190,8 +198,10 @@ class MainstayLocalTests(unittest.TestCase):
 
         env = render_safebox_env(BundleConfig(services=services))
 
-        self.assertIn('SAFEBOX_DEFAULT_HOME_MINT="http://clear:3339"', env)
-        self.assertIn('CLEAR_MINT_URL="https://mint.safebox.dev"', env)
+        self.assertIn(
+            'SAFEBOX_DEFAULT_HOME_MINT="https://mint.safebox.dev"', env
+        )
+        self.assertIn('CLEAR_MINT_URL="https://clear.example"', env)
 
     def test_endpoint_priority_selects_the_lowest_value_within_a_scope(self) -> None:
         service = ServiceEndpoint(
