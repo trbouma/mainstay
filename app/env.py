@@ -26,6 +26,7 @@ def render_safebox_env(bundle: BundleConfig) -> str:
         "SAFEBOX_DEFAULT_BOOTSTRAP_RELAY": spurline_internal,
         "SAFEBOX_ALLOWED_WS_RELAYS": spurline_internal,
         "SAFEBOX_SERVICE_ACORN_HOME_RELAY": spurline_internal,
+        "SAFEBOX_SERVICE_ACORN_ENABLED": "true",
         "SPURLINE_PUBLIC_URL": spurline.preferred_url(purpose="relay"),
         "MAINSTAY_LIGHTNING_MINT_URL": bundle.lightning_mint_url,
         "SAFEBOX_DEFAULT_HOME_MINT": bundle.lightning_mint_url,

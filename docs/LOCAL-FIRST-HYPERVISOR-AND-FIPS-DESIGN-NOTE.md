@@ -103,8 +103,9 @@ Safebox publishes host port `8888` by default so trusted LAN or VPN clients can
 reach it over explicitly enabled local HTTP and so it can coexist with a
 standalone instance on `8000`. Host-port conflicts remain visible and fail
 closed at container startup; Mainstay does not replace a running standalone
-container or reuse its data volume. The service-Acorn worker remains a separate
-profile while its private Clear URL contract is resolved.
+container or reuse its data volume. The singleton service-Acorn worker runs as
+a separate process in the default bundle and retains its identity in the
+Mainstay-scoped Safebox volume.
 
 ## Endpoint Model
 

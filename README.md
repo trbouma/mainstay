@@ -142,9 +142,19 @@ New Acorns use the external Lightning-backed mint at
 `https://mint.safebox.dev`. The project-private Clear endpoint remains
 separate in `SAFEBOX_CLEAR_MINTS`; it is not used as the Acorn home mint.
 
-The service-Acorn worker is not part of this first web-only start. It remains
-behind the `service-acorn` profile until Mainstay explicitly commissions that
-provider role.
+The singleton service-Acorn worker starts with the default bundle. On its first
+successful start it creates a provider Acorn against the internal Spurline
+relay and external Lightning mint, then stores its recovery state as
+`/app/data/service-acorn.json` in the project-scoped Safebox volume. Routine
+restarts recover that same identity. Do not delete or replace the state file
+without draining provider obligations and deliberately retiring the worker.
+
+Inspect its startup and retained public identity with:
+
+```bash
+docker compose ps service-acorn-worker
+docker compose logs service-acorn-worker
+```
 
 Mainstay starts Clear in root-bootstrap mode but does not commission it, issue
 Mint Notes, or enable treasury activity. The formal Clear commissioning state
@@ -184,7 +194,9 @@ bundle with:
 
 The refresh script runs `init-env.sh` after pulling changes, so a new deployment
 gets its environment automatically and an older environment gains missing
-Clear and Safebox secrets before Compose evaluates the bundle.
+Clear and Safebox secrets before Compose evaluates the bundle. It waits for
+both the managed HTTP status check and the service Acorn's persisted
+initialization state.
 
 Install and preview the MkDocs site locally:
 

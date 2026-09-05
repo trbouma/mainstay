@@ -36,3 +36,28 @@ do
 done
 
 printf '%s\n' 'Managed service status check passed: status=ok'
+
+printf '%s\n' 'Waiting for the service Acorn worker to initialize...'
+attempt=1
+while :
+do
+    worker_id=$(docker compose ps -q service-acorn-worker)
+    worker_health=$(
+        docker inspect --format '{{.State.Health.Status}}' "$worker_id" \
+            2>/dev/null || true
+    )
+    if [ "$worker_health" = "healthy" ]; then
+        break
+    fi
+    if [ "$attempt" -ge "$max_attempts" ]; then
+        printf '%s\n' \
+            'Service Acorn worker did not initialize within 60 seconds.' >&2
+        docker compose ps >&2
+        docker compose logs --tail 50 service-acorn-worker >&2
+        exit 1
+    fi
+    attempt=$((attempt + 1))
+    sleep 2
+done
+
+printf '%s\n' 'Service Acorn worker initialized and healthy.'

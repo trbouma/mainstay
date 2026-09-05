@@ -14,12 +14,22 @@ class MainstayLocalTests(unittest.TestCase):
     def test_compose_is_owned_by_mainstay(self) -> None:
         self.assertEqual(DEFAULT_COMPOSE_PATH, Path("docker-compose.yaml"))
 
+    def test_service_acorn_worker_is_in_the_default_compose_bundle(self) -> None:
+        compose = (Path(__file__).parents[1] / DEFAULT_COMPOSE_PATH).read_text(
+            encoding="utf-8"
+        )
+
+        self.assertNotIn('profiles: ["service-acorn"]', compose)
+        self.assertIn('SAFEBOX_SERVICE_ACORN_ENABLED: "true"', compose)
+        self.assertIn("service-acorn.json", compose)
+
     def test_default_registry_renders_safebox_env(self) -> None:
         env = render_safebox_env(BundleConfig.default())
 
         self.assertIn('SAFEBOX_DEFAULT_BOOTSTRAP_RELAY="ws://spurline:8080"', env)
         self.assertIn("SAFEBOX_ONBOARD_INVITE_CODE=", env)
         self.assertIn('SAFEBOX_ALLOW_INSECURE_HTTP="true"', env)
+        self.assertIn('SAFEBOX_SERVICE_ACORN_ENABLED="true"', env)
         self.assertIn('MAINSTAY_SAFEBOX_BIND_ADDRESS="0.0.0.0"', env)
         self.assertIn('MAINSTAY_SAFEBOX_PORT="8888"', env)
         self.assertIn(
