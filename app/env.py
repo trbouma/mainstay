@@ -18,6 +18,7 @@ def render_safebox_env(bundle: BundleConfig) -> str:
             "safebox_onboard_invite_code", ""
         ),
         "SAFEBOX_ALLOW_INSECURE_HTTP": "true",
+        "SAFEBOX_ALLOW_INSECURE_MINTS": "true",
         "CLEAR_MASTER_SECRET": bundle.secrets.get("clear_master_secret", ""),
         "CLEAR_OPERATOR_TOKEN": bundle.secrets.get("clear_operator_token", ""),
         "MAINSTAY_SAFEBOX_BIND_ADDRESS": safebox_web.bind_address or "0.0.0.0",

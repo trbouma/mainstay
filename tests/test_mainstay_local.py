@@ -20,6 +20,7 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('SAFEBOX_DEFAULT_BOOTSTRAP_RELAY="ws://spurline:8080"', env)
         self.assertIn("SAFEBOX_ONBOARD_INVITE_CODE=", env)
         self.assertIn('SAFEBOX_ALLOW_INSECURE_HTTP="true"', env)
+        self.assertIn('SAFEBOX_ALLOW_INSECURE_MINTS="true"', env)
         self.assertIn('MAINSTAY_SAFEBOX_BIND_ADDRESS="0.0.0.0"', env)
         self.assertIn('MAINSTAY_SAFEBOX_PORT="8888"', env)
         self.assertIn('SAFEBOX_DEFAULT_HOME_MINT="http://clear:3339"', env)
