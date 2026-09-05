@@ -14,6 +14,8 @@ Design notes:
 
 - [mainstay-local Hypervisor and FIPS](docs/LOCAL-FIRST-HYPERVISOR-AND-FIPS-DESIGN-NOTE.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](docs/ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
+- [Identity, Resolution, and Event-Native Services](docs/IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
+- [Local Clear Transactions](docs/LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md)
 
 ## Prototype App
 

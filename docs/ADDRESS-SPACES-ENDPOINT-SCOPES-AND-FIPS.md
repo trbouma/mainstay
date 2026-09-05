@@ -13,6 +13,10 @@ The central rule is:
 
 Internal, local, and external are scopes. HTTP, WebSocket, IPv4, IPv6, DNS, and
 FIPS are transports or locator forms. These dimensions must remain separate.
+The companion
+[identity and event-native services note](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
+defines how stable identifiers resolve to service identities and how those
+identities advertise capabilities over these scoped routes.
 
 ## Why Separate Identity and Address
 
@@ -151,6 +155,38 @@ Adding this route authorizes Safebox to request its keyset metadata; it does
 not make the URL a currency identity or make different CMUs interchangeable.
 Mainstay must retain every discovered `cmu-<keyset-id>` as a separate balance
 and eventual acceptance decision.
+
+### Internal Clear with external token acceptance
+
+The managed Clear mint remains internal at `http://clear:3339`. Safebox Web's
+server-side Acorn can use that route even when a browser reaches Safebox over a
+LAN or VPN; the Clear container does not need to publish a host port. The same
+wallet may hold CMUs from an external mint such as
+`https://clear.safebox.dev`, using that mint's external route for validation
+and refresh.
+
+This does not make the two mints interchangeable. Incoming tokens expose a
+complete keyset ID, CMU, and advisory mint URL. The target resolver maps the
+keyset ID to an approved mint-service identity and then selects an endpoint
+appropriate to the caller's scope. Local keysets route internally; external
+keysets route to their verified external service. Balances remain separated by
+complete keyset identity.
+
+The current `SAFEBOX_CLEAR_MINTS` list is a transitional combination of
+receive-advertisement restriction and controlled metadata endpoints. It must
+eventually split into trust, identity resolution, routing, and audience-aware
+advertisement policy. An externally visible capability document must not leak
+`http://clear:3339`, and a token's mint URL must not by itself authorize an
+arbitrary outbound request.
+
+The detailed identity and acceptance flow is specified in
+[Mainstay Identity, Resolution, and Event-Native Services](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md#internal-mint-and-external-token-acceptance).
+
+Implementation should begin with the internal half only: two local Acorn
+identities transfer one commissioned local CMU through internal Spurline and
+refresh it through internal Clear. The focused profile is defined in
+[Local Clear Transactions](LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md). External
+token acceptance remains a separate follow-on profile.
 
 ### Routing hints produced by a service
 
