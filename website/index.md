@@ -19,7 +19,7 @@ description: There's no place like home. Mainstay is a local-first application f
 </section>
 
 <figure class="mainstay-home-image">
-  <img src="assets/mainstay-home-refuge-sign.jpg" alt="A welcoming country house with a broad porch, garden, pastoral landscape, and a small Mainstay trail marker">
+  <img src="assets/mainstay-community-resort.jpg" alt="A welcoming coastal resort community beside a mountain inlet, with shared paths, gathering places, and a small Mainstay trail marker">
 </figure>
 
 <div class="mainstay-formula" markdown>
