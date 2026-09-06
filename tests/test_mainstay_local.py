@@ -23,6 +23,18 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('SAFEBOX_SERVICE_ACORN_ENABLED: "true"', compose)
         self.assertIn("service-acorn.json", compose)
 
+    def test_component_images_use_remote_git_build_contexts(self) -> None:
+        compose = (Path(__file__).parents[1] / DEFAULT_COMPOSE_PATH).read_text(
+            encoding="utf-8"
+        )
+
+        for repository in ("safebox-web", "spurline", "grove", "clear"):
+            self.assertIn(
+                f"https://github.com/trbouma/{repository}.git#main",
+                compose,
+            )
+        self.assertNotIn("context: ../", compose)
+
     def test_default_registry_renders_safebox_env(self) -> None:
         env = render_safebox_env(BundleConfig.default())
 

@@ -84,10 +84,14 @@ new identity to an existing mint database. It likewise refuses to generate a
 missing cookie key over an existing Safebox data volume, avoiding accidental
 session-key rotation during environment recovery.
 
-The `spurline`, `grove`, `clear`, and `safebox-web` checkouts must be beside the
-`mainstay` checkout because Compose builds them from sibling directories. The default
-deployment starts its own Safebox Web container and cannot replace, stop, or
-alter an independently running Safebox Web Compose project.
+Mainstay builds `spurline`, `grove`, `clear`, and `safebox-web` directly from
+their GitHub `main` branches, so their repositories do not need to be checked
+out beside Mainstay. The build-context variables in `.env.example` can instead
+select a tag, commit, fork, or local checkout when a deployment needs an exact
+version or development source. Remote builds require GitHub access while the
+images are being built but add no GitHub dependency to the running containers.
+The default deployment starts its own Safebox Web container and cannot replace,
+stop, or alter an independently running Safebox Web Compose project.
 
 Spurline is reachable by Mainstay containers as `ws://spurline:8080`, Grove as
 `http://grove:8000`, and Clear as `http://clear:3339`. None of those

@@ -10,7 +10,7 @@ git pull
 
 "$repo_dir/init-env.sh"
 
-printf '%s\n' 'Building the Mainstay Local service images...'
+printf '%s\n' 'Building the Mainstay Local service images from configured contexts...'
 docker compose build
 
 printf '%s\n' 'Recreating the Mainstay Local service bundle...'

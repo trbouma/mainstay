@@ -35,7 +35,7 @@ services:
   safebox-web:
     image: ${SAFEBOX_IMAGE:-safebox-web:local}
     build:
-      context: ../safebox-web
+      context: "${MAINSTAY_SAFEBOX_BUILD_CONTEXT:-https://github.com/trbouma/safebox-web.git#main}"
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
@@ -144,7 +144,7 @@ services:
   spurline:
     image: ${MAINSTAY_SPURLINE_IMAGE:-mainstay-local-spurline:local}
     build:
-      context: ../spurline
+      context: "${MAINSTAY_SPURLINE_BUILD_CONTEXT:-https://github.com/trbouma/spurline.git#main}"
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
@@ -170,7 +170,7 @@ services:
   grove:
     image: ${MAINSTAY_GROVE_IMAGE:-mainstay-local-grove:local}
     build:
-      context: ../grove
+      context: "${MAINSTAY_GROVE_BUILD_CONTEXT:-https://github.com/trbouma/grove.git#main}"
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
@@ -196,7 +196,7 @@ services:
   clear:
     image: ${MAINSTAY_CLEAR_IMAGE:-mainstay-local-clear:local}
     build:
-      context: ../clear
+      context: "${MAINSTAY_CLEAR_BUILD_CONTEXT:-https://github.com/trbouma/clear.git#main}"
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
