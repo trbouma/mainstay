@@ -177,6 +177,18 @@ different external default with `MAINSTAY_EXTERNAL_CLEAR_MINT_URL`. Registering
 the endpoint does not merge its CMUs: balances and trust decisions remain
 bound to each complete `cmu-<keyset-id>`.
 
+For cross-Mainstay token delivery, configure an externally reachable relay as
+the public NIP-05 discovery hint while retaining the private Spurline address as
+the wallet home relay:
+
+```env
+SAFEBOX_SERVICE_ACORN_HOME_RELAY=ws://spurline:8080
+SAFEBOX_NIP05_EXTERNAL_RELAYS=wss://spurline.safebox.dev
+```
+
+The external value is forwarded only to Safebox Web. It must not replace the
+internal home relay used by wallets and the service Acorn inside Mainstay.
+
 Generated Lightning invoices do not require the local Safebox instance to have
 a Lightning address. Conventional Lightning addresses remain optional external
 discovery hints because they require DNS and an HTTPS LNURL endpoint. Mainstay

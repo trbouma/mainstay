@@ -21,6 +21,10 @@ class MainstayLocalTests(unittest.TestCase):
 
         self.assertNotIn('profiles: ["service-acorn"]', compose)
         self.assertIn('SAFEBOX_SERVICE_ACORN_ENABLED: "true"', compose)
+        self.assertIn(
+            'SAFEBOX_NIP05_EXTERNAL_RELAYS: "${SAFEBOX_NIP05_EXTERNAL_RELAYS:-}"',
+            compose,
+        )
         self.assertIn("service-acorn.json", compose)
 
     def test_component_images_use_remote_git_build_contexts(self) -> None:
