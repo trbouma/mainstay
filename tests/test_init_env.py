@@ -65,7 +65,9 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
 
     env_file = tmp_path / ".env"
     values = _read_env(env_file)
-    assert result.stdout == "Created .env with generated Mainstay secrets.\n"
+    assert result.stdout.startswith("Created .env with generated Mainstay secrets.\n")
+    assert "operator-funded service-Acorn fee reserve" in result.stdout
+    assert "app.service_acorn_worker fund 100" in result.stdout
     assert len(values["CLEAR_MASTER_SECRET"]) == 64
     assert len(values["CLEAR_OPERATOR_TOKEN"]) == 64
     assert len(values["CLEAR_MINT_SERVICE_NSEC"]) == 64
@@ -152,7 +154,8 @@ def test_init_env_fills_missing_secrets_in_existing_file(tmp_path: Path) -> None
     )
 
     values = _read_env(env_file)
-    assert result.stdout == "Added missing Mainstay secrets to .env.\n"
+    assert result.stdout.startswith("Added missing Mainstay secrets to .env.\n")
+    assert "operator-funded service-Acorn fee reserve" in result.stdout
     assert values["MAINSTAY_LOCAL_PORT"] == "9876"
     assert len(values["CLEAR_MASTER_SECRET"]) == 64
     assert len(values["CLEAR_OPERATOR_TOKEN"]) == 64
@@ -176,7 +179,10 @@ def test_init_env_is_idempotent(tmp_path: Path) -> None:
         env=environment,
     )
 
-    assert result.stdout == ".env already contains the required Mainstay secrets.\n"
+    assert result.stdout.startswith(
+        ".env already contains the required Mainstay secrets.\n"
+    )
+    assert "operator-funded service-Acorn fee reserve" in result.stdout
     assert env_file.read_text(encoding="utf-8") == original
 
 

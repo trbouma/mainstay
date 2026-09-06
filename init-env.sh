@@ -8,6 +8,13 @@ example_file="$repo_dir/.env.example"
 clear_volume="mainstay-local_clear-data"
 safebox_volume="mainstay-local_safebox-web-data"
 
+print_reserve_advisory() {
+    printf '%s\n' \
+        'ADVISORY: Lightning-address delivery requires an operator-funded service-Acorn fee reserve.'
+    printf '%s\n' \
+        'After first startup, stop the worker and run: docker compose run --rm --no-deps service-acorn-worker python -m app.service_acorn_worker fund 100'
+}
+
 if [ ! -f "$example_file" ]; then
     printf '%s\n' "Missing environment template: $example_file" >&2
     exit 1
@@ -40,6 +47,7 @@ if [ -n "$master_secret" ] && [ -n "$operator_token" ] && \
     [ -n "$cookie_key" ] && [ -n "$invite_code" ]; then
     chmod 600 "$env_file"
     printf '%s\n' '.env already contains the required Mainstay secrets.'
+    print_reserve_advisory
     exit 0
 fi
 
@@ -183,3 +191,4 @@ if [ "$created" = true ]; then
 else
     printf '%s\n' 'Added missing Mainstay secrets to .env.'
 fi
+print_reserve_advisory

@@ -133,9 +133,24 @@ def _init(config_path: Path, *, force: bool) -> int:
         )
         return 1
     config_path.parent.mkdir(parents=True, exist_ok=True)
-    config_path.write_text(BundleConfig.default().to_json(), encoding="utf-8")
+    bundle = BundleConfig.default()
+    config_path.write_text(bundle.to_json(), encoding="utf-8")
     print(f"Wrote {config_path}")
+    _print_reserve_advisory(bundle.service_acorn_reserve_sats)
     return 0
+
+
+def _print_reserve_advisory(amount_sats: int) -> None:
+    print(
+        "Operator action required: after the first service-Acorn startup, "
+        f"fund at least {amount_sats} sats of mint-fee reserve before enabling "
+        "Lightning-address payments."
+    )
+    print(
+        "Run: docker compose stop service-acorn-worker && "
+        "docker compose run --rm --no-deps service-acorn-worker "
+        f"python -m app.service_acorn_worker fund {amount_sats}"
+    )
 
 
 def _config(config_path: Path, output_path: Path) -> int:

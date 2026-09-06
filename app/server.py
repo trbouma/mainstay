@@ -18,6 +18,7 @@ def render_dashboard(bundle: BundleConfig) -> str:
         _render_service_row(name, endpoint)
         for name, endpoint in bundle.services.items()
     )
+    reserve_advisory = _render_reserve_advisory(bundle)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -90,6 +91,22 @@ def render_dashboard(bundle: BundleConfig) -> str:
     .dot.ok {{ background: var(--accent); }}
     .dot.error {{ background: var(--danger); }}
     .services {{ border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }}
+    .advisory {{
+      display: grid;
+      grid-template-columns: minmax(150px, 0.45fr) minmax(0, 1.55fr);
+      gap: 20px;
+      margin: 0 0 20px;
+      padding: 16px 18px;
+      border: 1px solid #e3c791;
+      border-left: 4px solid var(--warning);
+      border-radius: 6px;
+      background: #fffaf0;
+    }}
+    .advisory-label {{ color: var(--warning); font-size: 12px; font-weight: 750; text-transform: uppercase; }}
+    .advisory h2 {{ margin-top: 3px; }}
+    .advisory p {{ margin: 0; color: #584b36; font-size: 13px; }}
+    .advisory p + p {{ margin-top: 7px; }}
+    .advisory code {{ color: var(--ink); }}
     .service {{
       display: grid;
       grid-template-columns: minmax(140px, 0.7fr) minmax(240px, 1.5fr) minmax(110px, 0.55fr);
@@ -124,6 +141,7 @@ def render_dashboard(bundle: BundleConfig) -> str:
     @media (max-width: 700px) {{
       .header-inner {{ align-items: flex-start; flex-direction: column; gap: 14px; padding: 18px 0; }}
       .overview {{ align-items: flex-start; flex-direction: column; gap: 12px; }}
+      .advisory {{ grid-template-columns: 1fr; gap: 8px; }}
       .service {{ grid-template-columns: 1fr; gap: 12px; }}
       .service-state {{ justify-content: flex-start; }}
       .service-identity {{ grid-template-columns: 1fr; gap: 3px; }}
@@ -157,6 +175,7 @@ def render_dashboard(bundle: BundleConfig) -> str:
         <span id="bundle-state">Checking services</span>
       </div>
     </section>
+    {reserve_advisory}
     <div class="services">
       {service_rows}
     </div>
@@ -330,6 +349,29 @@ def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
           <div class="report-content"></div>
         </details>
       </article>"""
+
+
+def _render_reserve_advisory(bundle: BundleConfig) -> str:
+    safebox_web = bundle.services.get("safebox_web")
+    if safebox_web is None or not safebox_web.enabled:
+        return ""
+    amount = bundle.service_acorn_reserve_sats
+    command = (
+        "docker compose stop service-acorn-worker && "
+        "docker compose run --rm --no-deps service-acorn-worker "
+        f"python -m app.service_acorn_worker fund {amount}"
+    )
+    return f"""<section class="advisory" aria-labelledby="reserve-title">
+      <div>
+        <span class="advisory-label">Required bootstrap step</span>
+        <h2 id="reserve-title">Confirm Lightning fee reserve</h2>
+      </div>
+      <div>
+        <p>The service Acorn needs at least {amount} sats of operator-funded reserve to cover mint input fees while delivering Lightning-address payments. A healthy worker can create invoices before this reserve exists.</p>
+        <p>Mainstay does not yet measure the reserve automatically. Fund it after first startup and replenish it as fees consume it.</p>
+        <p><code>{escape(command)}</code></p>
+      </div>
+    </section>"""
 
 
 def _render_endpoint_address(scope: str, url: str) -> str:

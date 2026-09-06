@@ -175,8 +175,13 @@ class BundleConfig:
     clear_currency_name: str = "Mainstay Local Credits"
     lightning_mint_url: str = "https://mint.safebox.dev"
     external_clear_mint_url: str = "https://clear.safebox.dev"
+    service_acorn_reserve_sats: int = 100
     secrets: dict[str, str] = field(default_factory=dict)
     services: dict[str, ServiceEndpoint] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.service_acorn_reserve_sats <= 0:
+            raise ValueError("service_acorn_reserve_sats must be positive")
 
     @classmethod
     def default(cls) -> BundleConfig:
@@ -273,6 +278,9 @@ class BundleConfig:
                     "https://clear.safebox.dev",
                 )
             ),
+            service_acorn_reserve_sats=int(
+                raw.get("service_acorn_reserve_sats", 100)
+            ),
             secrets=dict(raw.get("secrets") or {}),
             services=services,
         )
@@ -286,6 +294,7 @@ class BundleConfig:
             "clear_currency_name": self.clear_currency_name,
             "lightning_mint_url": self.lightning_mint_url,
             "external_clear_mint_url": self.external_clear_mint_url,
+            "service_acorn_reserve_sats": self.service_acorn_reserve_sats,
             "secrets": self.secrets,
             "services": {
                 name: endpoint.to_dict()
@@ -301,6 +310,7 @@ class BundleConfig:
             "port": self.port,
             "forwarded_allow_ips": self.forwarded_allow_ips,
             "clear_currency_name": self.clear_currency_name,
+            "service_acorn_reserve_sats": self.service_acorn_reserve_sats,
             "services": {
                 name: endpoint.to_dict()
                 for name, endpoint in self.services.items()

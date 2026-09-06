@@ -78,6 +78,7 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn(
             '"external_clear_mint_url": "https://clear.safebox.dev"', text
         )
+        self.assertIn('"service_acorn_reserve_sats": 100', text)
         self.assertIn('"fips_npub"', text)
         self.assertIn('"homepage_url": "http://clear:3339/"', text)
         self.assertIn('"scope": "internal"', text)
@@ -155,8 +156,29 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn("renderIdentity", page)
         self.assertIn('name !== "service_identity"', page)
         self.assertIn("description.textContent", page)
+        self.assertIn("Required bootstrap step", page)
+        self.assertIn("Confirm Lightning fee reserve", page)
+        self.assertIn("app.service_acorn_worker fund 100", page)
+        self.assertIn("does not yet measure the reserve automatically", page)
         self.assertEqual(page.count("Local</span>"), 1)
         self.assertNotIn("External</span>", page)
+
+    def test_dashboard_omits_reserve_advisory_without_safebox(self) -> None:
+        bundle = BundleConfig(
+            services={
+                "clear": BundleConfig.default().require_service("clear"),
+            }
+        )
+
+        page = render_dashboard(bundle)
+
+        self.assertNotIn("Confirm Lightning fee reserve", page)
+
+    def test_service_acorn_reserve_must_be_positive(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError, "service_acorn_reserve_sats must be positive"
+        ):
+            BundleConfig(service_acorn_reserve_sats=0)
 
     def test_dashboard_escapes_registry_values(self) -> None:
         bundle = BundleConfig(

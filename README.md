@@ -12,6 +12,7 @@ home.
 
 Design notes:
 
+- [Clerk and Treasury Functions](docs/CLERK-AND-TREASURY-FUNCTIONS.md)
 - [mainstay-local Hypervisor and FIPS](docs/LOCAL-FIRST-HYPERVISOR-AND-FIPS-DESIGN-NOTE.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](docs/ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
 - [Identity, Resolution, and Event-Native Services](docs/IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
@@ -83,6 +84,27 @@ a missing master secret; recover the original secret instead of assigning a
 new identity to an existing mint database. It likewise refuses to generate a
 missing cookie key over an existing Safebox data volume, avoiding accidental
 session-key rotation during environment recovery.
+
+Secret initialization does not fund the service Acorn. After its first
+successful startup, the operator must provide a mint-fee reserve before relying
+on Lightning-address delivery. A healthy worker can create an invoice with no
+reserve, then fail after settlement when it attempts to deliver the full amount
+as ecash. Mainstay displays this required bootstrap step on the dashboard; it
+does not yet measure the remaining reserve automatically.
+
+Fund the default 100-sat reserve while the singleton worker is stopped:
+
+```bash
+docker compose stop service-acorn-worker
+docker compose run --rm --no-deps service-acorn-worker \
+  python -m app.service_acorn_worker fund 100
+docker compose up -d service-acorn-worker
+```
+
+Pay the displayed invoice and wait for the funding command to confirm the
+deposit before restarting the worker. The reserve is operator-owned working
+capital, is separate from recipient payments, and must be replenished as mint
+fees consume it.
 
 Mainstay builds `spurline`, `grove`, `clear`, and `safebox-web` directly from
 their GitHub `main` branches, so their repositories do not need to be checked
