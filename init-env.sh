@@ -7,6 +7,7 @@ env_file="$repo_dir/.env"
 example_file="$repo_dir/.env.example"
 clear_volume="mainstay-local_clear-data"
 safebox_volume="mainstay-local_safebox-web-data"
+installation_identity="$repo_dir/build/mainstay-local/installation-identity.json"
 
 print_reserve_advisory() {
     printf '%s\n' \
@@ -39,11 +40,13 @@ read_value() {
 master_secret=$(read_value CLEAR_MASTER_SECRET)
 operator_token=$(read_value CLEAR_OPERATOR_TOKEN)
 mint_service_nsec=$(read_value CLEAR_MINT_SERVICE_NSEC)
+installation_nsec=$(read_value MAINSTAY_INSTALLATION_NSEC)
 cookie_key=$(read_value SAFEBOX_COOKIE_KEY)
 invite_code=$(read_value SAFEBOX_ONBOARD_INVITE_CODE)
 
 if [ -n "$master_secret" ] && [ -n "$operator_token" ] && \
     [ -n "$mint_service_nsec" ] && \
+    [ -n "$installation_nsec" ] && \
     [ -n "$cookie_key" ] && [ -n "$invite_code" ]; then
     chmod 600 "$env_file"
     printf '%s\n' '.env already contains the required Mainstay secrets.'
@@ -92,6 +95,17 @@ if [ -z "$mint_service_nsec" ]; then
     mint_service_nsec=$(openssl rand -hex 32)
 fi
 
+if [ -z "$installation_nsec" ]; then
+    if [ -f "$installation_identity" ]; then
+        printf '%s\n' \
+            'Refusing to replace the Mainstay installation identity.' >&2
+        printf '%s\n' \
+            "Recover MAINSTAY_INSTALLATION_NSEC for $installation_identity." >&2
+        exit 1
+    fi
+    installation_nsec=$(openssl rand -hex 32)
+fi
+
 if [ -z "$cookie_key" ]; then
     if docker volume inspect "$safebox_volume" >/dev/null 2>&1; then
         printf '%s\n' \
@@ -118,12 +132,14 @@ awk \
     -v master_secret="$master_secret" \
     -v operator_token="$operator_token" \
     -v mint_service_nsec="$mint_service_nsec" \
+    -v installation_nsec="$installation_nsec" \
     -v cookie_key="$cookie_key" \
     -v invite_code="$invite_code" '
     BEGIN {
         found_master = 0
         found_operator = 0
         found_mint_service = 0
+        found_installation = 0
         found_cookie = 0
         found_invite = 0
     }
@@ -145,6 +161,13 @@ awk \
         if (!found_mint_service) {
             print "CLEAR_MINT_SERVICE_NSEC=" mint_service_nsec
             found_mint_service = 1
+        }
+        next
+    }
+    /^MAINSTAY_INSTALLATION_NSEC=/ {
+        if (!found_installation) {
+            print "MAINSTAY_INSTALLATION_NSEC=" installation_nsec
+            found_installation = 1
         }
         next
     }
@@ -172,6 +195,9 @@ awk \
         }
         if (!found_mint_service) {
             print "CLEAR_MINT_SERVICE_NSEC=" mint_service_nsec
+        }
+        if (!found_installation) {
+            print "MAINSTAY_INSTALLATION_NSEC=" installation_nsec
         }
         if (!found_cookie) {
             print "SAFEBOX_COOKIE_KEY=" cookie_key

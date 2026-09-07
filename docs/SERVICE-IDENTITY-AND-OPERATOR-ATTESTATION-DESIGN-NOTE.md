@@ -2,10 +2,11 @@
 
 ## Status
 
-This is a detailed design note for discussion. It defines the identity roles,
-evidence chain, lifecycle, and first implementation sequence for stable
-Mainstay service identities and operator attestations. It does not assign
-final Nostr event kinds or authorize production commissioning commands yet.
+This note defines the identity roles, evidence chain, lifecycle, and first
+implementation sequence for stable Mainstay service identities and operator
+attestations. The Clear-first profile is implemented for local testing. Its
+NIP-78 event kinds and schemas remain provisional and are not presented as an
+interoperable Nostr standard.
 
 This note specializes the broader
 [Identity, Resolution, and Event-Native Services](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
@@ -27,9 +28,10 @@ The proposed first profile is:
    an operator-signed attestation that references it.
 6. A service-signed descriptor references the accepted operator attestation.
 7. Verification uses signed events, not an unsigned `operator_npub` field.
-8. The first release supports one directly attesting operator per service.
-   Installation identities and multi-operator policy remain compatible future
-   extensions.
+8. A Mainstay installation acts as the operator authority for services it
+   manages and may itself be authorized by a higher authority.
+9. The first release supports one directly attesting Mainstay installation per
+   service. Multi-operator policy remains a compatible future extension.
 
 The resulting evidence answers three different questions:
 
@@ -70,14 +72,15 @@ An optional future keypair representing one Mainstay deployment. It can sign a
 deployment manifest and make routine statements about services in that
 installation after an operator commissions it.
 
-The first profile does not require this intermediary. The operator directly
-attests each service so the initial trust chain remains short:
+The Mainstay-managed profile uses the installation as the immediate operator
+authority:
 
 ```text
-operator npub --attests--> service npub
+Mainstay installation npub --attests--> service npub
 ```
 
-The extensible form is:
+An autonomous installation treats that `npub` as its local trust root. The
+extensible form adds a higher authority without removing local operation:
 
 ```text
 operator npub --commissions--> installation npub
@@ -131,17 +134,18 @@ For the initial Docker profile, Mainstay bootstrap may generate and preserve:
 
 ```dotenv
 MAINSTAY_SERVICE_NSEC=
+MAINSTAY_INSTALLATION_NSEC=
 SPURLINE_SERVICE_NSEC=
 GROVE_SERVICE_NSEC=
 SAFEBOX_WEB_SERVICE_NSEC=
 CLEAR_MINT_SERVICE_NSEC=
-MAINSTAY_OPERATOR_NPUB=
 ```
 
-Each `nsec` is injected only into its corresponding service. The operator
-`npub` may be injected wherever the expected authority must be displayed or
-verified. The operator `nsec` is never placed in the shared `.env`, a service
-container, the Mainstay registry, or a dashboard response.
+Each service `nsec` is injected only into its corresponding service.
+`MAINSTAY_INSTALLATION_NSEC` is held by the host-side commissioning CLI and is
+never injected into a managed service or the long-running control-plane
+container. A future higher-authority `nsec` likewise remains outside Mainstay;
+only its signed delegation and public key enter the installation.
 
 The `.env` approach is an initial custody mechanism, not the final design.
 Service-specific secret files, delegated signers, hardware-backed keys, or a
@@ -255,7 +259,7 @@ The request is signed by the service key and contains:
 Required event tags should include:
 
 ```text
-["d", "mainstay-service-commissioning"]
+["d", "org.mainstay.service-commissioning-request:<nonce>"]
 ["p", "<operator-hex-pubkey>", "", "operator"]
 ["t", "mainstay-service-commissioning"]
 ["service-type", "clear-mint"]
@@ -282,23 +286,21 @@ The attestation is signed by the operator key and contains:
   "relationship": "operates",
   "management": "mainstay-managed",
   "commissioning_request": "<request-event-id>",
-  "installation": null,
+  "installation": "<mainstay-installation-hex-pubkey>",
   "sequence": 1,
   "previous": null,
-  "issued_at": 1788700100,
-  "expires_at": 1820236100
+  "issued_at": 1788700100
 }
 ```
 
 Required event tags should include:
 
 ```text
-["d", "mainstay-service-operator:<service-hex-pubkey>"]
+["d", "org.mainstay.service-operator-attestation:<service-hex-pubkey>"]
 ["p", "<service-hex-pubkey>", "", "service"]
 ["e", "<request-event-id>", "", "commissioning-request"]
 ["t", "mainstay-service-operator"]
 ["service-type", "clear-mint"]
-["expiration", "1820236100"]
 ```
 
 The event author is the operator public key and is the authoritative source of
@@ -323,24 +325,38 @@ The next service-signed descriptor references the attestation:
     "attestation_event_id": "<attestation-event-id>"
   },
   "management": "mainstay-managed",
-  "capabilities": [],
-  "endpoints": [],
+  "capabilities": ["cashu.info", "cashu.keys", "clear.mint"],
   "issued_at": 1788700200,
-  "expires_at": 1789305000,
-  "sequence": 2,
-  "previous": "<previous-descriptor-event-id>"
+  "state": "commissioned"
 }
+```
+
+Required event tags should include:
+
+```text
+["d", "org.mainstay.service-descriptor"]
+["p", "<operator-hex-pubkey>", "", "operator"]
+["e", "<attestation-event-id>", "", "operator-attestation"]
+["t", "mainstay-service-descriptor"]
+["service-type", "clear-mint"]
 ```
 
 The descriptor does not make the operator claim true. It proves that the
 service accepted and is currently advertising the referenced relationship.
+Endpoint advertisements, expiry, replacement sequencing, and revocation are
+deliberately deferred until their lifecycle rules are implemented and tested.
 
 ### Event kinds
 
-Concrete event kinds remain deliberately unassigned in this draft. Descriptor
-and current-relationship events resemble addressable events; commissioning
-requests and immutable audit evidence may be better represented as regular
-events. Before assigning kinds, the project must review current NIPs, collision
+The Clear-first experiment uses NIP-78 application-specific data events:
+
+- kind `78` for an immutable commissioning request; and
+- kind `30078` for the current operator attestation and service descriptor,
+  distinguished by their `d` tags.
+
+These assignments are provisional. They intentionally use the existing
+application-data envelope while the schemas are local to Mainstay. A future
+interoperability proposal may assign dedicated kinds after reviewing collision
 risk, replacement semantics, deletion behavior, and relay support.
 
 Event validity never depends on relay publication. A complete signed event can
@@ -440,20 +456,23 @@ services by itself.
 
 ## Commissioning Flow
 
-The proposed operator workflow is:
+The implemented Clear-first workflow is:
 
 ```bash
-mainstay-local identity requests create
-mainstay-local identity requests export commissioning.json
-
-# Performed by an independent operator signer:
-mainstay-operator attest commissioning.json --output attestations.json
-
-mainstay-local identity attestations import attestations.json
-mainstay-local identity verify
+./init-env.sh
+poetry run mainstay-local service commission clear
+poetry run mainstay-local service show clear
+poetry run mainstay-local service verify clear
 ```
 
-The exact command names are provisional. The workflow requirements are not:
+`service commission clear` asks Clear to sign a request, verifies it, signs the
+operator attestation with the Mainstay installation key, returns it to Clear,
+asks Clear to verify and retain the complete evidence chain, and publishes the
+three public events through Clear to internal Spurline. `--no-publish` retains
+the evidence locally when the relay is intentionally unavailable.
+
+The command accepts the managed registry name `clear`, not an arbitrary URL or
+service `npub`. The workflow requirements are:
 
 - show the operator every service `npub`, type, installation, and management
   mode before signing;
@@ -587,7 +606,8 @@ governance, service identity, and network transport as separate layers.
 
 ### Phase 3: Direct operator commissioning
 
-- Configure one `MAINSTAY_OPERATOR_NPUB`.
+- Generate one `MAINSTAY_INSTALLATION_NSEC` and record its derived public
+  identity sentinel.
 - Generate service-signed commissioning requests.
 - Add offline export, signing, import, and verification workflows.
 - Store complete signed evidence and show its state in the dashboard.
@@ -614,10 +634,11 @@ Clear-specific event format.
 
 ## Open Questions
 
-1. Which concrete event kinds best fit commissioning requests, attestations,
-   descriptors, revocations, and rotation evidence?
-2. Should the first operator attestation expire, or remain valid until explicit
-   revocation with a recommended renewal interval?
+1. Should dedicated interoperable event kinds eventually replace the
+   provisional NIP-78 application-data profile?
+2. Should a later operator attestation expire, or remain valid until explicit
+   revocation with a recommended renewal interval? The first profile remains
+   valid until explicit replacement or revocation.
 3. Is `operates` the correct relationship term, or do deployments need
    separate `owns`, `hosts`, `administers`, and `authorizes` claims?
 4. Should the first profile allow one operator per service only, or model a

@@ -165,6 +165,8 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('class="service-report"', page)
         self.assertIn('class="service-identity" hidden', page)
         self.assertIn('class="identity-npub"', page)
+        self.assertIn('class="operator-npub operator-field"', page)
+        self.assertIn("operator.status", page)
         self.assertIn("renderIdentity", page)
         self.assertIn('name !== "service_identity"', page)
         self.assertIn("description.textContent", page)

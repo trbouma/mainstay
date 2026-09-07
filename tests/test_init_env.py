@@ -71,6 +71,7 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
     assert len(values["CLEAR_MASTER_SECRET"]) == 64
     assert len(values["CLEAR_OPERATOR_TOKEN"]) == 64
     assert len(values["CLEAR_MINT_SERVICE_NSEC"]) == 64
+    assert len(values["MAINSTAY_INSTALLATION_NSEC"]) == 64
     assert len(values["SAFEBOX_COOKIE_KEY"]) == 44
     assert values["SAFEBOX_COOKIE_KEY"].endswith("=")
     assert len(values["SAFEBOX_ONBOARD_INVITE_CODE"]) == 32
@@ -78,11 +79,13 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
     assert values["CLEAR_MINT_SERVICE_NSEC"] not in {
         values["CLEAR_MASTER_SECRET"],
         values["CLEAR_OPERATOR_TOKEN"],
+        values["MAINSTAY_INSTALLATION_NSEC"],
     }
     assert stat.S_IMODE(env_file.stat().st_mode) == 0o600
     assert values["CLEAR_MASTER_SECRET"] not in result.stdout
     assert values["CLEAR_OPERATOR_TOKEN"] not in result.stdout
     assert values["CLEAR_MINT_SERVICE_NSEC"] not in result.stdout
+    assert values["MAINSTAY_INSTALLATION_NSEC"] not in result.stdout
     assert values["SAFEBOX_COOKIE_KEY"] not in result.stdout
     assert values["SAFEBOX_ONBOARD_INVITE_CODE"] not in result.stdout
 
@@ -160,6 +163,7 @@ def test_init_env_fills_missing_secrets_in_existing_file(tmp_path: Path) -> None
     assert len(values["CLEAR_MASTER_SECRET"]) == 64
     assert len(values["CLEAR_OPERATOR_TOKEN"]) == 64
     assert len(values["CLEAR_MINT_SERVICE_NSEC"]) == 64
+    assert len(values["MAINSTAY_INSTALLATION_NSEC"]) == 64
     assert len(values["SAFEBOX_COOKIE_KEY"]) == 44
     assert len(values["SAFEBOX_ONBOARD_INVITE_CODE"]) == 32
     assert stat.S_IMODE(env_file.stat().st_mode) == 0o600
@@ -210,4 +214,36 @@ def test_init_env_assigns_first_service_identity_to_existing_clear_volume(
 
     values = _read_env(env_file)
     assert len(values["CLEAR_MINT_SERVICE_NSEC"]) == 64
+    assert len(values["MAINSTAY_INSTALLATION_NSEC"]) == 64
     assert values["CLEAR_MINT_SERVICE_NSEC"] not in result.stdout
+
+
+def test_init_env_refuses_to_replace_recorded_installation_identity(
+    tmp_path: Path,
+) -> None:
+    script, environment = _stage_helper(tmp_path)
+    state = tmp_path / "build/mainstay-local/installation-identity.json"
+    state.parent.mkdir(parents=True)
+    state.write_text('{"npub":"npub1existing"}\n', encoding="utf-8")
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "CLEAR_MASTER_SECRET=existing-master\n"
+        "CLEAR_OPERATOR_TOKEN=existing-operator\n"
+        "CLEAR_MINT_SERVICE_NSEC=existing-service-key\n"
+        "MAINSTAY_INSTALLATION_NSEC=\n"
+        "SAFEBOX_COOKIE_KEY=existing-cookie\n"
+        "SAFEBOX_ONBOARD_INVITE_CODE=existing-invite\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [str(script)],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    assert result.returncode == 1
+    assert "Refusing to replace the Mainstay installation identity" in result.stderr
+    assert _read_env(env_file)["MAINSTAY_INSTALLATION_NSEC"] == ""

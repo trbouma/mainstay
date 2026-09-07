@@ -706,9 +706,9 @@ Rotation should eventually be exposed as a controlled command rather than a
 text-editing convention:
 
 ```text
-mainstay-local identity rotate <service>
-mainstay-local identity rotate <service> --dry-run
-mainstay-local identity recover <service> --authority-event <file>
+mainstay-local service rotate <service>
+mainstay-local service rotate <service> --dry-run
+mainstay-local service recover <service> --authority-event <file>
 ```
 
 The normal rotation command should verify current state, stage rather than

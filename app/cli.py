@@ -11,6 +11,13 @@ from .clear_context import LocalClearError, send_local_clear
 from .env import render_safebox_env
 from .registry import BundleConfig
 from .server import serve
+from .service_context import (
+    DEFAULT_IDENTITY_STATE_PATH,
+    ServiceCommissioningError,
+    commission_service,
+    show_service,
+    verify_service,
+)
 from .status import check_bundle
 
 DEFAULT_CONFIG_PATH = Path(
@@ -140,6 +147,44 @@ def main(argv: list[str] | None = None) -> int:
         help="Local Safebox directory timeout in seconds.",
     )
 
+    service_parser = subparsers.add_parser(
+        "service",
+        help="Manage Mainstay-managed services.",
+    )
+    service_subparsers = service_parser.add_subparsers(
+        dest="service_command",
+        required=True,
+    )
+    service_commission_parser = service_subparsers.add_parser(
+        "commission",
+        help="Commission a managed service under this Mainstay installation.",
+    )
+    service_commission_parser.add_argument("service")
+    _add_service_context_arguments(service_commission_parser)
+    service_commission_parser.add_argument(
+        "--identity-state",
+        type=Path,
+        default=DEFAULT_IDENTITY_STATE_PATH,
+        help="Public installation identity sentinel path.",
+    )
+    service_commission_parser.add_argument(
+        "--no-publish",
+        action="store_true",
+        help="Retain evidence in the service without publishing it to Spurline.",
+    )
+    for action, help_text in (
+        ("show", "Show a managed service identity and its public evidence."),
+        ("verify", "Verify a managed service commissioning evidence chain."),
+    ):
+        action_parser = service_subparsers.add_parser(action, help=help_text)
+        action_parser.add_argument("service")
+        action_parser.add_argument(
+            "--compose-file",
+            type=Path,
+            default=DEFAULT_COMPOSE_PATH,
+        )
+        action_parser.add_argument("--env-file", type=Path, default=Path(".env"))
+
     args = parser.parse_args(argv)
 
     if args.command == "init":
@@ -162,6 +207,8 @@ def main(argv: list[str] | None = None) -> int:
             env_path=args.env_file,
             timeout=args.timeout,
         )
+    if args.command == "service":
+        return _service_command(args)
 
     parser.error(f"unknown command: {args.command}")
     return 2
@@ -174,6 +221,21 @@ def _add_config_argument(parser: argparse.ArgumentParser) -> None:
         default=DEFAULT_CONFIG_PATH,
         help="Path to the mainstay-local registry JSON file.",
     )
+
+
+def _add_service_context_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=None,
+        help="Optional registry JSON for a customized deployment.",
+    )
+    parser.add_argument(
+        "--compose-file",
+        type=Path,
+        default=DEFAULT_COMPOSE_PATH,
+    )
+    parser.add_argument("--env-file", type=Path, default=Path(".env"))
 
 
 def _env_int(name: str) -> int | None:
@@ -294,4 +356,50 @@ def _clear_send(
         print(f"mainstay-local clear send failed: {exc}", file=sys.stderr)
         return 1
     print(json.dumps(receipt, indent=2))
+    return 0
+
+
+def _service_command(args: argparse.Namespace) -> int:
+    try:
+        if args.service_command == "commission":
+            bundle = (
+                BundleConfig.from_json(args.config)
+                if args.config is not None
+                else BundleConfig.default()
+            )
+            relay = bundle.require_service("spurline").require_url(
+                "internal",
+                purpose="relay",
+            )
+            result = commission_service(
+                args.service,
+                compose_path=args.compose_file,
+                env_path=args.env_file,
+                state_path=args.identity_state,
+                relay=relay,
+                publish=not args.no_publish,
+            )
+        elif args.service_command == "show":
+            result = show_service(
+                args.service,
+                compose_path=args.compose_file,
+                env_path=args.env_file,
+            )
+        elif args.service_command == "verify":
+            result = verify_service(
+                args.service,
+                compose_path=args.compose_file,
+                env_path=args.env_file,
+            )
+        else:
+            raise ServiceCommissioningError(
+                f"unknown service command: {args.service_command}"
+            )
+    except (ServiceCommissioningError, ValueError) as exc:
+        print(
+            f"mainstay-local service {args.service_command} failed: {exc}",
+            file=sys.stderr,
+        )
+        return 1
+    print(json.dumps(result, indent=2))
     return 0

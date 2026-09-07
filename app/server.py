@@ -127,8 +127,9 @@ def render_dashboard(bundle: BundleConfig) -> str:
     .service-state {{ display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 13px; }}
     .service-identity {{ grid-column: 1 / -1; display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; border-top: 1px solid var(--line); padding-top: 14px; }}
     .service-identity[hidden] {{ display: none; }}
-    .identity-label, .identity-meta {{ color: var(--muted); font-size: 12px; }}
-    .identity-npub {{ min-width: 0; }}
+    .identity-label, .identity-meta, .operator-label, .operator-meta {{ color: var(--muted); font-size: 12px; }}
+    .identity-npub, .operator-npub {{ min-width: 0; }}
+    .operator-field[hidden] {{ display: none; }}
     .service-report {{ grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 14px; }}
     .service-report summary {{ color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 650; }}
     .report-grid {{ display: grid; grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1fr); gap: 7px 18px; margin: 14px 0 2px; }}
@@ -239,6 +240,9 @@ def render_dashboard(bundle: BundleConfig) -> str:
         container.hidden = true;
         container.querySelector(".identity-npub").textContent = "";
         container.querySelector(".identity-meta").textContent = "";
+        for (const field of container.querySelectorAll(".operator-field")) {{
+          field.hidden = true;
+        }}
         return;
       }}
       container.hidden = false;
@@ -249,6 +253,23 @@ def render_dashboard(bundle: BundleConfig) -> str:
         [identity.type, identity.management, identity.state]
           .filter((value) => typeof value === "string" && value.trim())
           .join(", ");
+      const operator = identity.operator && typeof identity.operator === "object"
+        ? identity.operator
+        : null;
+      const operatorNpub = operator && typeof operator.npub === "string"
+        ? operator.npub.trim()
+        : "";
+      const operatorFields = container.querySelectorAll(".operator-field");
+      for (const field of operatorFields) {{
+        field.hidden = !operatorNpub.startsWith("npub1");
+      }}
+      if (operatorNpub.startsWith("npub1")) {{
+        const operatorKey = container.querySelector(".operator-npub");
+        operatorKey.textContent = operatorNpub;
+        operatorKey.title = operatorNpub;
+        container.querySelector(".operator-meta").textContent =
+          typeof operator.status === "string" ? operator.status : "";
+      }}
     }}
 
     function renderHomepage(container, homepage) {{
@@ -343,6 +364,9 @@ def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
           <span class="identity-label">Identity</span>
           <code class="identity-npub"></code>
           <span class="identity-meta"></span>
+          <span class="operator-label operator-field" hidden>Operator</span>
+          <code class="operator-npub operator-field" hidden></code>
+          <span class="operator-meta operator-field" hidden></span>
         </div>
         <details class="service-report" hidden>
           <summary>Service report</summary>

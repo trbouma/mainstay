@@ -14,7 +14,14 @@ MAX_HOMEPAGE_BYTES = 64 * 1024
 MAX_REPORT_DEPTH = 4
 MAX_REPORT_ITEMS = 24
 MAX_REPORT_STRING = 500
-SERVICE_IDENTITY_FIELDS = ("npub", "type", "management", "state")
+SERVICE_IDENTITY_FIELDS = (
+    "npub",
+    "type",
+    "management",
+    "state",
+    "descriptor_event_id",
+)
+SERVICE_OPERATOR_FIELDS = ("npub", "attestation_event_id", "status")
 
 
 @dataclass(frozen=True)
@@ -168,10 +175,10 @@ def _normalize_report(value: Any, *, depth: int = 0) -> Any:
     return str(value)[:MAX_REPORT_STRING]
 
 
-def _normalize_service_identity(value: Any) -> dict[str, str | None]:
+def _normalize_service_identity(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
         return {}
-    return {
+    result = {
         field: (
             None
             if value[field] is None
@@ -180,6 +187,18 @@ def _normalize_service_identity(value: Any) -> dict[str, str | None]:
         for field in SERVICE_IDENTITY_FIELDS
         if field in value
     }
+    operator = value.get("operator")
+    if isinstance(operator, dict):
+        result["operator"] = {
+            field: (
+                None
+                if operator[field] is None
+                else str(operator[field])[:MAX_REPORT_STRING]
+            )
+            for field in SERVICE_OPERATOR_FIELDS
+            if field in operator
+        }
+    return result
 
 
 class _HomepageHTMLParser(HTMLParser):

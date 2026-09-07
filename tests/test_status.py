@@ -49,7 +49,14 @@ class ServiceStatusTests(unittest.TestCase):
                     "npub": "npub1clearservice",
                     "type": "clear-mint",
                     "management": "mainstay-managed",
-                    "state": "uncommissioned",
+                    "state": "commissioned",
+                    "descriptor_event_id": "descriptor-event",
+                    "operator": {
+                        "npub": "npub1installation",
+                        "attestation_event_id": "attestation-event",
+                        "status": "verified",
+                        "nsec": "nsec1operator-must-not-escape",
+                    },
                     "nsec": "nsec1must-not-escape",
                 },
                 "currency": {"name": "Mainstay Local Credits"},
@@ -80,7 +87,13 @@ class ServiceStatusTests(unittest.TestCase):
                 "npub": "npub1clearservice",
                 "type": "clear-mint",
                 "management": "mainstay-managed",
-                "state": "uncommissioned",
+                "state": "commissioned",
+                "descriptor_event_id": "descriptor-event",
+                "operator": {
+                    "npub": "npub1installation",
+                    "attestation_event_id": "attestation-event",
+                    "status": "verified",
+                },
             },
         )
         self.assertNotIn("nsec", json.dumps(result.homepage.to_dict()))

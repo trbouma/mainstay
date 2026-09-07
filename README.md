@@ -45,6 +45,21 @@ running, shows a bounded report from its internal homepage. Registry endpoints
 are scoped as `internal`, `local`, or `external`; Safebox dependencies use
 internal endpoints even when a service also publishes another route.
 
+Commission the managed Clear service under this Mainstay installation after
+the updated Clear image is running:
+
+```bash
+./init-env.sh
+poetry run mainstay-local service commission clear
+poetry run mainstay-local service show clear
+poetry run mainstay-local service verify clear
+```
+
+The host-side command signs with `MAINSTAY_INSTALLATION_NSEC`; that key is not
+injected into Clear or the long-running Mainstay container. Clear independently
+verifies and stores the public evidence, then publishes it to internal
+Spurline. Use `--no-publish` only for an intentionally offline commissioning.
+
 Run the local control-plane HTTP surface directly:
 
 ```bash
@@ -254,7 +269,9 @@ the trust boundary and failure behavior.
 `init-env.sh` also creates `CLEAR_MINT_SERVICE_NSEC`. Clear derives a stable
 mint-service `npub`, records that public identity with its database, and shows
 it in `clear-root info` and the Mainstay service report. The identity starts as
-`uncommissioned`; it is not the currency root and does not yet authorize a
+`bootstrapped`; it can operate technically but has no recognized operator
+attestation until `mainstay-local service commission clear` succeeds. The
+service identity is not the currency root and does not itself authorize a
 keyset-to-service binding. Preserve `.env` with the `clear-data` volume.
 
 Connecting Mainstay to an established external Clear mint is a separate
