@@ -16,6 +16,7 @@ Design notes:
 - [mainstay-local Hypervisor and FIPS](docs/LOCAL-FIRST-HYPERVISOR-AND-FIPS-DESIGN-NOTE.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](docs/ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
 - [Identity, Resolution, and Event-Native Services](docs/IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
+- [Service Identity and Operator Attestation](docs/SERVICE-IDENTITY-AND-OPERATOR-ATTESTATION-DESIGN-NOTE.md)
 - [Local Clear Transactions](docs/LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md)
 - [Clear Transfer Routing and Reachability](docs/CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md)
 - [Mainstay Clear Context Wrapper](docs/MAINSTAY-CLEAR-CONTEXT-WRAPPER.md)
