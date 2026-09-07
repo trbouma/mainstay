@@ -296,6 +296,12 @@ attestation until `mainstay-local service commission clear` succeeds. The
 service identity is not the currency root and does not itself authorize a
 keyset-to-service binding. Preserve `.env` with the Clear data source.
 
+The helper also creates `GROVE_SERVICE_NSEC` and injects it only into Grove.
+Grove reports the derived service `npub` on its homepage and records it in its
+persistent data as a mismatch sentinel. This bootstrapped identity is
+uncommissioned; Mainstay does not yet implement Grove commissioning or signed
+endpoint descriptors.
+
 Connecting Mainstay to an established external Clear mint is a separate
 registry mode and does not reuse this managed-mint volume.
 

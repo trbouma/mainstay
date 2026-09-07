@@ -205,7 +205,7 @@ Treat these as recovery units:
 | Mainstay installation identity | `MAINSTAY_INSTALLATION_NSEC` and its public sentinel |
 | Clear mint database and root wallet | `CLEAR_MASTER_SECRET`, service nsec, operator policy, and canonical mint URL |
 | Safebox database and service-Acorn state | Safebox cookie key, configured relays and mints, and payment reserve records |
-| Grove data | Grove endpoint and authorization policy |
+| Grove data | `GROVE_SERVICE_NSEC`, Grove endpoint, and authorization policy |
 | Spurline database | Relay identity, access policy, and advertised routes |
 
 Stopping a container, rebuilding an image, or changing a route should not

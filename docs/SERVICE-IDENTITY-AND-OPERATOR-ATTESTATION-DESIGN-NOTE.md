@@ -598,8 +598,11 @@ governance, service identity, and network transport as separate layers.
 
 ### Phase 2: Service bootstrap
 
-- Extend `init-env.sh` to generate Mainstay, Spurline, Grove, and Safebox Web
-  service keys as it already does for Clear.
+Clear and Grove now implement this bootstrap profile. Spurline and Safebox Web
+remain future work.
+
+- Extend `init-env.sh` to generate Spurline and Safebox Web service keys as it
+  already does for Clear and Grove.
 - Inject each key only into its service.
 - Add persistent `npub` sentinels and mismatch refusal to each service.
 - Expose uncommissioned identity summaries without private material.

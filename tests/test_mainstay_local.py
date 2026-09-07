@@ -74,6 +74,8 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('SPURLINE_PUBLIC_URL="ws://spurline:8080"', env)
         self.assertIn('CLEAR_MINT_URL="http://clear:3339"', env)
         self.assertIn("CLEAR_MINT_SERVICE_NSEC=", env)
+        self.assertIn("GROVE_SERVICE_NSEC=", env)
+        self.assertIn('GROVE_SERVICE_MANAGEMENT="mainstay-managed"', env)
         self.assertIn(
             'CLEAR_MINT_SERVICE_MANAGEMENT="mainstay-managed"', env
         )
@@ -153,6 +155,12 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIsNone(grove.url_for("external"))
         self.assertEqual(grove.health_url, "http://grove:8000/health")
         self.assertEqual(grove.homepage_url, "http://grove:8000/")
+
+        compose = (Path(__file__).parents[1] / DEFAULT_COMPOSE_PATH).read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("GROVE_SERVICE_NSEC", compose)
+        self.assertIn('GROVE_SERVICE_MANAGEMENT: "mainstay-managed"', compose)
 
     def test_dashboard_lists_services_and_api_endpoints(self) -> None:
         page = render_dashboard(BundleConfig.default())

@@ -185,6 +185,8 @@ services:
       GROVE_DATA_DIR: /data
       GROVE_PUBLIC_URL: http://grove:8000
       GROVE_SERVER_NAME: grove
+      GROVE_SERVICE_NSEC: "${GROVE_SERVICE_NSEC:?Run ./init-env.sh to generate GROVE_SERVICE_NSEC}"
+      GROVE_SERVICE_MANAGEMENT: "mainstay-managed"
       GROVE_MAX_BLOB_SIZE: "${GROVE_MAX_BLOB_SIZE:-104857600}"
       GROVE_AUTH_CLOCK_SKEW_SECONDS: "${GROVE_AUTH_CLOCK_SKEW_SECONDS:-30}"
     expose:
