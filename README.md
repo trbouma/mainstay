@@ -17,6 +17,8 @@ Design notes:
 - [Address Spaces, Endpoint Scopes, and FIPS](docs/ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
 - [Identity, Resolution, and Event-Native Services](docs/IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
 - [Local Clear Transactions](docs/LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md)
+- [Clear Transfer Routing and Reachability](docs/CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md)
+- [Mainstay Clear Context Wrapper](docs/MAINSTAY-CLEAR-CONTEXT-WRAPPER.md)
 
 ## Prototype App
 
@@ -177,6 +179,13 @@ different external default with `MAINSTAY_EXTERNAL_CLEAR_MINT_URL`. Registering
 the endpoint does not merge its CMUs: balances and trust decisions remain
 bound to each complete `cmu-<keyset-id>`.
 
+Mainstay passes only `MAINSTAY_EXTERNAL_CLEAR_MINT_URL` through
+`SAFEBOX_CLEAR_EXTERNAL_MINTS` for public NIP-05 advertisement. It never
+advertises the Docker-only `http://clear:3339` route. A cross-instance Clear
+send may carry tokens from a public HTTPS mint even when the receiver has not
+seen that mint before. The managed Mainstay mint remains local-only until an
+external route to that same mint is deliberately implemented.
+
 For cross-Mainstay token delivery, configure an externally reachable relay as
 the public NIP-05 discovery hint while retaining the private Spurline address as
 the wallet home relay:
@@ -225,6 +234,21 @@ container loopback interface:
 docker compose exec clear clear-root info
 docker compose exec clear clear-root wallet balance
 ```
+
+For an operator distribution to a Safebox registered in this same Mainstay,
+run the context-aware wrapper from the Mainstay checkout on the Docker host:
+
+```bash
+poetry run mainstay-local clear send 20 awaycastle559 --memo "hello"
+```
+
+The command accepts only a bare local handle. It verifies the handle and Clear
+receive capability through the co-resident Safebox directory, selects the
+internal Spurline route, and then invokes `clear-root` with its explicit
+internal-delivery override. Mainstay does not own or read the root wallet and
+does not print the resulting bearer token or proofs. See the
+[Clear context wrapper design note](docs/MAINSTAY-CLEAR-CONTEXT-WRAPPER.md) for
+the trust boundary and failure behavior.
 
 `init-env.sh` also creates `CLEAR_MINT_SERVICE_NSEC`. Clear derives a stable
 mint-service `npub`, records that public identity with its database, and shows

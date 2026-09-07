@@ -188,6 +188,12 @@ refresh it through internal Clear. The focused profile is defined in
 [Local Clear Transactions](LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md). External
 token acceptance remains a separate follow-on profile.
 
+Both interim paths were manually validated on September 6, 2026: an internal
+mint transfer between two wallets in one Mainstay instance, and a public mint
+transfer from an independent Safebox into Mainstay. The implemented routing
+matrix and pre-export guard are recorded in
+[Clear Transfer Routing and Reachability](CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md).
+
 ### Routing hints produced by a service
 
 When a service must publish a route for a token, document, or protocol response,

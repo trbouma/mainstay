@@ -25,6 +25,10 @@ class MainstayLocalTests(unittest.TestCase):
             'SAFEBOX_NIP05_EXTERNAL_RELAYS: "${SAFEBOX_NIP05_EXTERNAL_RELAYS:-}"',
             compose,
         )
+        self.assertIn(
+            'SAFEBOX_CLEAR_EXTERNAL_MINTS: "${MAINSTAY_EXTERNAL_CLEAR_MINT_URL:-https://clear.safebox.dev}"',
+            compose,
+        )
         self.assertIn("service-acorn.json", compose)
 
     def test_component_images_use_remote_git_build_contexts(self) -> None:
@@ -60,6 +64,10 @@ class MainstayLocalTests(unittest.TestCase):
         )
         self.assertIn(
             'SAFEBOX_CLEAR_MINTS="http://clear:3339,https://clear.safebox.dev"',
+            env,
+        )
+        self.assertIn(
+            'SAFEBOX_CLEAR_EXTERNAL_MINTS="https://clear.safebox.dev"',
             env,
         )
         self.assertIn('SAFEBOX_BLOSSOM_HOME_SERVER="http://grove:8000"', env)

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import subprocess
 import sys
 from pathlib import Path
 
+from .clear_context import LocalClearError, send_local_clear
 from .env import render_safebox_env
 from .registry import BundleConfig
 from .server import serve
@@ -92,6 +94,52 @@ def main(argv: list[str] | None = None) -> int:
         help="Port to bind.",
     )
 
+    clear_parser = subparsers.add_parser(
+        "clear",
+        help="Run context-aware Clear operations.",
+    )
+    clear_subparsers = clear_parser.add_subparsers(
+        dest="clear_command",
+        required=True,
+    )
+    clear_send_parser = clear_subparsers.add_parser(
+        "send",
+        help="Send from the root wallet to a locally registered handle.",
+    )
+    clear_send_parser.add_argument(
+        "--config",
+        type=Path,
+        default=None,
+        help=(
+            "Optional registry JSON for a customized deployment; the current "
+            "Mainstay defaults are used when omitted."
+        ),
+    )
+    clear_send_parser.add_argument("amount", type=int)
+    clear_send_parser.add_argument(
+        "handle",
+        help="Bare handle registered by this Mainstay Safebox.",
+    )
+    clear_send_parser.add_argument("--memo", default=None)
+    clear_send_parser.add_argument(
+        "--compose-file",
+        type=Path,
+        default=DEFAULT_COMPOSE_PATH,
+        help="Compose file containing the managed Clear service.",
+    )
+    clear_send_parser.add_argument(
+        "--env-file",
+        type=Path,
+        default=None,
+        help="Optional environment file to pass to Docker Compose.",
+    )
+    clear_send_parser.add_argument(
+        "--timeout",
+        type=float,
+        default=2.0,
+        help="Local Safebox directory timeout in seconds.",
+    )
+
     args = parser.parse_args(argv)
 
     if args.command == "init":
@@ -104,6 +152,16 @@ def main(argv: list[str] | None = None) -> int:
         return _up(args.config, args.compose_file, args.env_file, args.detach)
     if args.command == "serve":
         return _serve(args.config, host=args.host, port=args.port)
+    if args.command == "clear" and args.clear_command == "send":
+        return _clear_send(
+            args.config,
+            amount=args.amount,
+            handle=args.handle,
+            memo=args.memo,
+            compose_path=args.compose_file,
+            env_path=args.env_file,
+            timeout=args.timeout,
+        )
 
     parser.error(f"unknown command: {args.command}")
     return 2
@@ -204,4 +262,36 @@ def _serve(config_path: Path, *, host: str | None, port: int | None) -> int:
         else BundleConfig.default()
     )
     serve(bundle, host=host or bundle.host, port=port or bundle.port)
+    return 0
+
+
+def _clear_send(
+    config_path: Path | None,
+    *,
+    amount: int,
+    handle: str,
+    memo: str | None,
+    compose_path: Path,
+    env_path: Path | None,
+    timeout: float,
+) -> int:
+    try:
+        bundle = (
+            BundleConfig.from_json(config_path)
+            if config_path is not None
+            else BundleConfig.default()
+        )
+        receipt = send_local_clear(
+            bundle,
+            amount=amount,
+            handle=handle,
+            memo=memo,
+            compose_path=compose_path,
+            env_path=env_path,
+            timeout=timeout,
+        )
+    except (LocalClearError, ValueError) as exc:
+        print(f"mainstay-local clear send failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(receipt, indent=2))
     return 0

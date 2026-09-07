@@ -43,6 +43,9 @@ def render_safebox_env(bundle: BundleConfig) -> str:
         "SAFEBOX_CLEAR_RECEIVE_ENABLED": "true" if clear.enabled else "false",
         "MAINSTAY_EXTERNAL_CLEAR_MINT_URL": bundle.external_clear_mint_url,
         "SAFEBOX_CLEAR_MINTS": clear_mints if clear.enabled else "",
+        "SAFEBOX_CLEAR_EXTERNAL_MINTS": (
+            bundle.external_clear_mint_url if clear.enabled else ""
+        ),
         "CLEAR_MINT_URL": clear.preferred_url(purpose="mint"),
         "SAFEBOX_BLOSSOM_HOME_SERVER": grove_internal,
         "GROVE_PUBLIC_URL": grove.preferred_url(purpose="blossom"),

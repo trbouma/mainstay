@@ -2,9 +2,9 @@
 
 ## Status
 
-This note defines the first Clear transaction profile for Mainstay. It is a
-design document only. It does not change Mainstay bootstrap, Clear, Safebox
-Web, Safebox Acorn, or the current container configuration.
+This note defines the first Clear transaction profile for Mainstay. The core
+profile is implemented and was manually validated on September 6, 2026, with
+two wallets using the managed internal Clear mint and Spurline relay.
 
 The first profile is deliberately local-only:
 
@@ -282,22 +282,25 @@ The existing repositories already provide much of the transaction path:
 - receipt acceptance is explicit and runs as a durable Safebox Web background
   job.
 
-The important gaps for this local profile are:
+The important remaining gaps for this local profile are:
 
-1. Safebox's Clear-recipient resolver currently performs HTTPS NIP-05 lookup;
-   it needs the same local-directory path used for local Lightning recipients.
-2. The local Clear mint does not yet expose and persist the proposed
+1. The local Clear mint does not yet expose and persist the proposed
    mint-service identity.
-3. Mainstay cannot yet resolve a keyset ID to that service identity and its
+2. Mainstay cannot yet resolve a keyset ID to that service identity and its
    internal route.
-4. `SAFEBOX_CLEAR_MINTS` currently combines receive advertisement and metadata
-   routing; it is not a complete local trust policy.
-5. Acorn acceptance currently follows the mint URL carried in the token rather
+3. `SAFEBOX_CLEAR_MINTS` remains a metadata and acceptance setting rather than
+   a complete local trust policy. Public advertisement is now separated into
+   `SAFEBOX_CLEAR_EXTERNAL_MINTS`.
+4. Acorn acceptance currently follows the mint URL carried in the token rather
    than receiving a pre-verified route selected by Mainstay or Safebox.
-6. Public NIP-05 capability output can include the private Docker mint URL when
-   it is present in `SAFEBOX_CLEAR_MINTS`.
+5. One Clear service cannot yet advertise multiple verified routes to the same
+   keysets and shared spent-note state.
 
-These are future implementation tasks, not changes made by this note.
+Safebox now resolves same-instance Clear recipients through its local handle
+directory and routes delivery explicitly through internal Spurline. Public
+NIP-05 output advertises only `SAFEBOX_CLEAR_EXTERNAL_MINTS`, and remote sends
+from internal HTTP mints fail before proof export. A public HTTPS mint may be
+learned by the receiver from its first Clear transfer.
 
 ## First Implementation Slices
 
@@ -315,8 +318,9 @@ When implementation begins, use narrow slices:
 8. Exercise send, pending receipt, explicit acceptance, restart recovery, and
    failure states end to end.
 
-Only after this profile is reliable should Mainstay add an external-token
-acceptance profile for `https://clear.safebox.dev`.
+The external public-mint profile has also been validated from an independent
+Safebox into Mainstay. Its routing and guard rules are recorded in
+[Clear Transfer Routing and Reachability](CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md).
 
 ## Acceptance Criteria
 
@@ -328,12 +332,14 @@ acceptance profile for `https://clear.safebox.dev`.
 - Sender and recipient histories identify the exact CMU and keyset ID.
 - Mainstay never combines balances across keysets or CMUs.
 - Internal dependency failure does not trigger an external fallback.
-- A token naming an unknown keyset or arbitrary mint URL causes no outbound
-  request.
+- Within the local-only profile, a token naming an unknown keyset or an
+  unapproved internal mint URL causes no outbound request. The separate public
+  profile may evaluate a well-formed HTTPS mint after explicit acceptance.
 - Restart and uncertain-outcome handling do not duplicate or lose value.
 
 ## References
 
+- [Clear Transfer Routing and Reachability](CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md)
 - [Identity, Resolution, and Event-Native Services](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
 - [Clear Receive Advertisement](https://github.com/trbouma/safebox-web/blob/main/docs/CLEAR-RECEIVE-ADVERTISEMENT.md)
