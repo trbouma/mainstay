@@ -31,3 +31,34 @@ records or changing blob hashes.
 The first implementation treats Mainstay's route as a candidate supplied over
 the trusted local network. Signed context manifests and independently verified
 service descriptors remain later hardening steps.
+
+## Runtime Resolution
+
+Safebox Web uses `SAFEBOX_MAINSTAY_CONTEXT_URL` to retrieve `/context`. It
+caches the public manifest briefly, assigns the installation `npub` as the
+Acorn's active context, and periodically checks that the wallet's private
+`context_endpoints` record contains the current Grove hint. A standalone
+Safebox leaves this setting blank and does not acquire a Mainstay context.
+
+When an attachment operation begins, Acorn resolves the Grove `npub` stored in
+the Safebox record. Global service records may contribute only external HTTPS
+routes. Context records may contribute internal or local HTTP routes only when
+their `context_npub` matches the active Mainstay installation. Eligible routes
+are ordered by evidence state, scope, and priority, then deduplicated.
+
+The ordinary local path is therefore:
+
+```text
+attachment ciphertext hash
+    -> Grove service npub
+    -> active Mainstay installation npub
+    -> matching context endpoint
+    -> http://grove:8000
+```
+
+The old `blobref` and configured Blossom servers remain compatibility
+fallbacks. For a record that names Grove identities, a fallback server must
+report a matching service `npub`. Acorn then independently verifies the
+ciphertext hash before decryption and the plaintext hash afterward. Mainstay
+selects the local context; it does not replace resource-integrity checks or
+take ownership of the wallet's records.
