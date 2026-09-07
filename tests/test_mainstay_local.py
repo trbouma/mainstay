@@ -7,7 +7,8 @@ from unittest.mock import patch
 from app.cli import DEFAULT_COMPOSE_PATH, _up
 from app.env import render_safebox_env
 from app.registry import BundleConfig, EndpointAddress, ServiceEndpoint
-from app.server import render_dashboard
+from app.server import render_dashboard, render_service_context
+from app.status import HomepageResult
 
 
 class MainstayLocalTests(unittest.TestCase):
@@ -71,6 +72,10 @@ class MainstayLocalTests(unittest.TestCase):
             env,
         )
         self.assertIn('SAFEBOX_BLOSSOM_HOME_SERVER="http://grove:8000"', env)
+        self.assertIn(
+            'SAFEBOX_MAINSTAY_CONTEXT_URL="http://mainstay-local:8788/context"',
+            env,
+        )
         self.assertIn('SPURLINE_PUBLIC_URL="ws://spurline:8080"', env)
         self.assertIn('CLEAR_MINT_URL="http://clear:3339"', env)
         self.assertIn("CLEAR_MINT_SERVICE_NSEC=", env)
@@ -163,6 +168,35 @@ class MainstayLocalTests(unittest.TestCase):
         )
         self.assertIn("GROVE_SERVICE_NSEC", compose)
         self.assertIn('GROVE_SERVICE_MANAGEMENT: "mainstay-managed"', compose)
+
+    @patch("app.server.inspect_homepage")
+    def test_service_context_advertises_grove_identity_and_internal_route(
+        self, inspect
+    ) -> None:
+        inspect.return_value = HomepageResult(
+            "http://grove:8000/",
+            True,
+            format="json",
+            report={
+                "service_identity": {
+                    "npub": "npub1grove",
+                    "nsec": "must-not-escape",
+                }
+            },
+        )
+
+        context = render_service_context(
+            BundleConfig.default(),
+            installation_npub="npub1mainstay",
+        )
+
+        self.assertEqual(context["context_npub"], "npub1mainstay")
+        self.assertEqual(context["services"][0]["service_npub"], "npub1grove")
+        self.assertEqual(
+            context["services"][0]["endpoints"][0]["locator"]["url"],
+            "http://grove:8000",
+        )
+        self.assertNotIn("nsec", str(context))
 
     def test_spurline_uses_a_managed_service_identity(self) -> None:
         compose = (Path(__file__).parents[1] / DEFAULT_COMPOSE_PATH).read_text(

@@ -54,6 +54,7 @@ def render_safebox_env(bundle: BundleConfig) -> str:
         ),
         "CLEAR_MINT_URL": clear.preferred_url(purpose="mint"),
         "SAFEBOX_BLOSSOM_HOME_SERVER": grove_internal,
+        "SAFEBOX_MAINSTAY_CONTEXT_URL": "http://mainstay-local:8788/context",
         "GROVE_PUBLIC_URL": grove.preferred_url(purpose="blossom"),
         "SAFEBOX_CURRENCY_RATES_ENABLED": "false",
         "CLEAR_CURRENCY_NAME": bundle.clear_currency_name,

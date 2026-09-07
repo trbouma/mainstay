@@ -23,6 +23,7 @@ Design notes:
 - [Local Clear Transactions](docs/LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md)
 - [Clear Transfer Routing and Reachability](docs/CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md)
 - [Mainstay Clear Context Wrapper](docs/MAINSTAY-CLEAR-CONTEXT-WRAPPER.md)
+- [Mainstay Grove Context Integration](docs/MAINSTAY-GROVE-CONTEXT-INTEGRATION.md)
 
 ## Prototype App
 

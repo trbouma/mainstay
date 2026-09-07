@@ -10,7 +10,9 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from .registry import BundleConfig, ServiceEndpoint
-from .status import check_bundle
+from .status import check_bundle, inspect_homepage
+
+GROVE_CAPABILITIES = ("blossom.read", "blossom.write", "blossom.delete")
 
 
 def render_dashboard(bundle: BundleConfig) -> str:
@@ -433,14 +435,77 @@ def _render_endpoint_address(scope: str, url: str) -> str:
     )
 
 
-def serve(bundle: BundleConfig, *, host: str, port: int) -> None:
-    handler = _handler_for(bundle)
+def render_service_context(
+    bundle: BundleConfig,
+    *,
+    installation_npub: str | None,
+    timeout: float = 1.0,
+) -> dict[str, Any]:
+    """Return public identities and routes supplied by this installation."""
+
+    services: list[dict[str, Any]] = []
+    grove = bundle.services.get("grove")
+    if installation_npub and grove is not None and grove.enabled:
+        homepage = (
+            inspect_homepage(grove.homepage_url, timeout=timeout)
+            if grove.homepage_url
+            else None
+        )
+        report = homepage.report if homepage is not None and homepage.ok else None
+        identity = report.get("service_identity") if isinstance(report, dict) else None
+        service_npub = identity.get("npub") if isinstance(identity, dict) else None
+        if isinstance(service_npub, str) and service_npub.strip():
+            endpoints = []
+            for address in grove.endpoints:
+                parsed = urlsplit(address.url)
+                if parsed.scheme not in {"http", "https"}:
+                    continue
+                endpoints.append(
+                    {
+                        "endpoint_id": (
+                            f"mainstay-{grove.name}-{address.scope}-{address.purpose}"
+                        ),
+                        "scope": address.scope,
+                        "transport": parsed.scheme,
+                        "locator": {"url": address.url},
+                        "capabilities": list(GROVE_CAPABILITIES),
+                        "priority": address.priority,
+                    }
+                )
+            services.append(
+                {
+                    "name": grove.name,
+                    "service_type": grove.kind,
+                    "service_npub": service_npub.strip(),
+                    "endpoints": endpoints,
+                }
+            )
+    return {
+        "type": "mainstay-service-context",
+        "version": 1,
+        "context_npub": installation_npub,
+        "services": services,
+    }
+
+
+def serve(
+    bundle: BundleConfig,
+    *,
+    host: str,
+    port: int,
+    installation_npub: str | None = None,
+) -> None:
+    handler = _handler_for(bundle, installation_npub=installation_npub)
     server = ThreadingHTTPServer((host, port), handler)
     print(f"mainstay-local listening on http://{host}:{port}")
     server.serve_forever()
 
 
-def _handler_for(bundle: BundleConfig) -> type[BaseHTTPRequestHandler]:
+def _handler_for(
+    bundle: BundleConfig,
+    *,
+    installation_npub: str | None = None,
+) -> type[BaseHTTPRequestHandler]:
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
             if self.path == "/":
@@ -454,6 +519,14 @@ def _handler_for(bundle: BundleConfig) -> type[BaseHTTPRequestHandler]:
                 return
             if self.path == "/registry":
                 self._send_json(bundle.to_dict())
+                return
+            if self.path == "/context":
+                self._send_json(
+                    render_service_context(
+                        bundle,
+                        installation_npub=installation_npub,
+                    )
+                )
                 return
             if self.path == "/status":
                 results = check_bundle(bundle, timeout=1.0)

@@ -7,6 +7,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+from stroma import KeyError as StromaKeyError
+from stroma import Keys
+
 from .clear_context import LocalClearError, send_local_clear
 from .env import render_safebox_env
 from .registry import BundleConfig
@@ -323,7 +326,21 @@ def _serve(config_path: Path, *, host: str | None, port: int | None) -> int:
         if config_path.exists()
         else BundleConfig.default()
     )
-    serve(bundle, host=host or bundle.host, port=port or bundle.port)
+    installation_secret = os.getenv("MAINSTAY_INSTALLATION_NSEC", "").strip()
+    installation_npub = None
+    if installation_secret:
+        try:
+            installation_npub = Keys(
+                priv_k=installation_secret
+            ).public_key_bech32()
+        except StromaKeyError as exc:
+            raise ValueError("MAINSTAY_INSTALLATION_NSEC is invalid") from exc
+    serve(
+        bundle,
+        host=host or bundle.host,
+        port=port or bundle.port,
+        installation_npub=installation_npub,
+    )
     return 0
 
 
