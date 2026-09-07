@@ -302,6 +302,11 @@ persistent data as a mismatch sentinel. This bootstrapped identity is
 uncommissioned; Mainstay does not yet implement Grove commissioning or signed
 endpoint descriptors.
 
+Spurline follows the same model. `init-env.sh` creates
+`SPURLINE_SERVICE_NSEC`, injects it only into the relay, and Spurline reports
+the derived service `npub` and deterministic FIPS IPv6 address. The identity
+is bound to the relay data directory and starts uncommissioned.
+
 Connecting Mainstay to an established external Clear mint is a separate
 registry mode and does not reuse this managed-mint volume.
 

@@ -74,6 +74,8 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn('SPURLINE_PUBLIC_URL="ws://spurline:8080"', env)
         self.assertIn('CLEAR_MINT_URL="http://clear:3339"', env)
         self.assertIn("CLEAR_MINT_SERVICE_NSEC=", env)
+        self.assertIn("SPURLINE_SERVICE_NSEC=", env)
+        self.assertIn('SPURLINE_SERVICE_MANAGEMENT="mainstay-managed"', env)
         self.assertIn("GROVE_SERVICE_NSEC=", env)
         self.assertIn('GROVE_SERVICE_MANAGEMENT="mainstay-managed"', env)
         self.assertIn(
@@ -161,6 +163,14 @@ class MainstayLocalTests(unittest.TestCase):
         )
         self.assertIn("GROVE_SERVICE_NSEC", compose)
         self.assertIn('GROVE_SERVICE_MANAGEMENT: "mainstay-managed"', compose)
+
+    def test_spurline_uses_a_managed_service_identity(self) -> None:
+        compose = (Path(__file__).parents[1] / DEFAULT_COMPOSE_PATH).read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("SPURLINE_SERVICE_NSEC", compose)
+        self.assertIn('SPURLINE_SERVICE_MANAGEMENT: "mainstay-managed"', compose)
 
     def test_dashboard_lists_services_and_api_endpoints(self) -> None:
         page = render_dashboard(BundleConfig.default())

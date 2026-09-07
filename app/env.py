@@ -31,6 +31,10 @@ def render_safebox_env(bundle: BundleConfig) -> str:
         "CLEAR_MINT_SERVICE_MANAGEMENT": "mainstay-managed",
         "GROVE_SERVICE_NSEC": bundle.secrets.get("grove_service_nsec", ""),
         "GROVE_SERVICE_MANAGEMENT": "mainstay-managed",
+        "SPURLINE_SERVICE_NSEC": bundle.secrets.get(
+            "spurline_service_nsec", ""
+        ),
+        "SPURLINE_SERVICE_MANAGEMENT": "mainstay-managed",
         "MAINSTAY_SAFEBOX_BIND_ADDRESS": safebox_web.bind_address or "0.0.0.0",
         "MAINSTAY_SAFEBOX_PORT": str(safebox_web.port or 8888),
         "FORWARDED_ALLOW_IPS": bundle.forwarded_allow_ips,

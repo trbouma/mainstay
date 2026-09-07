@@ -160,6 +160,8 @@ services:
       SPURLINE_DATABASE: /data/spurline.sqlite3
       SPURLINE_VERIFY_SIGNATURES: "${SPURLINE_VERIFY_SIGNATURES:-true}"
       SPURLINE_PUBLIC_URL: ws://spurline:8080
+      SPURLINE_SERVICE_NSEC: "${SPURLINE_SERVICE_NSEC:?Run ./init-env.sh to generate SPURLINE_SERVICE_NSEC}"
+      SPURLINE_SERVICE_MANAGEMENT: "mainstay-managed"
     expose:
       - "8080"
     read_only: true
