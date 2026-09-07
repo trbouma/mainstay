@@ -90,6 +90,80 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
     assert values["SAFEBOX_ONBOARD_INVITE_CODE"] not in result.stdout
 
 
+def test_init_env_configures_bind_storage_on_first_initialization(
+    tmp_path: Path,
+) -> None:
+    script, environment = _stage_helper(tmp_path)
+    data_root = tmp_path / "managed-data"
+
+    subprocess.run(
+        [str(script), "--data-root", str(data_root)],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    values = _read_env(tmp_path / ".env")
+    assert values["MAINSTAY_DATA_ROOT"] == str(data_root)
+    assert values["MAINSTAY_DATA_RUNTIME_USER"] == f"{os.getuid()}:{os.getgid()}"
+    assert values["MAINSTAY_LOCAL_DATA_SOURCE"] == str(data_root / "mainstay-local")
+    assert values["MAINSTAY_SAFEBOX_DATA_SOURCE"] == str(data_root / "safebox-web")
+    assert values["MAINSTAY_SPURLINE_DATA_SOURCE"] == str(data_root / "spurline")
+    assert values["MAINSTAY_GROVE_DATA_SOURCE"] == str(data_root / "grove")
+    assert values["MAINSTAY_CLEAR_DATA_SOURCE"] == str(data_root / "clear")
+    for directory in (
+        "mainstay-local",
+        "safebox-web",
+        "spurline",
+        "grove",
+        "clear",
+    ):
+        assert (data_root / directory).is_dir()
+
+
+def test_init_env_refuses_to_change_configured_data_root(tmp_path: Path) -> None:
+    script, environment = _stage_helper(tmp_path)
+    first_root = tmp_path / "first"
+    subprocess.run(
+        [str(script), "--data-root", str(first_root)],
+        check=True,
+        env=environment,
+    )
+
+    result = subprocess.run(
+        [str(script), "--data-root", str(tmp_path / "second")],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    assert result.returncode == 1
+    assert "Refusing to change MAINSTAY_DATA_ROOT" in result.stderr
+    assert _read_env(tmp_path / ".env")["MAINSTAY_DATA_ROOT"] == str(first_root)
+
+
+def test_init_env_protects_existing_bind_mounted_clear_data(tmp_path: Path) -> None:
+    script, environment = _stage_helper(tmp_path)
+    data_root = tmp_path / "managed-data"
+    clear_data = data_root / "clear"
+    clear_data.mkdir(parents=True)
+    (clear_data / "clear.sqlite3").write_text("existing", encoding="utf-8")
+
+    result = subprocess.run(
+        [str(script), "--data-root", str(data_root)],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    assert result.returncode == 1
+    assert "because Clear data exists" in result.stderr
+    assert not (tmp_path / ".env").exists()
+
+
 def test_init_env_refuses_new_identity_for_existing_volume(tmp_path: Path) -> None:
     script, environment = _stage_helper(tmp_path)
     environment["MOCK_CLEAR_VOLUME_EXISTS"] = "1"

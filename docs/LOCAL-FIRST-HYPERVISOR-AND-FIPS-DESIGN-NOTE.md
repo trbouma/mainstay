@@ -321,6 +321,32 @@ control plane for continuity without turning Safebox Web into a deployment
 dashboard. Safebox Web, Stroma, and future apps should appear as apps managed by
 the local runtime rather than as owners of the runtime.
 
+### Docker storage initialization
+
+The Docker prototype lets the operator choose one persistent data root during
+the first `init-env.sh` run. Mainstay records the absolute root and the derived
+service paths in `.env`, then gives every stateful service its own subdirectory:
+
+```text
+<mainstay-data-root>/mainstay-local
+<mainstay-data-root>/safebox-web
+<mainstay-data-root>/spurline
+<mainstay-data-root>/grove
+<mainstay-data-root>/clear
+```
+
+These paths are bind-mounted into the same container locations previously
+backed by Compose named volumes. The initializing host UID and GID are also
+recorded so the unprivileged service processes can write the host-owned
+directories without broadening their permissions. Omitting a data root retains
+the existing Docker-managed, project-scoped named-volume profile.
+
+The root is an installation decision, not a routine runtime setting. Mainstay
+must refuse to change it during a later initialization and must refuse to
+generate replacement identity-bound secrets over populated storage. Moving the
+root is a separate migration operation performed with the services stopped,
+followed by verification before the old copy is retired.
+
 ## FreeBSD Jail Trajectory
 
 The jail model should follow the same service graph:
@@ -339,6 +365,7 @@ the prototype should map cleanly to those datasets:
 
 | Docker volume | Jail/ZFS destination |
 | --- | --- |
+| `mainstay-local-data` | Mainstay control-plane state |
 | `safebox-web-data` | Safebox Web database and service-Acorn state |
 | `clear-data` | Clear mint database and root wallet |
 | `grove-data` | Grove blob store and metadata |

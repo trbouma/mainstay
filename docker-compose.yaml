@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
+    user: "${MAINSTAY_DATA_RUNTIME_USER:-mainstay}"
     command:
       - mainstay-local
       - serve
@@ -27,7 +28,7 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=16m
     volumes:
-      - mainstay-local-data:/app/data
+      - "${MAINSTAY_LOCAL_DATA_SOURCE:-mainstay-local-data}:/app/data"
     security_opt:
       - no-new-privileges:true
     stop_grace_period: 30s
@@ -39,6 +40,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
+    user: "${MAINSTAY_DATA_RUNTIME_USER:-safebox}"
     command:
       - uvicorn
       - app.main:app
@@ -92,7 +94,7 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=64m
     volumes:
-      - safebox-web-data:/app/data
+      - "${MAINSTAY_SAFEBOX_DATA_SOURCE:-safebox-web-data}:/app/data"
     security_opt:
       - no-new-privileges:true
     stop_grace_period: 120s
@@ -102,6 +104,7 @@ services:
     command: ["python", "-m", "app.service_acorn_worker", "run"]
     restart: unless-stopped
     init: true
+    user: "${MAINSTAY_DATA_RUNTIME_USER:-safebox}"
     depends_on:
       safebox-web:
         condition: service_healthy
@@ -138,7 +141,7 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=64m
     volumes:
-      - safebox-web-data:/app/data
+      - "${MAINSTAY_SAFEBOX_DATA_SOURCE:-safebox-web-data}:/app/data"
     security_opt:
       - no-new-privileges:true
     stop_grace_period: 30s
@@ -150,6 +153,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
+    user: "${MAINSTAY_DATA_RUNTIME_USER:-spurline}"
     environment:
       SPURLINE_HOST: 0.0.0.0
       SPURLINE_PORT: 8080
@@ -162,7 +166,7 @@ services:
     tmpfs:
       - /tmp:size=16m,mode=1777
     volumes:
-      - spurline-data:/data
+      - "${MAINSTAY_SPURLINE_DATA_SOURCE:-spurline-data}:/data"
     cap_drop:
       - ALL
     security_opt:
@@ -176,6 +180,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
+    user: "${MAINSTAY_DATA_RUNTIME_USER:-grove}"
     environment:
       GROVE_DATA_DIR: /data
       GROVE_PUBLIC_URL: http://grove:8000
@@ -188,7 +193,7 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=16m
     volumes:
-      - grove-data:/data
+      - "${MAINSTAY_GROVE_DATA_SOURCE:-grove-data}:/data"
     cap_drop:
       - ALL
     security_opt:
@@ -202,6 +207,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
+    user: "${MAINSTAY_DATA_RUNTIME_USER:-clear}"
     command:
       - clear
       - --host
@@ -234,7 +240,7 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=64m
     volumes:
-      - clear-data:/app/data
+      - "${MAINSTAY_CLEAR_DATA_SOURCE:-clear-data}:/app/data"
     cap_drop:
       - ALL
     security_opt:

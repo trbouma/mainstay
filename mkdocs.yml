@@ -37,6 +37,7 @@ theme:
 
 nav:
   - Home: index.md
+  - First-Time Start: getting-started.md
   - Understand Mainstay:
       - Product Vision: product-vision.md
       - Product Family: product-family.md

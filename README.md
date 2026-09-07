@@ -10,6 +10,9 @@ home.
 
 ## Documentation
 
+Start with the [first-time start guide](website/getting-started.md) for either
+a quick testing deployment or a planned production initialization.
+
 Design notes:
 
 - [Clerk and Treasury Functions](docs/CLERK-AND-TREASURY-FUNCTIONS.md)
@@ -92,16 +95,34 @@ docker compose ps
 curl http://127.0.0.1:8788/health
 ```
 
+To choose where persistent service data lives, set the root on the first
+initialization:
+
+```bash
+./init-env.sh --data-root "$HOME/mainstay-local-data"
+docker compose up --build --detach
+```
+
+This records the absolute root in `.env` and creates `mainstay-local`,
+`safebox-web`, `spurline`, `grove`, and `clear` subdirectories beneath it.
+Compose uses those directories as bind mounts and runs the data-writing
+processes with the initializing host user's UID and GID. Without `--data-root`,
+Mainstay continues to use Docker-managed, project-scoped named volumes and the
+native account from each service image. Initialization will not change an
+existing installation from one root to another; relocating live data requires
+an explicit stopped-service migration and corresponding `.env` update.
+
 `init-env.sh` copies `.env.example` when `.env` is absent and generates
 independent Clear master/operator secrets, a valid Safebox cookie-encryption
 key, and a private Safebox onboarding invite code without printing them. It
 also fills those entries in an older `.env` when they are missing. The command
 is idempotent and restricts `.env` to the current user.
-If the project-scoped Clear data volume already exists, it refuses to generate
+If the configured Clear storage already contains data, it refuses to generate
 a missing master secret; recover the original secret instead of assigning a
 new identity to an existing mint database. It likewise refuses to generate a
-missing cookie key over an existing Safebox data volume, avoiding accidental
-session-key rotation during environment recovery.
+missing cookie key over existing Safebox storage, avoiding accidental
+session-key rotation during environment recovery. Preserve `.env` alongside
+backups because it records both the identity-bound secrets and storage layout.
 
 Secret initialization does not fund the service Acorn. After its first
 successful startup, the operator must provide a mint-fee reserve before relying
@@ -167,7 +188,8 @@ docker compose ps safebox-web
 ```
 
 The `mainstay-local` Compose project gives this instance its own container and
-named data volume; it does not reuse a standalone Safebox Web project's state.
+persistent data source; it does not reuse a standalone Safebox Web project's
+state.
 Set `MAINSTAY_SAFEBOX_PORT` to another unused host port if `8888` is occupied.
 
 Safebox Web initializes and migrates its SQLite database during application
@@ -225,7 +247,7 @@ design questions are recorded under **Payment Identity and Discovery** in the
 The singleton service-Acorn worker starts with the default bundle. On its first
 successful start it creates a provider Acorn against the internal Spurline
 relay and external Lightning mint, then stores its recovery state as
-`/app/data/service-acorn.json` in the project-scoped Safebox volume. Routine
+`/app/data/service-acorn.json` in Mainstay's Safebox data source. Routine
 restarts recover that same identity. Do not delete or replace the state file
 without draining provider obligations and deliberately retiring the worker.
 
@@ -272,7 +294,7 @@ it in `clear-root info` and the Mainstay service report. The identity starts as
 `bootstrapped`; it can operate technically but has no recognized operator
 attestation until `mainstay-local service commission clear` succeeds. The
 service identity is not the currency root and does not itself authorize a
-keyset-to-service binding. Preserve `.env` with the `clear-data` volume.
+keyset-to-service binding. Preserve `.env` with the Clear data source.
 
 Connecting Mainstay to an established external Clear mint is a separate
 registry mode and does not reuse this managed-mint volume.
