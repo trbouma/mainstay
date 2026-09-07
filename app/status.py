@@ -16,6 +16,7 @@ MAX_REPORT_ITEMS = 24
 MAX_REPORT_STRING = 500
 SERVICE_IDENTITY_FIELDS = (
     "npub",
+    "fips_ipv6_address",
     "type",
     "management",
     "state",

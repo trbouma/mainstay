@@ -47,6 +47,7 @@ class ServiceStatusTests(unittest.TestCase):
                 "name": "Clear",
                 "service_identity": {
                     "npub": "npub1clearservice",
+                    "fips_ipv6_address": "fd12:6ef4:53c:5900:f315:6311:7f99:b6ea",
                     "type": "clear-mint",
                     "management": "mainstay-managed",
                     "state": "commissioned",
@@ -85,6 +86,7 @@ class ServiceStatusTests(unittest.TestCase):
             result.homepage.report["service_identity"],
             {
                 "npub": "npub1clearservice",
+                "fips_ipv6_address": "fd12:6ef4:53c:5900:f315:6311:7f99:b6ea",
                 "type": "clear-mint",
                 "management": "mainstay-managed",
                 "state": "commissioned",

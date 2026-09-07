@@ -127,8 +127,10 @@ def render_dashboard(bundle: BundleConfig) -> str:
     .service-state {{ display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 13px; }}
     .service-identity {{ grid-column: 1 / -1; display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; border-top: 1px solid var(--line); padding-top: 14px; }}
     .service-identity[hidden] {{ display: none; }}
-    .identity-label, .identity-meta, .operator-label, .operator-meta {{ color: var(--muted); font-size: 12px; }}
-    .identity-npub, .operator-npub {{ min-width: 0; }}
+    .identity-label, .identity-meta, .fips-label, .operator-label, .operator-meta {{ color: var(--muted); font-size: 12px; }}
+    .identity-npub, .identity-fips, .operator-npub {{ min-width: 0; }}
+    .identity-fips {{ grid-column: 2 / -1; }}
+    .fips-field[hidden] {{ display: none; }}
     .operator-field[hidden] {{ display: none; }}
     .service-report {{ grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 14px; }}
     .service-report summary {{ color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 650; }}
@@ -146,6 +148,7 @@ def render_dashboard(bundle: BundleConfig) -> str:
       .service {{ grid-template-columns: 1fr; gap: 12px; }}
       .service-state {{ justify-content: flex-start; }}
       .service-identity {{ grid-template-columns: 1fr; gap: 3px; }}
+      .identity-fips {{ grid-column: auto; }}
       .report-grid {{ grid-template-columns: 1fr; gap: 2px; }}
       .report-grid dd + dt {{ margin-top: 7px; }}
     }}
@@ -240,6 +243,10 @@ def render_dashboard(bundle: BundleConfig) -> str:
         container.hidden = true;
         container.querySelector(".identity-npub").textContent = "";
         container.querySelector(".identity-meta").textContent = "";
+        container.querySelector(".identity-fips").textContent = "";
+        for (const field of container.querySelectorAll(".fips-field")) {{
+          field.hidden = true;
+        }}
         for (const field of container.querySelectorAll(".operator-field")) {{
           field.hidden = true;
         }}
@@ -253,6 +260,15 @@ def render_dashboard(bundle: BundleConfig) -> str:
         [identity.type, identity.management, identity.state]
           .filter((value) => typeof value === "string" && value.trim())
           .join(", ");
+      const fipsAddress = typeof identity.fips_ipv6_address === "string"
+        ? identity.fips_ipv6_address.trim()
+        : "";
+      for (const field of container.querySelectorAll(".fips-field")) {{
+        field.hidden = !fipsAddress;
+      }}
+      const fips = container.querySelector(".identity-fips");
+      fips.textContent = fipsAddress;
+      fips.title = fipsAddress;
       const operator = identity.operator && typeof identity.operator === "object"
         ? identity.operator
         : null;
@@ -364,6 +380,8 @@ def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
           <span class="identity-label">Identity</span>
           <code class="identity-npub"></code>
           <span class="identity-meta"></span>
+          <span class="fips-label fips-field" hidden>FIPS IPv6</span>
+          <code class="identity-fips fips-field" hidden></code>
           <span class="operator-label operator-field" hidden>Operator</span>
           <code class="operator-npub operator-field" hidden></code>
           <span class="operator-meta operator-field" hidden></span>
