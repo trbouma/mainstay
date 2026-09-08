@@ -77,6 +77,30 @@ but refuse to overwrite the recovery file if identity-bound keys disagree.
 Keep a separately encrypted off-host copy as well; the in-root copy shares the
 same disk failure domain as the service data.
 
+## Recover Existing Data
+
+Clone Mainstay into a new dedicated deployment directory, make sure the prior
+service set is stopped, and run:
+
+```bash
+./recover-mainstay.sh
+```
+
+Supply the existing instance root that contains `.env.recovery`. The wizard
+verifies the recovery secrets, service directories, Docker namespace, and host
+ports before writing a new deployment `.env`. It offers three deliberate
+choices when names may differ:
+
+1. Use the existing data-root basename as the Compose project name.
+2. Specify a different Compose project name after acknowledging that the data
+   directory will retain its existing name.
+3. Abort so the operator can rename or remount the directory or ZFS dataset
+   first.
+
+The script never renames storage and never generates replacement identity
+material. A new Compose name can safely point to an old absolute data-root name,
+but the old and new service sets must never access that state concurrently.
+
 For a completely disposable test installation, run:
 
 ```bash

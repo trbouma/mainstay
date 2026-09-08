@@ -226,6 +226,14 @@ instance root, outside every service mount. Updating it must refuse any mismatch
 in identity-bound material. It is a convenient same-disk recovery companion,
 not a substitute for encrypted off-host secret and data backups.
 
+Recovery is an attachment operation, not bootstrap. `recover-mainstay.sh`
+requires the existing data root and its `.env.recovery`, refuses to generate
+missing secrets, and verifies that no competing Compose project is attached.
+The data-directory name and Compose project name are independent runtime facts:
+the operator may reuse the directory basename, explicitly accept a different
+Compose name, or abort to rename or remount storage while all services are
+stopped. Recovery never performs that filesystem or ZFS rename itself.
+
 Configuration distinguishes:
 
 - secrets and identity-bound recovery material;

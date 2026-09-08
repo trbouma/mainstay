@@ -239,6 +239,7 @@ compose_project_default=$(env_default COMPOSE_PROJECT_NAME mainstay-local)
 compose_project_name=$(prompt_project_name "$compose_project_default")
 configured_data_root=$(env_default MAINSTAY_DATA_ROOT "")
 configured_data_parent=$(env_default MAINSTAY_DATA_PARENT "")
+configured_data_directory_name=$(env_default MAINSTAY_DATA_DIRECTORY_NAME "")
 legacy_data_layout=false
 if [ "$env_existed" = true ] && [ -n "$configured_data_root" ] && \
     [ -z "$configured_data_parent" ]; then
@@ -255,11 +256,22 @@ else
         '~') data_parent=$HOME ;;
         '~/'*) data_parent="$HOME/${data_parent#\~/}" ;;
     esac
+    data_directory_name=$configured_data_directory_name
+    if [ -z "$data_directory_name" ]; then
+        if [ "$env_existed" = true ] && [ -n "$configured_data_root" ]; then
+            data_directory_name=$(basename -- "$configured_data_root")
+        else
+            data_directory_name=$compose_project_name
+        fi
+    fi
     if [ -n "$data_parent" ]; then
-        data_root="$data_parent/$compose_project_name"
+        data_root="$data_parent/$data_directory_name"
     else
         data_root=""
     fi
+fi
+if [ "$legacy_data_layout" = true ]; then
+    data_directory_name=$(basename -- "$data_root")
 fi
 case "$data_root" in
     '~') data_root=$HOME ;;
@@ -405,6 +417,7 @@ set_env_value MAINSTAY_SAFEBOX_BIND_ADDRESS "$safebox_bind"
 set_env_value MAINSTAY_SAFEBOX_PORT "$safebox_port"
 set_env_value COMPOSE_PROJECT_NAME "$compose_project_name"
 set_env_value MAINSTAY_DATA_PARENT "$data_parent"
+set_env_value MAINSTAY_DATA_DIRECTORY_NAME "$data_directory_name"
 
 if [ -n "$data_root" ] && [ "$managed_data_root" = true ]; then
     marker="$data_root/$managed_marker_name"

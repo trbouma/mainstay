@@ -147,6 +147,21 @@ overwrite it when identity-bound secrets differ. This same-disk copy simplifies
 reattachment to restored data, but it does not replace an encrypted off-host
 backup of `.env` and the instance root.
 
+Recover an existing instance into a fresh deployment directory with:
+
+```bash
+./recover-mainstay.sh
+```
+
+The recovery wizard requires an existing instance root containing
+`.env.recovery` and all five service data directories. It never generates
+replacement secrets. The operator may use the existing data-root basename as
+the new Compose project name, choose a different Compose name after an explicit
+mismatch warning, or abort. Compose and storage names need not match during
+recovery; the absolute data sources remain authoritative. To rename a directory
+or ZFS dataset, stop the old service set and rename or remount it before running
+the recovery wizard. The script itself never renames recovered storage.
+
 An installation created with the wizard marks only its derived instance root;
 the parent can safely contain other Mainstay instances. Tear the selected
 instance down completely with:

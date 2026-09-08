@@ -93,6 +93,7 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     data_root = data_parent / "mainstay-testlab"
     assert values["COMPOSE_PROJECT_NAME"] == "mainstay-testlab"
     assert values["MAINSTAY_DATA_PARENT"] == str(data_parent)
+    assert values["MAINSTAY_DATA_DIRECTORY_NAME"] == "mainstay-testlab"
     assert values["MAINSTAY_DATA_ROOT"] == str(data_root)
     assert values["MAINSTAY_LOCAL_BIND_ADDRESS"] == "0.0.0.0"
     assert values["MAINSTAY_LOCAL_PORT"] == "8788"
