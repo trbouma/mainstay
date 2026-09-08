@@ -15,6 +15,7 @@ a quick testing deployment or a planned production initialization.
 
 Design notes:
 
+- [Mainstay House Style and Family Audit](docs/MAINSTAY-HOUSE-STYLE.md)
 - [Clerk and Treasury Functions](docs/CLERK-AND-TREASURY-FUNCTIONS.md)
 - [mainstay-local Hypervisor and FIPS](docs/LOCAL-FIRST-HYPERVISOR-AND-FIPS-DESIGN-NOTE.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](docs/ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
@@ -88,11 +89,29 @@ poetry run ruff check .
 
 ## Run with Docker
 
-Initialize `.env`, then start the local bundle:
+> **One deployment directory per instance:** Every Mainstay instance must run
+> from its own dedicated checkout or deployment directory. That directory owns
+> the instance's `.env`, Compose lifecycle, generated installation identity,
+> and teardown authority. Never run multiple instances from one directory or
+> share one `.env` between deployment directories.
+
+For a first installation, run the interactive operator wizard:
 
 ```bash
-./init-env.sh
-docker compose up --build --detach
+./install-mainstay.sh
+```
+
+It prompts for the dedicated data root and the host bind addresses and ports
+for the dashboard and Safebox Web. Enter `abort`, `quit`, or `q` at any prompt
+to stop before configuration is written. Existing `.env` values are displayed
+as defaults; otherwise the shipped defaults are used. The final review defaults
+to not writing anything.
+
+For routine starts after `.env` exists, validate Compose, start the bundle, and
+wait for readiness with:
+
+```bash
+./start-mainstay.sh
 docker compose ps
 curl http://127.0.0.1:8788/health
 ```
@@ -101,8 +120,7 @@ To choose where persistent service data lives, set the root on the first
 initialization:
 
 ```bash
-./init-env.sh --data-root "$HOME/mainstay-local-data"
-docker compose up --build --detach
+./start-mainstay.sh --data-root "$HOME/mainstay-local-data"
 ```
 
 This records the absolute root in `.env` and creates `mainstay-local`,
@@ -113,6 +131,20 @@ Mainstay continues to use Docker-managed, project-scoped named volumes and the
 native account from each service image. Initialization will not change an
 existing installation from one root to another; relocating live data requires
 an explicit stopped-service migration and corresponding `.env` update.
+
+An installation created with the wizard uses a marked, dedicated data root by
+default. Tear it down completely with:
+
+```bash
+./teardown-mainstay.sh
+```
+
+The teardown command shows exactly what it will remove and requires the literal
+confirmation `DELETE`. It runs `docker compose down --volumes`, removes `.env`
+and generated installation-identity state, and deletes a bind-mounted data root
+only when the installer ownership marker is present. An unmarked operator-owned
+directory is never recursively deleted. Built images remain available, making
+the next disposable installation quicker.
 
 `init-env.sh` copies `.env.example` when `.env` is absent and generates
 independent Clear master/operator secrets, a valid Safebox cookie-encryption

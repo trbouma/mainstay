@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 from stroma import fips_ipv6_address
 
+from . import __version__
 from .registry import BundleConfig, ServiceEndpoint
 from .status import check_bundle, inspect_homepage
 
@@ -642,7 +643,13 @@ def _handler_for(
                 )
                 return
             if self.path == "/health":
-                self._send_json({"status": "ok"})
+                self._send_json(
+                    {
+                        "status": "ok",
+                        "service": "mainstay-local",
+                        "version": __version__,
+                    }
+                )
                 return
             if self.path == "/registry":
                 self._send_json(bundle.to_dict())

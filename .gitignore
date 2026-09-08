@@ -152,6 +152,7 @@ activemq-data/
 
 # Environments
 .env
+.mainstay-data/
 .envrc
 .venv
 env/

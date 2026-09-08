@@ -5,6 +5,14 @@ needs a more deliberate first start because its storage layout, service keys,
 mint identity, public routes, and recovery material become part of the durable
 operating context.
 
+!!! warning "Use one deployment directory for each Mainstay instance"
+
+    A Mainstay deployment directory owns one instance's `.env`, Compose
+    lifecycle, generated installation identity, and teardown authority. Create
+    a separate checkout or deployment directory for every instance. Do not run
+    multiple instances from one directory and do not share `.env` files between
+    deployment directories.
+
 ## Quick Testing Start
 
 Use this path for disposable testing on a trusted machine. It accepts the
@@ -18,10 +26,14 @@ run the service images.
 ```bash
 git clone https://github.com/trbouma/mainstay.git
 cd mainstay
-./init-env.sh
-docker compose up --build --detach
+./install-mainstay.sh
 docker compose ps
 ```
+
+The wizard asks for the dashboard and Safebox Web host ports, their bind
+addresses, and one data root for all service data. Press Enter to accept a
+displayed default. Enter `abort`, `quit`, or `q` at any prompt to leave without
+writing configuration. The final confirmation defaults to no.
 
 Open the Mainstay dashboard at `http://127.0.0.1:8788/` and Safebox Web at
 `http://127.0.0.1:8888/`. To retrieve the generated onboarding path without
@@ -49,6 +61,18 @@ At this point Safebox, the internal relay, Grove, Clear, and the service-Acorn
 worker are running. Clear is bootstrapped but its service identity is not yet
 commissioned, its treasury gate is closed, and the service Acorn has no
 operator-funded mint-fee reserve.
+
+For a completely disposable test installation, run:
+
+```bash
+./teardown-mainstay.sh
+```
+
+After the explicit `DELETE` confirmation, it removes the Compose containers,
+network, named volumes, generated `.env`, and installation identity state. A
+bind-mounted root is deleted only when it carries the installer's ownership
+marker; unmarked operator-owned directories are preserved. Component images
+remain cached for a quicker reinstall.
 
 ## Optional Testing Milestones
 
@@ -179,21 +203,22 @@ Use this order once the decisions above are recorded:
 
 1. Pin the Mainstay and component source revisions.
 2. Select and prepare the persistent data root.
-3. Run `./init-env.sh --data-root <absolute-path>` exactly once.
-4. Back up the new `.env` through the approved secret-custody process.
-5. Edit `.env` with the chosen Clear URL and policy, public relay routes,
+3. Run `./install-mainstay.sh`, answer `no` when asked to start, and use the
+   review screen to prepare `.env` without starting stateful services.
+4. Edit `.env` with the chosen Clear URL and policy, public relay routes,
    ports, bind addresses, reverse-proxy trust, TLS policy, and pinned contexts.
-6. Validate interpolation with `docker compose config --quiet`.
-7. Start with `docker compose up --build --detach` and wait for healthy status.
-8. Verify the dashboard and each internal service report.
-9. Commission the Clear service identity under the Mainstay installation.
-10. Run `clear-root verify`, review its result, and explicitly enable treasury
+5. Back up the completed `.env` through the approved secret-custody process.
+6. Run `./start-mainstay.sh`; it validates interpolation, builds the images,
+   starts the bundle and waits for healthy status.
+7. Verify the dashboard and each internal service report.
+8. Commission the Clear service identity under the Mainstay installation.
+9. Run `clear-root verify`, review its result, and explicitly enable treasury
     operations only if local policy permits issuance.
-11. Fund and verify the service-Acorn fee reserve before accepting
+10. Fund and verify the service-Acorn fee reserve before accepting
     Lightning-address payments.
-12. Test local Safebox transfer, external relay delivery where enabled, Clear
+11. Test local Safebox transfer, external relay delivery where enabled, Clear
     redemption from every intended context, and reverse-proxied HTTPS access.
-13. Take and restore the first complete backup before onboarding production
+12. Take and restore the first complete backup before onboarding production
     users or issuing non-disposable value.
 
 ## Values That Must Move Together
