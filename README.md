@@ -16,6 +16,7 @@ a quick testing deployment or a planned production initialization.
 Design notes:
 
 - [Mainstay House Style and Family Audit](docs/MAINSTAY-HOUSE-STYLE.md)
+- [Mainstay Instance Lifecycle and Recovery](docs/MAINSTAY-INSTANCE-LIFECYCLE.md)
 - [Clerk and Treasury Functions](docs/CLERK-AND-TREASURY-FUNCTIONS.md)
 - [mainstay-local Hypervisor and FIPS](docs/LOCAL-FIRST-HYPERVISOR-AND-FIPS-DESIGN-NOTE.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](docs/ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)

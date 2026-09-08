@@ -276,6 +276,9 @@ VPN, firewall or reverse-proxy boundary.
 
 ## Mainstay First-Start Contract
 
+The complete install, recovery and teardown contract is maintained in
+[Mainstay Instance Lifecycle and Recovery](MAINSTAY-INSTANCE-LIFECYCLE.md).
+
 A deployment directory owns exactly one Mainstay instance. Its `.env`, Compose
 project lifecycle, generated installation identity and teardown authority must
 not be shared with another instance. Operators create a separate checkout or
