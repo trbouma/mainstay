@@ -64,6 +64,7 @@ if [ -n "$data_root" ]; then
 else
     "$repo_dir/init-env.sh"
 fi
+"$repo_dir/save-recovery-env.sh"
 
 printf '%s\n' 'Validating the Mainstay Compose configuration...'
 docker compose config --quiet

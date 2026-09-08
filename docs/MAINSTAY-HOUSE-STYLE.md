@@ -221,6 +221,11 @@ permissions and never printed. Persistent state records its expected public
 service identity. Supplying a different key to existing state causes startup
 to fail rather than silently changing the service identity.
 
+Bind-mounted installations retain an atomic mode-`0600` `.env.recovery` at the
+instance root, outside every service mount. Updating it must refuse any mismatch
+in identity-bound material. It is a convenient same-disk recovery companion,
+not a substitute for encrypted off-host secret and data backups.
+
 Configuration distinguishes:
 
 - secrets and identity-bound recovery material;

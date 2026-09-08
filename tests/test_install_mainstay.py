@@ -16,6 +16,7 @@ def _stage_installer(tmp_path: Path) -> tuple[Path, dict[str, str], Path]:
         "docker-compose.yaml",
         "init-env.sh",
         "install-mainstay.sh",
+        "save-recovery-env.sh",
         "start-mainstay.sh",
         "teardown-mainstay.sh",
     ):
@@ -100,6 +101,11 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     assert (
         data_root / ".mainstay-local-managed-data-root"
     ).read_text(encoding="utf-8") == "org.mainstay.local-managed-data-root:v1\n"
+    recovery_file = data_root / ".env.recovery"
+    assert recovery_file.read_text(encoding="utf-8") == (
+        deployment / ".env"
+    ).read_text(encoding="utf-8")
+    assert recovery_file.stat().st_mode & 0o777 == 0o600
     assert "Run ./start-mainstay.sh when you are ready." in result.stdout
     assert "Preflight checks passed. No configuration has been written." in (
         result.stdout

@@ -139,6 +139,14 @@ native account from each service image. Initialization will not change an
 existing installation from one root to another; relocating live data requires
 an explicit stopped-service migration and corresponding `.env` update.
 
+For bind-mounted installations, Mainstay stores a private recovery copy at
+`<instance-root>/.env.recovery`. The instance root itself is not mounted into a
+container. The installer creates the copy after configuration is complete and
+routine starts refresh it atomically with mode `0600`. Mainstay refuses to
+overwrite it when identity-bound secrets differ. This same-disk copy simplifies
+reattachment to restored data, but it does not replace an encrypted off-host
+backup of `.env` and the instance root.
+
 An installation created with the wizard marks only its derived instance root;
 the parent can safely contain other Mainstay instances. Tear the selected
 instance down completely with:
@@ -150,9 +158,10 @@ instance down completely with:
 The teardown command shows exactly what it will remove and requires the literal
 confirmation `DELETE`. It runs `docker compose down --volumes`, removes `.env`
 and generated installation-identity state, and deletes the derived instance
-root only when the installer ownership marker is present. The shared parent and
-unmarked operator-owned directories are never recursively deleted. Built images
-remain available, making the next disposable installation quicker.
+root, including `.env.recovery`, only when the installer ownership marker is
+present. The shared parent and unmarked operator-owned directories are never
+recursively deleted. Built images remain available, making the next disposable
+installation quicker.
 
 `init-env.sh` copies `.env.example` when `.env` is absent and generates
 independent Clear master/operator secrets, a valid Safebox cookie-encryption

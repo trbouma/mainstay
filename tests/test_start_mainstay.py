@@ -16,6 +16,7 @@ def test_fresh_start_prepares_environment_and_waits_for_readiness(tmp_path) -> N
         ".env.example",
         "docker-compose.yaml",
         "init-env.sh",
+        "save-recovery-env.sh",
         "start-mainstay.sh",
     ):
         shutil.copy2(REPOSITORY / name, deployment / name)

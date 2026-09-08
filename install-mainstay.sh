@@ -412,6 +412,8 @@ if [ -n "$data_root" ] && [ "$managed_data_root" = true ]; then
     chmod 600 "$marker"
 fi
 
+"$repo_dir/save-recovery-env.sh"
+
 printf '%s\n' 'Mainstay configuration is ready in .env.'
 if [ "$start_after" = yes ]; then
     "$repo_dir/start-mainstay.sh"

@@ -70,6 +70,13 @@ worker are running. Clear is bootstrapped but its service identity is not yet
 commissioned, its treasury gate is closed, and the service Acorn has no
 operator-funded mint-fee reserve.
 
+When a host data root is configured, the completed environment is also copied
+atomically to `<instance-root>/.env.recovery` with mode `0600`. That path is not
+mounted into any service container. Starts refresh non-identity configuration
+but refuse to overwrite the recovery file if identity-bound keys disagree.
+Keep a separately encrypted off-host copy as well; the in-root copy shares the
+same disk failure domain as the service data.
+
 For a completely disposable test installation, run:
 
 ```bash
@@ -78,9 +85,10 @@ For a completely disposable test installation, run:
 
 After the explicit `DELETE` confirmation, it removes the Compose containers,
 network, named volumes, generated `.env`, and installation identity state. A
-derived instance root is deleted only when it carries the installer's ownership
-marker; its parent and unmarked operator-owned directories are preserved.
-Component images remain cached for a quicker reinstall.
+derived instance root, including `.env.recovery`, is deleted only when it
+carries the installer's ownership marker; its parent and unmarked
+operator-owned directories are preserved. Component images remain cached for a
+quicker reinstall.
 
 ## Optional Testing Milestones
 
