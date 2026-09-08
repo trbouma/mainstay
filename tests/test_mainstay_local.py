@@ -56,6 +56,10 @@ class MainstayLocalTests(unittest.TestCase):
 
         self.assertIn('SAFEBOX_DEFAULT_BOOTSTRAP_RELAY="ws://spurline:8080"', env)
         self.assertIn("SAFEBOX_ONBOARD_INVITE_CODE=", env)
+        self.assertIn("SAFEBOX_WEB_SERVICE_NSEC=", env)
+        self.assertIn(
+            'SAFEBOX_WEB_SERVICE_MANAGEMENT="mainstay-managed"', env
+        )
         self.assertIn('SAFEBOX_ALLOW_INSECURE_HTTP="true"', env)
         self.assertIn('SAFEBOX_SERVICE_ACORN_ENABLED="true"', env)
         self.assertIn('MAINSTAY_SAFEBOX_BIND_ADDRESS="0.0.0.0"', env)
@@ -137,6 +141,9 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertEqual(
             safebox_web.health_url, "http://safebox-web:8000/health"
         )
+        self.assertEqual(
+            safebox_web.homepage_url, "http://safebox-web:8000/info"
+        )
 
     def test_default_registry_accepts_the_installed_safebox_port(self) -> None:
         safebox_web = BundleConfig.default(
@@ -182,6 +189,8 @@ class MainstayLocalTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("CLEAR_MINT_SERVICE_NSEC", compose)
+        self.assertIn("SAFEBOX_WEB_SERVICE_NSEC", compose)
+        self.assertIn("SAFEBOX_WEB_SERVICE_MANAGEMENT", compose)
         self.assertIn('CLEAR_MINT_SERVICE_MANAGEMENT: "mainstay-managed"', compose)
 
     def test_grove_uses_the_private_runtime_namespace(self) -> None:

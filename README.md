@@ -385,6 +385,12 @@ Spurline follows the same model. `init-env.sh` creates
 the derived service `npub` and deterministic FIPS IPv6 address. The identity
 is bound to the relay data directory and starts uncommissioned.
 
+Safebox Web has its own application-service identity under the same lifecycle.
+`SAFEBOX_WEB_SERVICE_NSEC` is injected only into the web application, which
+reports its derived `npub` and FIPS IPv6 address at `/info` and binds that
+identity to its persistent data. It is distinct from every user Acorn and from
+the provider service Acorn. No signing or commissioning role is implied yet.
+
 Connecting Mainstay to an established external Clear mint is a separate
 registry mode and does not reuse this managed-mint volume.
 

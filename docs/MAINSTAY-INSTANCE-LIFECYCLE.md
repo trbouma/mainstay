@@ -180,7 +180,7 @@ The file is mode `0600`. Before replacing an existing recovery copy,
 
 - `MAINSTAY_INSTALLATION_NSEC`;
 - `CLEAR_MASTER_SECRET`;
-- Clear, Spurline and Grove service keys; and
+- Clear, Spurline, Grove and Safebox Web service keys; and
 - `SAFEBOX_COOKIE_KEY`.
 
 A mismatch stops the update and preserves the previous recovery copy. This is

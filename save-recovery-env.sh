@@ -48,6 +48,7 @@ CLEAR_MASTER_SECRET
 CLEAR_MINT_SERVICE_NSEC
 SPURLINE_SERVICE_NSEC
 GROVE_SERVICE_NSEC
+SAFEBOX_WEB_SERVICE_NSEC
 SAFEBOX_COOKIE_KEY'
 
 for key in $identity_keys; do
@@ -81,4 +82,3 @@ mv "$temp_file" "$recovery_file"
 trap - EXIT HUP INT TERM
 
 printf '%s\n' "Saved recovery configuration: $recovery_file"
-

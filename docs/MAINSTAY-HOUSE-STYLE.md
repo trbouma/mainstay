@@ -331,7 +331,7 @@ milestones because they carry policy or value consequences.
 | Clear | Reference implementation for identity persistence and commissioning | Standard health envelope; management, state and operator on runtime page; relative runtime links | Production security review and additional governance profiles |
 | Grove | Strong independent service boundary and persistent service identity | Standard health envelope; management and state on runtime page; relative runtime links | Commissioning request, attestation and descriptor support |
 | Spurline | Strong relay boundary and persistent service identity | Runtime identity management/state display and relative links; health already conforms | Commissioning request, attestation and descriptor support |
-| Safebox Web | Strong human app, security boundary and local-first integration | Standard health envelope | Decide whether the application itself needs an identity; do not reuse user or provider Acorn keys |
+| Safebox Web | Strong human app, security boundary and local-first integration | Standard health envelope; distinct persistent application-service identity and information envelope | Commissioning request, attestation and descriptor support |
 | Safebox Acorn | Strong protocol and authority boundary | No runtime-service changes apply | Continue release hardening and staged Stroma migration |
 | Stroma | Strong narrow protocol boundary and shared FIPS derivation | No runtime-service changes apply | Continue protocol hardening; no service identity is required for the library |
 
@@ -339,9 +339,9 @@ milestones because they carry policy or value consequences.
 
 1. Grove and Spurline possess stable service identities but cannot yet complete
    the Mainstay commissioning exchange implemented by Clear.
-2. Safebox Web has no distinct application-service identity. This is safer than
-   conflating it with a user Acorn or provider Acorn, but the application role
-   remains unresolved.
+2. Safebox Web now has a distinct application-service identity. It remains
+   deliberately separate from every user Acorn and from the provider service
+   Acorn; its future protocol role and commissioning evidence remain unresolved.
 3. Mainstay cannot yet read a live service-Acorn reserve without briefly
    pausing the worker. A future private status interface should report only a
    bounded operational snapshot and never wallet proofs.

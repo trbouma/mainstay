@@ -13,6 +13,7 @@ IDENTITY_VALUES = {
     "CLEAR_MINT_SERVICE_NSEC": "clear-service-key",
     "SPURLINE_SERVICE_NSEC": "spurline-service-key",
     "GROVE_SERVICE_NSEC": "grove-service-key",
+    "SAFEBOX_WEB_SERVICE_NSEC": "safebox-web-service-key",
     "SAFEBOX_COOKIE_KEY": "cookie-key",
 }
 

@@ -193,6 +193,7 @@ class BundleConfig:
                 "clear_operator_token": "",
                 "clear_mint_service_nsec": "",
                 "spurline_service_nsec": "",
+                "safebox_web_service_nsec": "",
             },
             services={
                 "safebox_web": ServiceEndpoint(
@@ -213,7 +214,7 @@ class BundleConfig:
                     bind_address="0.0.0.0",
                     port=safebox_port,
                     health_url="http://safebox-web:8000/health",
-                    homepage_url="http://safebox-web:8000/",
+                    homepage_url="http://safebox-web:8000/info",
                 ),
                 "clear": ServiceEndpoint(
                     name="clear",
