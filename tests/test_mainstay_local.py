@@ -237,6 +237,7 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn("Required bootstrap step", page)
         self.assertIn("Confirm Lightning fee reserve", page)
         self.assertIn("app.service_acorn_worker fund 100", page)
+        self.assertIn("mainstay-local reserve balance", page)
         self.assertIn("does not yet measure the reserve automatically", page)
         self.assertEqual(page.count("Local</span>"), 1)
         self.assertNotIn("External</span>", page)

@@ -147,6 +147,17 @@ deposit before restarting the worker. The reserve is operator-owned working
 capital, is separate from recipient payments, and must be replenished as mint
 fees consume it.
 
+Check the current reserve from the Mainstay project directory:
+
+```bash
+poetry run mainstay-local reserve balance
+```
+
+Mainstay briefly pauses the singleton service Acorn worker while it loads the
+persisted wallet, then restores the worker only if it was running beforehand.
+The command reports the wallet's current Cash balance without exposing its
+recovery key. Lightning-address delivery is paused during this short check.
+
 Mainstay builds `spurline`, `grove`, `clear`, and `safebox-web` directly from
 their GitHub `main` branches, so their repositories do not need to be checked
 out beside Mainstay. The build-context variables in `.env.example` can instead

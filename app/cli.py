@@ -13,6 +13,7 @@ from stroma import Keys
 from .clear_context import LocalClearError, send_local_clear
 from .env import render_safebox_env
 from .registry import BundleConfig
+from .reserve_context import ReserveContextError, read_service_acorn_reserve
 from .server import serve
 from .service_context import (
     DEFAULT_IDENTITY_STATE_PATH,
@@ -150,6 +151,29 @@ def main(argv: list[str] | None = None) -> int:
         help="Local Safebox directory timeout in seconds.",
     )
 
+    reserve_parser = subparsers.add_parser(
+        "reserve",
+        help="Inspect the service Acorn operating reserve.",
+    )
+    reserve_subparsers = reserve_parser.add_subparsers(
+        dest="reserve_command",
+        required=True,
+    )
+    reserve_balance_parser = reserve_subparsers.add_parser(
+        "balance",
+        help="Show the current service Acorn reserve balance.",
+    )
+    reserve_balance_parser.add_argument(
+        "--compose-file",
+        type=Path,
+        default=DEFAULT_COMPOSE_PATH,
+    )
+    reserve_balance_parser.add_argument(
+        "--env-file",
+        type=Path,
+        default=Path(".env"),
+    )
+
     service_parser = subparsers.add_parser(
         "service",
         help="Manage Mainstay-managed services.",
@@ -209,6 +233,11 @@ def main(argv: list[str] | None = None) -> int:
             compose_path=args.compose_file,
             env_path=args.env_file,
             timeout=args.timeout,
+        )
+    if args.command == "reserve" and args.reserve_command == "balance":
+        return _reserve_balance(
+            compose_path=args.compose_file,
+            env_path=args.env_file,
         )
     if args.command == "service":
         return _service_command(args)
@@ -373,6 +402,19 @@ def _clear_send(
         print(f"mainstay-local clear send failed: {exc}", file=sys.stderr)
         return 1
     print(json.dumps(receipt, indent=2))
+    return 0
+
+
+def _reserve_balance(*, compose_path: Path, env_path: Path | None) -> int:
+    try:
+        result = read_service_acorn_reserve(
+            compose_path=compose_path,
+            env_path=env_path,
+        )
+    except ReserveContextError as exc:
+        print(f"mainstay-local reserve balance failed: {exc}", file=sys.stderr)
+        return 1
+    print(f"Service Acorn reserve: {result['balance']} sats")
     return 0
 
 
