@@ -24,6 +24,7 @@ Design notes:
 - [Clear Transfer Routing and Reachability](docs/CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md)
 - [Mainstay Clear Context Wrapper](docs/MAINSTAY-CLEAR-CONTEXT-WRAPPER.md)
 - [Mainstay Grove Context Integration](docs/MAINSTAY-GROVE-CONTEXT-INTEGRATION.md)
+- [Mainstay Continuity Coordinator](docs/MAINSTAY-CONTINUITY-COORDINATOR-DESIGN-NOTE.md)
 
 ## Prototype App
 

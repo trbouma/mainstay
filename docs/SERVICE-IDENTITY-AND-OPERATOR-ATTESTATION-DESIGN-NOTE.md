@@ -116,6 +116,14 @@ The initial Mainstay deployment contains these distinct identities:
 | Clear | Mint-service `npub` | Distinct from keyset IDs and currency authority |
 | Operator | Operator `npub` | Commissions services; private key remains separate |
 
+Mainstay uses one installation identity for both the installation authority
+and the control-plane service. These roles share one custody, persistence, and
+rotation boundary, so a second Mainstay service key would add ceremony without
+adding a meaningful security boundary. The installation `npub` identifies the
+Mainstay instance when it commissions its managed services and when Mainstay
+instances later communicate with one another. A separate higher authority may
+attest this installation identity without replacing it.
+
 The Safebox Web identity must not replace a user's Acorn identity or the
 service Acorn. The Clear identity must not replace the complete Cashu keyset
 ID, CMU, root authority, or treasurer identities. Those objects have separate
@@ -648,19 +656,17 @@ Clear-specific event format.
    list while enforcing threshold one?
 5. Which service state stores complete evidence, and which evidence belongs in
    a shared Mainstay registry cache?
-6. Should Mainstay itself first receive a service identity, an installation
-   identity, or both?
-7. How should an operator signer establish its human-readable identity without
+6. How should an operator signer establish its human-readable identity without
    making DNS or NIP-05 authoritative?
-8. What bounded offline policy is acceptable when current revocation evidence
+7. What bounded offline policy is acceptable when current revocation evidence
    cannot be queried?
-9. Which Clear authority must additionally attest a mint-service identity for
+8. Which Clear authority must additionally attest a mint-service identity for
    commissioned CMUs and keysets?
-10. Should a Safebox Web service identity attest its provider Acorn
+9. Should a Safebox Web service identity attest its provider Acorn
     relationship, or should the operator attest both identities independently?
-11. How should public and local descriptor projections prove that they belong
+10. How should public and local descriptor projections prove that they belong
     to the same service without leaking internal topology?
-12. What backup and recovery evidence is required before Mainstay offers
+11. What backup and recovery evidence is required before Mainstay offers
     automated key rotation?
 
 ## Acceptance Criteria for the First Profile

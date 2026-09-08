@@ -4,10 +4,16 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from stroma import Keys, fips_ipv6_address
+
 from app.cli import DEFAULT_COMPOSE_PATH, _up
 from app.env import render_safebox_env
 from app.registry import BundleConfig, EndpointAddress, ServiceEndpoint
-from app.server import render_dashboard, render_service_context
+from app.server import (
+    installation_identity,
+    render_dashboard,
+    render_service_context,
+)
 from app.status import HomepageResult
 
 
@@ -231,6 +237,24 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn("does not yet measure the reserve automatically", page)
         self.assertEqual(page.count("Local</span>"), 1)
         self.assertNotIn("External</span>", page)
+
+    def test_dashboard_presents_mainstay_installation_identity(self) -> None:
+        npub = Keys(priv_k="33" * 32).public_key_bech32()
+
+        page = render_dashboard(
+            BundleConfig.default(),
+            installation_npub=npub,
+        )
+        identity = installation_identity(npub)
+
+        assert identity is not None
+        self.assertIn('src="/assets/mainstay-logo.svg"', page)
+        self.assertIn('href="/identity"', page)
+        self.assertIn("Mainstay installation", page)
+        self.assertIn(npub, page)
+        self.assertIn(fips_ipv6_address(npub), page)
+        self.assertEqual(identity["type"], "mainstay-installation")
+        self.assertEqual(identity["role"], "installation and control plane")
 
     def test_dashboard_omits_reserve_advisory_without_safebox(self) -> None:
         bundle = BundleConfig(

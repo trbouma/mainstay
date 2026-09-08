@@ -9,18 +9,28 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlsplit
 
+from stroma import fips_ipv6_address
+
 from .registry import BundleConfig, ServiceEndpoint
 from .status import check_bundle, inspect_homepage
 
 GROVE_CAPABILITIES = ("blossom.read", "blossom.write", "blossom.delete")
 
 
-def render_dashboard(bundle: BundleConfig) -> str:
+def render_dashboard(
+    bundle: BundleConfig,
+    *,
+    installation_npub: str | None = None,
+) -> str:
     service_rows = "\n".join(
         _render_service_row(name, endpoint)
         for name, endpoint in bundle.services.items()
     )
     reserve_advisory = _render_reserve_advisory(bundle)
+    installation_panel = _render_installation_panel(
+        bundle,
+        installation_npub=installation_npub,
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -31,13 +41,17 @@ def render_dashboard(bundle: BundleConfig) -> str:
   <style>
     :root {{
       color-scheme: light;
-      --ink: #17211c;
-      --muted: #667169;
-      --line: #d9dfdb;
+      --ink: #14201c;
+      --muted: #607069;
+      --line: #d5ddd8;
       --surface: #ffffff;
-      --canvas: #f3f6f4;
-      --accent: #087f5b;
-      --accent-soft: #dff3eb;
+      --canvas: #eef3f0;
+      --deep: #12312c;
+      --deep-soft: #1c443c;
+      --accent: #087b62;
+      --blue: #2774a6;
+      --amber: #e4a53a;
+      --coral: #c95f4d;
       --warning: #a15c00;
       --danger: #b42318;
     }}
@@ -49,32 +63,42 @@ def render_dashboard(bundle: BundleConfig) -> str:
       font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }}
     header {{
-      background: var(--surface);
-      border-bottom: 1px solid var(--line);
+      color: #f7fbf9;
+      background: var(--deep);
+      border-top: 4px solid var(--amber);
+      border-bottom: 1px solid #31524b;
     }}
-    .header-inner, main {{ width: min(1080px, calc(100% - 32px)); margin: 0 auto; }}
+    .header-inner, main {{ width: min(1120px, calc(100% - 32px)); margin: 0 auto; }}
     .header-inner {{
-      min-height: 76px;
+      min-height: 94px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 24px;
     }}
-    .brand {{ min-width: 0; }}
-    h1 {{ margin: 0; font-size: 20px; line-height: 1.2; letter-spacing: 0; }}
-    .tagline {{ margin: 4px 0 0; color: var(--muted); font-size: 13px; }}
+    .brand {{ display: flex; align-items: center; gap: 14px; min-width: 0; }}
+    .brand-logo {{ width: 54px; height: 54px; padding: 7px; background: #f7fbf9; border: 1px solid #537169; border-radius: 6px; }}
+    .brand-copy {{ min-width: 0; }}
+    h1 {{ margin: 0; font-size: 24px; line-height: 1.15; letter-spacing: 0; }}
+    .tagline {{ margin: 5px 0 0; color: #b9cbc5; font-size: 13px; }}
     nav {{ display: flex; gap: 16px; flex-wrap: wrap; }}
     a {{ color: var(--accent); text-underline-offset: 3px; }}
-    nav a {{ font-size: 13px; font-weight: 650; text-decoration: none; }}
-    main {{ padding: 36px 0 56px; }}
+    nav a {{ color: #d8e8e2; font-size: 13px; font-weight: 650; text-decoration: none; border-bottom: 2px solid transparent; }}
+    nav a:hover {{ color: #ffffff; border-bottom-color: var(--amber); }}
+    .signal-line {{ display: grid; grid-template-columns: 1.4fr 0.7fr 2.2fr 0.45fr; height: 5px; }}
+    .signal-line span:nth-child(1) {{ background: var(--blue); }}
+    .signal-line span:nth-child(2) {{ background: var(--amber); }}
+    .signal-line span:nth-child(3) {{ background: var(--accent); }}
+    .signal-line span:nth-child(4) {{ background: var(--coral); }}
+    main {{ padding: 30px 0 56px; }}
     .overview {{
       display: flex;
       align-items: end;
       justify-content: space-between;
       gap: 24px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }}
-    h2 {{ margin: 0; font-size: 16px; letter-spacing: 0; }}
+    h2 {{ margin: 0; font-size: 17px; letter-spacing: 0; }}
     .summary {{ margin: 4px 0 0; color: var(--muted); font-size: 13px; }}
     .bundle-state {{
       display: inline-flex;
@@ -84,7 +108,7 @@ def render_dashboard(bundle: BundleConfig) -> str:
       padding: 5px 10px;
       border: 1px solid var(--line);
       border-radius: 6px;
-      background: var(--surface);
+      background: #f8fbf9;
       font-size: 13px;
       font-weight: 650;
       white-space: nowrap;
@@ -92,7 +116,29 @@ def render_dashboard(bundle: BundleConfig) -> str:
     .dot {{ width: 8px; height: 8px; border-radius: 50%; background: #8a948d; flex: 0 0 auto; }}
     .dot.ok {{ background: var(--accent); }}
     .dot.error {{ background: var(--danger); }}
-    .services {{ border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }}
+    .installation {{
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(210px, 0.72fr) minmax(0, 1.7fr);
+      gap: 28px;
+      margin: 0 0 20px;
+      padding: 24px 26px;
+      overflow: hidden;
+      color: #f7fbf9;
+      background: var(--deep-soft);
+      border-left: 6px solid var(--amber);
+      border-radius: 6px;
+    }}
+    .installation::after {{ content: ""; position: absolute; right: 0; top: 0; width: 10px; height: 100%; background: var(--blue); }}
+    .eyebrow {{ display: block; margin-bottom: 7px; color: #f3c972; font-size: 11px; font-weight: 800; text-transform: uppercase; }}
+    .installation h2 {{ font-size: 20px; }}
+    .installation-role {{ margin: 5px 0 0; color: #b9cbc5; font-size: 13px; }}
+    .identity-fields {{ display: grid; gap: 10px; min-width: 0; align-content: center; }}
+    .identity-field {{ display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; align-items: baseline; }}
+    .identity-field span {{ color: #a9c1b9; font-size: 11px; font-weight: 700; text-transform: uppercase; }}
+    .identity-field code {{ color: #ffffff; font-size: 12px; }}
+    .identity-missing {{ color: #d7e3df; font-size: 13px; }}
+    .services {{ border: 1px solid var(--line); border-radius: 7px; overflow: hidden; background: var(--surface); box-shadow: 0 10px 28px rgba(18, 49, 44, 0.08); }}
     .advisory {{
       display: grid;
       grid-template-columns: minmax(150px, 0.45fr) minmax(0, 1.55fr);
@@ -117,10 +163,15 @@ def render_dashboard(bundle: BundleConfig) -> str:
       min-height: 92px;
       padding: 18px 20px;
       border-top: 1px solid var(--line);
+      border-left: 4px solid var(--accent);
     }}
     .service:first-child {{ border-top: 0; }}
+    .service[data-service="safebox_web"] {{ border-left-color: var(--blue); }}
+    .service[data-service="clear"] {{ border-left-color: var(--amber); }}
+    .service[data-service="grove"] {{ border-left-color: var(--accent); }}
+    .service[data-service="spurline"] {{ border-left-color: var(--coral); }}
     .service-name {{ margin: 0; font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }}
-    .kind {{ color: var(--muted); font-size: 12px; }}
+    .kind {{ display: inline-block; margin-top: 4px; padding: 2px 5px; color: #4d5f57; background: #edf2ef; border-radius: 3px; font-size: 11px; }}
     .addresses {{ min-width: 0; }}
     .address {{ display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 8px; font-size: 13px; }}
     .address + .address {{ margin-top: 5px; }}
@@ -145,7 +196,10 @@ def render_dashboard(bundle: BundleConfig) -> str:
     .detail span + span::before {{ content: " / "; color: #a3aaa5; }}
     @media (max-width: 700px) {{
       .header-inner {{ align-items: flex-start; flex-direction: column; gap: 14px; padding: 18px 0; }}
+      .brand-logo {{ width: 48px; height: 48px; }}
       .overview {{ align-items: flex-start; flex-direction: column; gap: 12px; }}
+      .installation {{ grid-template-columns: 1fr; gap: 18px; padding: 21px 20px; }}
+      .identity-field {{ grid-template-columns: 1fr; gap: 2px; }}
       .advisory {{ grid-template-columns: 1fr; gap: 8px; }}
       .service {{ grid-template-columns: 1fr; gap: 12px; }}
       .service-state {{ justify-content: flex-start; }}
@@ -160,21 +214,27 @@ def render_dashboard(bundle: BundleConfig) -> str:
   <header>
     <div class="header-inner">
       <div class="brand">
-        <h1>Mainstay Local</h1>
-        <p class="tagline">There's no place like home.</p>
+        <img class="brand-logo" src="/assets/mainstay-logo.svg" alt="">
+        <div class="brand-copy">
+          <h1>Mainstay Local</h1>
+          <p class="tagline">There's no place like home.</p>
+        </div>
       </div>
       <nav aria-label="API endpoints">
+        <a href="/identity">Identity</a>
         <a href="/health">Health</a>
         <a href="/registry">Registry</a>
         <a href="/status">Status JSON</a>
       </nav>
     </div>
   </header>
+  <div class="signal-line" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <main>
+    {installation_panel}
     <section class="overview" aria-labelledby="services-title">
       <div>
-        <h2 id="services-title">Local services</h2>
-        <p class="summary">{len(bundle.services)} registered services</p>
+        <h2 id="services-title">Service network</h2>
+        <p class="summary">{len(bundle.services)} services coordinated inside this installation</p>
       </div>
       <div class="bundle-state" aria-live="polite">
         <span class="dot" id="bundle-dot"></span>
@@ -395,6 +455,51 @@ def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
       </article>"""
 
 
+def installation_identity(installation_npub: str | None) -> dict[str, Any] | None:
+    if not installation_npub:
+        return None
+    try:
+        fips_address = fips_ipv6_address(installation_npub)
+    except (TypeError, ValueError):
+        fips_address = None
+    return {
+        "npub": installation_npub,
+        "fips_ipv6_address": fips_address,
+        "type": "mainstay-installation",
+        "management": "self-managed",
+        "state": "active",
+        "role": "installation and control plane",
+    }
+
+
+def _render_installation_panel(
+    bundle: BundleConfig,
+    *,
+    installation_npub: str | None,
+) -> str:
+    identity = installation_identity(installation_npub)
+    if identity is None:
+        fields = '<p class="identity-missing">Installation identity unavailable</p>'
+    else:
+        fips_address = identity.get("fips_ipv6_address") or "Unavailable"
+        fields = f"""<div class="identity-field">
+          <span>Identity</span>
+          <code>{escape(str(identity["npub"]))}</code>
+        </div>
+        <div class="identity-field">
+          <span>FIPS IPv6</span>
+          <code>{escape(str(fips_address))}</code>
+        </div>"""
+    return f"""<section class="installation" aria-labelledby="installation-title">
+      <div>
+        <span class="eyebrow">Mainstay installation</span>
+        <h2 id="installation-title">{escape(bundle.name)}</h2>
+        <p class="installation-role">Installation identity and local control plane</p>
+      </div>
+      <div class="identity-fields">{fields}</div>
+    </section>"""
+
+
 def _render_reserve_advisory(bundle: BundleConfig) -> str:
     safebox_web = bundle.services.get("safebox_web")
     if safebox_web is None or not safebox_web.enabled:
@@ -484,6 +589,9 @@ def render_service_context(
         "type": "mainstay-service-context",
         "version": 1,
         "context_npub": installation_npub,
+        "fips_ipv6_address": (
+            installation_identity(installation_npub) or {}
+        ).get("fips_ipv6_address"),
         "services": services,
     }
 
@@ -510,8 +618,27 @@ def _handler_for(
         def do_GET(self) -> None:
             if self.path == "/":
                 self._send_text(
-                    render_dashboard(bundle),
+                    render_dashboard(
+                        bundle,
+                        installation_npub=installation_npub,
+                    ),
                     content_type="text/html; charset=utf-8",
+                )
+                return
+            if self.path == "/assets/mainstay-logo.svg":
+                self._send_bytes(
+                    MAINSTAY_LOGO_SVG,
+                    content_type="image/svg+xml; charset=utf-8",
+                )
+                return
+            if self.path == "/identity":
+                self._send_json(
+                    {
+                        "name": bundle.name,
+                        "service_identity": installation_identity(
+                            installation_npub
+                        ),
+                    }
                 )
                 return
             if self.path == "/health":
@@ -566,7 +693,9 @@ def _handler_for(
             self.wfile.write(body)
 
         def _send_text(self, text: str, *, content_type: str) -> None:
-            body = text.encode("utf-8")
+            self._send_bytes(text.encode("utf-8"), content_type=content_type)
+
+        def _send_bytes(self, body: bytes, *, content_type: str) -> None:
             self.send_response(200)
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(body)))
@@ -574,3 +703,10 @@ def _handler_for(
             self.wfile.write(body)
 
     return Handler
+
+
+MAINSTAY_LOGO_SVG = b"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mainstay logo">
+  <path fill="#2f66d8" d="M64 205 256 66l192 139v73l-48-35v135h-48V208l-96-70-96 70v170h-48V243l-48 35z"/>
+  <path fill="#173b78" d="M64 394h168V198l24-24 24 24v196h168v52H64z"/>
+  <path fill="#e4a53a" d="M280 246h96l38 34-38 34h-96z"/>
+</svg>"""
