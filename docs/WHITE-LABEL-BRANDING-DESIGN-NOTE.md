@@ -12,8 +12,8 @@ a branded member experience. It does not implement branding yet.
 **Mainstay provides the invisible private venue infrastructure; the venue owns
 the member experience.**
 
-A Crays deployment should look and speak like Crays throughout its wallet and
-member-facing pages. Mainstay coordinates the local services behind that
+A branded deployment should look and speak like its venue throughout the wallet
+and member-facing pages. Mainstay coordinates the local services behind that
 experience without requiring Mainstay to be the public product name. Another
 operator can run the same software with a different experience profile and no
 fork of Safebox Web or the infrastructure services.
@@ -33,7 +33,7 @@ The proposed first profile is:
 5. Mainstay remains discoverable in operator and technical metadata even when
    member-facing attribution is intentionally absent.
 6. Clear, Grove and Spurline retain their service names and protocol identities;
-   they do not become Crays services at the protocol layer.
+   they do not become venue-branded services at the protocol layer.
 7. Branding never changes an `npub`, keyset ID, mint unit, blob digest, endpoint
    scope, commissioning relationship or member-controlled identity.
 8. No configured profile means that each application uses its built-in native
@@ -48,8 +48,8 @@ The proposed first profile is:
 ### Experience owner
 
 The experience owner is the venue whose name, language and visual identity a
-member encounters. For the first Crays installation, Crays is the experience
-owner.
+member encounters. In a branded installation, the selected venue is the
+experience owner.
 
 The experience owner controls:
 
@@ -112,9 +112,9 @@ The canonical file is `brand.json`. A proposed version-one profile is:
 {
   "schema": "org.mainstay.experience-profile",
   "schema_version": 1,
-  "id": "crays",
-  "name": "Crays",
-  "short_name": "Crays",
+  "id": "example-venue",
+  "name": "Example Venue",
+  "short_name": "Venue",
   "tagline": "Private venue infrastructure",
   "description": "A private place for member-controlled funds and records.",
   "assets": {
@@ -187,7 +187,7 @@ content security policy.
 
 ## Storage and Container Contract
 
-For an instance named `mainstay-crays`, the installed copy lives beneath the
+For an instance named `mainstay-venue`, the installed copy lives beneath the
 instance data root:
 
 ```text
@@ -269,7 +269,7 @@ configured profile is missing or invalid
     -> refuse startup with an operator-readable error
 ```
 
-This prevents partial branding, such as a Crays logo beside a Safebox title or
+This prevents partial branding, such as a venue logo beside a Safebox title or
 a stale social image. All browser assets and metadata derive from the same
 validated profile, including page titles, application name, favicon, manifest,
 Open Graph fields and QR-page presentation.
@@ -283,14 +283,14 @@ add a non-authoritative presentation block:
   "service": "safebox-web",
   "version": "0.1.0",
   "experience": {
-    "profile_id": "crays",
-    "name": "Crays"
+    "profile_id": "example-venue",
+    "name": "Example Venue"
   }
 }
 ```
 
 The `experience` block is unsigned presentation metadata. It is not evidence
-that Crays operates, commissions or controls the service.
+that the venue operates, commissions or controls the service.
 
 ## Identity and Trust
 
@@ -355,7 +355,7 @@ avoiding a premature dependency on DNS, HTTPS or a central theme registry.
 
 - Define a typed schema and JSON Schema fixture in Mainstay.
 - Add a `mainstay-local brand validate <directory>` command.
-- Add native and Crays example profiles with test assets.
+- Add native and generic venue example profiles with test assets.
 - Define atomic installation, digesting and recovery behavior.
 
 ### Phase 2: Safebox Web integration
@@ -393,7 +393,7 @@ The first branding release is complete when:
 
 1. one Mainstay installation can select one validated local profile;
 2. Safebox Web and the dashboard visibly use the same profile;
-3. a Crays deployment contains no accidental Safebox or Mainstay branding on
+3. a branded deployment contains no accidental Safebox or Mainstay branding on
    routine member-facing surfaces;
 4. operator surfaces still reveal the actual Mainstay installation and service
    identities;
@@ -408,8 +408,8 @@ The first branding release is complete when:
 
 ## Open Questions
 
-- Should the first Crays profile ship in Mainstay for development, or live in a
-  separate private brand-package repository?
+- Should a generic example profile ship in Mainstay for development, while
+  production profiles live in separate private brand-package repositories?
 - Which member-facing name should replace "Safebox" in wallet navigation, if
   any?
 - Is Mainstay attribution entirely hidden from members or included on an About
