@@ -72,7 +72,7 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     tmp_path: Path,
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
-    answers = "mainstay-testlab\n" + "\n" * 5 + "no\nyes\n"
+    answers = "mainstay-testlab\n" + "\n" * 6 + "no\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -99,6 +99,7 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     assert values["MAINSTAY_LOCAL_PORT"] == "8788"
     assert values["MAINSTAY_SAFEBOX_BIND_ADDRESS"] == "0.0.0.0"
     assert values["MAINSTAY_SAFEBOX_PORT"] == "8888"
+    assert values["MAINSTAY_LIGHTNING_MINT_URL"] == "https://mint.safebox.dev"
     assert (
         data_root / ".mainstay-local-managed-data-root"
     ).read_text(encoding="utf-8") == "org.mainstay.local-managed-data-root:v1\n"
@@ -111,6 +112,12 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     assert "Preflight checks passed. No configuration has been written." in (
         result.stdout
     )
+    assert result.stdout.count(
+        "Lightning-address delivery requires an operator-funded service-Acorn fee reserve"
+    ) == 2
+    assert "Required action: fund at least 100 sats" in result.stdout
+    assert "app.service_acorn_worker fund 100" in result.stdout
+    assert "./reserve-balance.sh" in result.stdout
 
 
 def test_installer_can_abort_before_changing_files(tmp_path: Path) -> None:
@@ -138,7 +145,7 @@ def test_installer_rejects_an_occupied_selected_port_before_writing(
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     environment["MOCK_LISTEN_PORT"] = "9001"
     data_parent = deployment / "data"
-    answers = f"port-test\n{data_parent}\n\n9001\n\n9000\nyes\n"
+    answers = f"port-test\n{data_parent}\n\n9001\n\n9000\n\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -161,7 +168,7 @@ def test_installer_rejects_an_existing_compose_project_before_writing(
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     environment["MOCK_PROJECT_EXISTS"] = "1"
-    answers = "mainstay-local\n" + "\n" * 5 + "yes\n"
+    answers = "mainstay-local\n" + "\n" * 6 + "yes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -190,6 +197,7 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
         "MAINSTAY_LOCAL_PORT=9876\n"
         "MAINSTAY_SAFEBOX_BIND_ADDRESS=100.70.55.66\n"
         "MAINSTAY_SAFEBOX_PORT=9999\n"
+        "MAINSTAY_LIGHTNING_MINT_URL=https://mint.example.com\n"
     )
     env_file.write_text(original, encoding="utf-8")
 
@@ -197,7 +205,7 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
         [str(deployment / "install-mainstay.sh")],
         cwd=deployment,
         env=environment,
-        input="\n\n\n\n\n\nno\nno\n",
+        input="\n\n\n\n\n\n\nno\nno\n",
         capture_output=True,
         text=True,
         check=False,
@@ -207,7 +215,38 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
     assert "Compose project name [private-venue]" in result.stderr
     assert "Dashboard host port [9876]" in result.stderr
     assert "Safebox Web host port [9999]" in result.stderr
+    assert "External Lightning mint URL [https://mint.example.com]" in result.stderr
     assert env_file.read_text(encoding="utf-8") == original
+
+
+def test_installer_reprompts_for_external_https_lightning_mint(
+    tmp_path: Path,
+) -> None:
+    deployment, environment, _docker_log = _stage_installer(tmp_path)
+    answers = (
+        "mint-test\n"
+        + "\n" * 5
+        + "http://mint.example.com\n"
+        + "https://mint.example.com\n"
+        + "no\nyes\n"
+    )
+
+    result = subprocess.run(
+        [str(deployment / "install-mainstay.sh")],
+        cwd=deployment,
+        env=environment,
+        input=answers,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "Enter an external https:// mint URL" in result.stderr
+    assert (
+        _read_env(deployment / ".env")["MAINSTAY_LIGHTNING_MINT_URL"]
+        == "https://mint.example.com"
+    )
 
 
 def test_teardown_removes_installer_managed_data_and_configuration(

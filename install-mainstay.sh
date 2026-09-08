@@ -180,6 +180,31 @@ prompt_bind_address() {
     done
 }
 
+prompt_https_url() {
+    label=$1
+    default_value=$2
+    while :; do
+        url=$(prompt_value "$label" "$default_value")
+        case "$url" in
+            https://?*)
+                case "$url" in
+                    *[[:space:]]*|*'?'*|*'#'*) ;;
+                    *)
+                        authority=${url#https://}
+                        authority=${authority%%/*}
+                        case "$authority" in
+                            ''|*@*) ;;
+                            *) printf '%s\n' "$url"; return ;;
+                        esac
+                        ;;
+                esac
+                ;;
+        esac
+        printf '%s\n' \
+            'Enter an external https:// mint URL without credentials, a query, fragment, or spaces; or abort.' >&2
+    done
+}
+
 prompt_project_name() {
     default_value=$1
     while :; do
@@ -217,6 +242,21 @@ set_env_value() {
     ' "$env_file" > "$temp_file"
     chmod 600 "$temp_file"
     mv "$temp_file" "$env_file"
+}
+
+print_fee_reserve_advisory() {
+    printf '%s\n' \
+        'ADVISORY: Lightning-address delivery requires an operator-funded service-Acorn fee reserve.'
+    printf '%s\n' \
+        'Mainstay does not transfer funds automatically. After first startup, fund at least 100 sats while the worker is stopped:'
+    printf '%s\n' \
+        '  docker compose stop service-acorn-worker'
+    printf '%s\n' \
+        '  docker compose run --rm --no-deps service-acorn-worker python -m app.service_acorn_worker fund 100'
+    printf '%s\n' \
+        '  docker compose up -d service-acorn-worker'
+    printf '%s\n' \
+        'The funding command reports the resulting balance. Check it later with: ./reserve-balance.sh'
 }
 
 printf '%s\n' 'Mainstay first-install wizard'
@@ -311,6 +351,8 @@ dashboard_bind_default=$(env_default MAINSTAY_LOCAL_BIND_ADDRESS 0.0.0.0)
 dashboard_port_default=$(env_default MAINSTAY_LOCAL_PORT 8788)
 safebox_bind_default=$(env_default MAINSTAY_SAFEBOX_BIND_ADDRESS 0.0.0.0)
 safebox_port_default=$(env_default MAINSTAY_SAFEBOX_PORT 8888)
+lightning_mint_default=$(env_default \
+    MAINSTAY_LIGHTNING_MINT_URL https://mint.safebox.dev)
 dashboard_bind=$(prompt_bind_address \
     'Dashboard bind address' "$dashboard_bind_default")
 dashboard_port=$(prompt_port \
@@ -319,6 +361,8 @@ safebox_bind=$(prompt_bind_address \
     'Safebox Web bind address' "$safebox_bind_default")
 safebox_port=$(prompt_port \
     'Safebox Web host port' "$safebox_port_default")
+lightning_mint_url=$(prompt_https_url \
+    'External Lightning mint URL' "$lightning_mint_default")
 
 if [ "$dashboard_bind" = "$safebox_bind" ] && \
     [ "$dashboard_port" = "$safebox_port" ]; then
@@ -389,6 +433,9 @@ fi
 printf '  Data root:       %s\n' "${data_root:-Docker-managed named volumes}"
 printf '  Dashboard:       %s:%s\n' "$dashboard_bind" "$dashboard_port"
 printf '  Safebox Web:     %s:%s\n' "$safebox_bind" "$safebox_port"
+printf '  Lightning mint:  %s\n' "$lightning_mint_url"
+printf '%s\n' \
+    '  Required action: fund at least 100 sats of service-Acorn fee reserve after startup'
 printf '  Start afterward: %s\n' "$start_after"
 if [ -n "$data_root" ] && [ "$managed_data_root" = false ]; then
     printf '%s\n' \
@@ -415,6 +462,7 @@ set_env_value MAINSTAY_LOCAL_BIND_ADDRESS "$dashboard_bind"
 set_env_value MAINSTAY_LOCAL_PORT "$dashboard_port"
 set_env_value MAINSTAY_SAFEBOX_BIND_ADDRESS "$safebox_bind"
 set_env_value MAINSTAY_SAFEBOX_PORT "$safebox_port"
+set_env_value MAINSTAY_LIGHTNING_MINT_URL "$lightning_mint_url"
 set_env_value COMPOSE_PROJECT_NAME "$compose_project_name"
 set_env_value MAINSTAY_DATA_PARENT "$data_parent"
 set_env_value MAINSTAY_DATA_DIRECTORY_NAME "$data_directory_name"
@@ -428,6 +476,8 @@ fi
 "$repo_dir/save-recovery-env.sh"
 
 printf '%s\n' 'Mainstay configuration is ready in .env.'
+printf '\n'
+print_fee_reserve_advisory
 if [ "$start_after" = yes ]; then
     "$repo_dir/start-mainstay.sh"
 else

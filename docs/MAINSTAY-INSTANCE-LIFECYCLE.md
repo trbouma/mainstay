@@ -123,12 +123,18 @@ The wizard gathers:
 - a unique Compose project name;
 - a data parent, or an explicit choice to use Docker-managed volumes;
 - dashboard bind address and host port;
-- Safebox Web bind address and host port; and
+- Safebox Web bind address and host port;
+- the external HTTPS Lightning mint used by Safebox Web and the service Acorn; and
 - whether to start after configuration.
 
 When `.env` exists, its values are displayed as defaults. When an entry is
 absent, the code default is displayed. Entering `abort`, `quit` or `q` stops the
 wizard. The final write confirmation defaults to no.
+
+The wizard prominently reports that Lightning-address delivery requires an
+operator-funded service-Acorn fee reserve. It lists funding as a required
+post-start action and prints the exact stop, fund, restart, and balance-check
+commands. Mainstay does not move operator funds during installation.
 
 Before that confirmation, the installer checks:
 

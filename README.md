@@ -105,8 +105,10 @@ For a first installation, run the interactive operator wizard:
 ./install-mainstay.sh
 ```
 
-It prompts for a unique Compose project name, a parent data directory, and the
-host bind addresses and ports for the dashboard and Safebox Web. A new instance
+It prompts for a unique Compose project name, a parent data directory, the
+host bind addresses and ports for the dashboard and Safebox Web, and the
+external Lightning mint used by new and service Acorns. The mint defaults to
+`https://mint.safebox.dev` and must use HTTPS. A new instance
 named `mainstay-testlab` with parent `/mnt/bitcoin/mainstay` uses the dedicated
 root `/mnt/bitcoin/mainstay/mainstay-testlab`. Enter `abort`, `quit`, or `q` at
 any prompt to stop before configuration is written. Existing `.env` values are
@@ -114,6 +116,9 @@ displayed as defaults; otherwise the shipped defaults are used. Before the
 final review it performs read-only checks for Docker, Compose, OpenSSL, a
 conflicting Compose namespace, data-root writability, and occupied host ports.
 The final review defaults to not writing anything.
+It also marks the operator-funded service-Acorn fee reserve as a required
+post-start action. The installer does not transfer funds automatically and
+prints the stop, fund, restart, and balance-check commands before it exits.
 
 For routine starts after `.env` exists, validate Compose, start the bundle, and
 wait for readiness with:
@@ -212,11 +217,18 @@ deposit before restarting the worker. The reserve is operator-owned working
 capital, is separate from recipient payments, and must be replenished as mint
 fees consume it.
 
-Check the current reserve from the Mainstay project directory:
+Check the current reserve from the deployed Mainstay directory without
+requiring Poetry on the host:
 
 ```bash
-poetry run mainstay-local reserve balance
+./reserve-balance.sh
 ```
+
+The script uses the configured Docker Compose project, briefly stops the
+singleton worker, runs its balance command in a one-off container, and restores
+the worker only when it was running beforehand. From a development checkout
+with Poetry installed, `poetry run mainstay-local reserve balance` remains an
+equivalent convenience command.
 
 Mainstay briefly pauses the singleton service Acorn worker while it loads the
 persisted wallet, then restores the worker only if it was running beforehand.

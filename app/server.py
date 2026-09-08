@@ -518,7 +518,7 @@ def _render_reserve_advisory(bundle: BundleConfig) -> str:
       </div>
       <div>
         <p>The service Acorn needs at least {amount} sats of operator-funded reserve to cover mint input fees while delivering Lightning-address payments. A healthy worker can create invoices before this reserve exists.</p>
-        <p>Mainstay does not yet measure the reserve automatically. Check it with <code>poetry run mainstay-local reserve balance</code>, fund it after first startup, and replenish it as fees consume it.</p>
+        <p>Mainstay does not yet measure the reserve automatically. Check it from the deployment host with <code>./reserve-balance.sh</code>, fund it after first startup, and replenish it as fees consume it.</p>
         <p><code>{escape(command)}</code></p>
       </div>
     </section>"""
