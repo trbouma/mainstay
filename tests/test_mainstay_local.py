@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import os
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from stroma import Keys, fips_ipv6_address
 
-from app.cli import DEFAULT_COMPOSE_PATH, _up
+from app.cli import DEFAULT_COMPOSE_PATH, _serve, _up
 from app.env import render_safebox_env
 from app.registry import BundleConfig, EndpointAddress, ServiceEndpoint
 from app.server import (
@@ -135,6 +136,33 @@ class MainstayLocalTests(unittest.TestCase):
         )
         self.assertEqual(
             safebox_web.health_url, "http://safebox-web:8000/health"
+        )
+
+    def test_default_registry_accepts_the_installed_safebox_port(self) -> None:
+        safebox_web = BundleConfig.default(
+            safebox_port=9000
+        ).require_service("safebox_web")
+
+        self.assertEqual(safebox_web.port, 9000)
+        self.assertEqual(
+            safebox_web.require_url("local", purpose="web"),
+            "http://127.0.0.1:9000",
+        )
+
+    @patch("app.cli.serve")
+    def test_server_uses_safebox_port_from_environment(self, serve) -> None:
+        missing_config = Path("does-not-exist.json")
+
+        with patch.dict(os.environ, {"MAINSTAY_SAFEBOX_PORT": "9000"}):
+            result = _serve(missing_config, host=None, port=None)
+
+        self.assertEqual(result, 0)
+        bundle = serve.call_args.args[0]
+        self.assertEqual(
+            bundle.require_service("safebox_web").require_url(
+                "local", purpose="web"
+            ),
+            "http://127.0.0.1:9000",
         )
 
     def test_clear_uses_the_private_runtime_namespace(self) -> None:

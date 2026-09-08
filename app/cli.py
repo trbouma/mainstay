@@ -353,7 +353,9 @@ def _serve(config_path: Path, *, host: str | None, port: int | None) -> int:
     bundle = (
         BundleConfig.from_json(config_path)
         if config_path.exists()
-        else BundleConfig.default()
+        else BundleConfig.default(
+            safebox_port=_env_int("MAINSTAY_SAFEBOX_PORT") or 8888
+        )
     )
     installation_secret = os.getenv("MAINSTAY_INSTALLATION_NSEC", "").strip()
     installation_npub = None

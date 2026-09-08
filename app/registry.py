@@ -184,7 +184,7 @@ class BundleConfig:
             raise ValueError("service_acorn_reserve_sats must be positive")
 
     @classmethod
-    def default(cls) -> BundleConfig:
+    def default(cls, *, safebox_port: int = 8888) -> BundleConfig:
         return cls(
             secrets={
                 "safebox_cookie_key": "",
@@ -203,12 +203,15 @@ class BundleConfig:
                             "internal", "web", "http://safebox-web:8000", 10
                         ),
                         EndpointAddress(
-                            "local", "web", "http://127.0.0.1:8888", 20
+                            "local",
+                            "web",
+                            f"http://127.0.0.1:{safebox_port}",
+                            20,
                         ),
                     ),
                     enabled=True,
                     bind_address="0.0.0.0",
-                    port=8888,
+                    port=safebox_port,
                     health_url="http://safebox-web:8000/health",
                     homepage_url="http://safebox-web:8000/",
                 ),
