@@ -217,8 +217,11 @@ class MainstayLocalTests(unittest.TestCase):
 
         self.assertIn("There's no place like home.", page)
         self.assertIn('data-service="safebox_web"', page)
-        self.assertIn('href="/registry"', page)
-        self.assertIn('fetch("/status"', page)
+        self.assertIn('href="registry"', page)
+        self.assertIn('fetch("status"', page)
+        self.assertNotIn('href="/', page)
+        self.assertNotIn('src="/', page)
+        self.assertNotIn('fetch("/', page)
         self.assertIn("window.location.hostname", page)
         self.assertIn('class="service-report"', page)
         self.assertIn('class="service-identity" hidden', page)
@@ -248,8 +251,8 @@ class MainstayLocalTests(unittest.TestCase):
         identity = installation_identity(npub)
 
         assert identity is not None
-        self.assertIn('src="/assets/mainstay-logo.svg"', page)
-        self.assertIn('href="/identity"', page)
+        self.assertIn('src="assets/mainstay-logo.svg"', page)
+        self.assertIn('href="identity"', page)
         self.assertIn("Mainstay installation", page)
         self.assertIn(npub, page)
         self.assertIn(fips_ipv6_address(npub), page)

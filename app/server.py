@@ -214,17 +214,17 @@ def render_dashboard(
   <header>
     <div class="header-inner">
       <div class="brand">
-        <img class="brand-logo" src="/assets/mainstay-logo.svg" alt="">
+        <img class="brand-logo" src="assets/mainstay-logo.svg" alt="">
         <div class="brand-copy">
           <h1>Mainstay Local</h1>
           <p class="tagline">There's no place like home.</p>
         </div>
       </div>
       <nav aria-label="API endpoints">
-        <a href="/identity">Identity</a>
-        <a href="/health">Health</a>
-        <a href="/registry">Registry</a>
-        <a href="/status">Status JSON</a>
+        <a href="identity">Identity</a>
+        <a href="health">Health</a>
+        <a href="registry">Registry</a>
+        <a href="status">Status JSON</a>
       </nav>
     </div>
   </header>
@@ -266,7 +266,7 @@ def render_dashboard(
       const bundleLabel = document.getElementById("bundle-state");
       const bundleDot = document.getElementById("bundle-dot");
       try {{
-        const response = await fetch("/status", {{ cache: "no-store" }});
+        const response = await fetch("status", {{ cache: "no-store" }});
         if (!response.ok) throw new Error(`HTTP ${{response.status}}`);
         const payload = await response.json();
         const results = new Map(payload.services.map((service) => [service.name, service]));
