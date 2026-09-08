@@ -238,10 +238,29 @@ printf '\n'
 compose_project_default=$(env_default COMPOSE_PROJECT_NAME mainstay-local)
 compose_project_name=$(prompt_project_name "$compose_project_default")
 configured_data_root=$(env_default MAINSTAY_DATA_ROOT "")
-if [ "$env_existed" = false ] && [ -z "$configured_data_root" ]; then
-    configured_data_root="$repo_dir/.mainstay-data"
+configured_data_parent=$(env_default MAINSTAY_DATA_PARENT "")
+legacy_data_layout=false
+if [ "$env_existed" = true ] && [ -n "$configured_data_root" ] && \
+    [ -z "$configured_data_parent" ]; then
+    legacy_data_layout=true
+    data_root=$(prompt_value \
+        'Existing dedicated instance data root' "$configured_data_root")
+    data_parent=$(dirname -- "$data_root")
+else
+    if [ "$env_existed" = false ] && [ -z "$configured_data_parent" ]; then
+        configured_data_parent="$repo_dir/.mainstay-data"
+    fi
+    data_parent=$(prompt_value 'Data parent directory' "$configured_data_parent")
+    case "$data_parent" in
+        '~') data_parent=$HOME ;;
+        '~/'*) data_parent="$HOME/${data_parent#\~/}" ;;
+    esac
+    if [ -n "$data_parent" ]; then
+        data_root="$data_parent/$compose_project_name"
+    else
+        data_root=""
+    fi
 fi
-data_root=$(prompt_value 'Dedicated data root' "$configured_data_root")
 case "$data_root" in
     '~') data_root=$HOME ;;
     '~/'*) data_root="$HOME/${data_root#\~/}" ;;
@@ -266,6 +285,14 @@ if [ -n "$data_root" ]; then
             exit 2
             ;;
     esac
+fi
+if [ "$env_existed" = true ] && \
+    [ "$data_root" != "$configured_data_root" ]; then
+    printf '%s\n' \
+        "Refusing to change MAINSTAY_DATA_ROOT from ${configured_data_root:-Docker-managed volumes}." >&2
+    printf '%s\n' \
+        'Move existing data with an explicit stopped-service migration instead.' >&2
+    exit 1
 fi
 
 dashboard_bind_default=$(env_default MAINSTAY_LOCAL_BIND_ADDRESS 0.0.0.0)
@@ -344,6 +371,9 @@ printf '%s\n' 'Preflight checks passed. No configuration has been written.'
 
 printf '\n%s\n' 'Review'
 printf '  Compose project: %s\n' "$compose_project_name"
+if [ "$legacy_data_layout" = false ]; then
+    printf '  Data parent:     %s\n' "${data_parent:-Docker-managed named volumes}"
+fi
 printf '  Data root:       %s\n' "${data_root:-Docker-managed named volumes}"
 printf '  Dashboard:       %s:%s\n' "$dashboard_bind" "$dashboard_port"
 printf '  Safebox Web:     %s:%s\n' "$safebox_bind" "$safebox_port"
@@ -374,6 +404,7 @@ set_env_value MAINSTAY_LOCAL_PORT "$dashboard_port"
 set_env_value MAINSTAY_SAFEBOX_BIND_ADDRESS "$safebox_bind"
 set_env_value MAINSTAY_SAFEBOX_PORT "$safebox_port"
 set_env_value COMPOSE_PROJECT_NAME "$compose_project_name"
+set_env_value MAINSTAY_DATA_PARENT "$data_parent"
 
 if [ -n "$data_root" ] && [ "$managed_data_root" = true ]; then
     marker="$data_root/$managed_marker_name"

@@ -33,11 +33,14 @@ docker compose ps
 ```
 
 The wizard asks for a unique Compose project name, the dashboard and Safebox
-Web host ports, their bind addresses, and one data root for all service data.
-Press Enter to accept a displayed default. Enter `abort`, `quit`, or `q` at any
-prompt to leave without writing configuration. The final confirmation defaults
-to no. Before that confirmation, a read-only preflight checks Docker, Compose,
-OpenSSL, the Compose namespace, data-root writability, and selected host-port
+Web host ports, their bind addresses, and a parent directory for service data.
+It creates one instance-specific root beneath that parent using the Compose
+project name. For example, parent `/mnt/bitcoin/mainstay` and name
+`mainstay-testlab` produce `/mnt/bitcoin/mainstay/mainstay-testlab`. Press Enter
+to accept a displayed default. Enter `abort`, `quit`, or `q` at any prompt to
+leave without writing configuration. The final confirmation defaults to no.
+Before that confirmation, a read-only preflight checks Docker, Compose, OpenSSL,
+the Compose namespace, data-root writability, and selected host-port
 availability.
 
 Open the Mainstay dashboard at `http://127.0.0.1:8788/` and Safebox Web at
@@ -75,9 +78,9 @@ For a completely disposable test installation, run:
 
 After the explicit `DELETE` confirmation, it removes the Compose containers,
 network, named volumes, generated `.env`, and installation identity state. A
-bind-mounted root is deleted only when it carries the installer's ownership
-marker; unmarked operator-owned directories are preserved. Component images
-remain cached for a quicker reinstall.
+derived instance root is deleted only when it carries the installer's ownership
+marker; its parent and unmarked operator-owned directories are preserved.
+Component images remain cached for a quicker reinstall.
 
 ## Optional Testing Milestones
 
@@ -134,7 +137,7 @@ and backup support. Select its root during first initialization:
 ./init-env.sh --data-root /absolute/path/to/mainstay-data
 ```
 
-Mainstay creates separate `mainstay-local`, `safebox-web`, `spurline`, `grove`,
+Mainstay creates separate `mainstay-control`, `safebox-web`, `spurline`, `grove`,
 and `clear` directories beneath that root. Omitting the option uses
 Docker-managed named volumes. The initialization helper will not silently move
 an existing installation to another root.

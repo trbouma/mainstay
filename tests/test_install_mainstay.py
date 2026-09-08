@@ -88,8 +88,10 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
         result.stdout
     )
     values = _read_env(deployment / ".env")
-    data_root = deployment / ".mainstay-data"
+    data_parent = deployment / ".mainstay-data"
+    data_root = data_parent / "mainstay-testlab"
     assert values["COMPOSE_PROJECT_NAME"] == "mainstay-testlab"
+    assert values["MAINSTAY_DATA_PARENT"] == str(data_parent)
     assert values["MAINSTAY_DATA_ROOT"] == str(data_root)
     assert values["MAINSTAY_LOCAL_BIND_ADDRESS"] == "0.0.0.0"
     assert values["MAINSTAY_LOCAL_PORT"] == "8788"
@@ -128,8 +130,8 @@ def test_installer_rejects_an_occupied_selected_port_before_writing(
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     environment["MOCK_LISTEN_PORT"] = "9001"
-    data_root = deployment / "data"
-    answers = f"port-test\n{data_root}\n\n9001\n\n9000\nyes\n"
+    data_parent = deployment / "data"
+    answers = f"port-test\n{data_parent}\n\n9001\n\n9000\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -144,7 +146,7 @@ def test_installer_rejects_an_occupied_selected_port_before_writing(
     assert result.returncode == 1
     assert "Dashboard port 9001 is already in use" in result.stderr
     assert not (deployment / ".env").exists()
-    assert not data_root.exists()
+    assert not data_parent.exists()
 
 
 def test_installer_rejects_an_existing_compose_project_before_writing(

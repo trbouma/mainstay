@@ -328,7 +328,7 @@ the first `init-env.sh` run. Mainstay records the absolute root and the derived
 service paths in `.env`, then gives every stateful service its own subdirectory:
 
 ```text
-<mainstay-data-root>/mainstay-local
+<mainstay-data-root>/mainstay-control
 <mainstay-data-root>/safebox-web
 <mainstay-data-root>/spurline
 <mainstay-data-root>/grove

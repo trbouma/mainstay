@@ -104,13 +104,15 @@ For a first installation, run the interactive operator wizard:
 ./install-mainstay.sh
 ```
 
-It prompts for a unique Compose project name, the dedicated data root, and the
-host bind addresses and ports for the dashboard and Safebox Web. Enter `abort`,
-`quit`, or `q` at any prompt to stop before configuration is written. Existing
-`.env` values are displayed as defaults; otherwise the shipped defaults are
-used. Before the final review it performs read-only checks for Docker, Compose,
-OpenSSL, a conflicting Compose namespace, data-root writability, and occupied
-host ports. The final review defaults to not writing anything.
+It prompts for a unique Compose project name, a parent data directory, and the
+host bind addresses and ports for the dashboard and Safebox Web. A new instance
+named `mainstay-testlab` with parent `/mnt/bitcoin/mainstay` uses the dedicated
+root `/mnt/bitcoin/mainstay/mainstay-testlab`. Enter `abort`, `quit`, or `q` at
+any prompt to stop before configuration is written. Existing `.env` values are
+displayed as defaults; otherwise the shipped defaults are used. Before the
+final review it performs read-only checks for Docker, Compose, OpenSSL, a
+conflicting Compose namespace, data-root writability, and occupied host ports.
+The final review defaults to not writing anything.
 
 For routine starts after `.env` exists, validate Compose, start the bundle, and
 wait for readiness with:
@@ -128,7 +130,7 @@ initialization:
 ./start-mainstay.sh --data-root "$HOME/mainstay-local-data"
 ```
 
-This records the absolute root in `.env` and creates `mainstay-local`,
+This records the absolute root in `.env` and creates `mainstay-control`,
 `safebox-web`, `spurline`, `grove`, and `clear` subdirectories beneath it.
 Compose uses those directories as bind mounts and runs the data-writing
 processes with the initializing host user's UID and GID. Without `--data-root`,
@@ -137,8 +139,9 @@ native account from each service image. Initialization will not change an
 existing installation from one root to another; relocating live data requires
 an explicit stopped-service migration and corresponding `.env` update.
 
-An installation created with the wizard uses a marked, dedicated data root by
-default. Tear it down completely with:
+An installation created with the wizard marks only its derived instance root;
+the parent can safely contain other Mainstay instances. Tear the selected
+instance down completely with:
 
 ```bash
 ./teardown-mainstay.sh
@@ -146,10 +149,10 @@ default. Tear it down completely with:
 
 The teardown command shows exactly what it will remove and requires the literal
 confirmation `DELETE`. It runs `docker compose down --volumes`, removes `.env`
-and generated installation-identity state, and deletes a bind-mounted data root
-only when the installer ownership marker is present. An unmarked operator-owned
-directory is never recursively deleted. Built images remain available, making
-the next disposable installation quicker.
+and generated installation-identity state, and deletes the derived instance
+root only when the installer ownership marker is present. The shared parent and
+unmarked operator-owned directories are never recursively deleted. Built images
+remain available, making the next disposable installation quicker.
 
 `init-env.sh` copies `.env.example` when `.env` is absent and generates
 independent Clear master/operator secrets, a valid Safebox cookie-encryption

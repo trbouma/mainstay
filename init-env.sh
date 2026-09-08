@@ -108,7 +108,12 @@ if [ -n "$data_root" ]; then
             exit 1
             ;;
     esac
-    local_data_source="$data_root/mainstay-local"
+    configured_local_data_source=$(read_value MAINSTAY_LOCAL_DATA_SOURCE)
+    if [ "$created" = false ] && [ -n "$configured_local_data_source" ]; then
+        local_data_source=$configured_local_data_source
+    else
+        local_data_source="$data_root/mainstay-control"
+    fi
     safebox_data_source="$data_root/safebox-web"
     spurline_data_source="$data_root/spurline"
     grove_data_source="$data_root/grove"
