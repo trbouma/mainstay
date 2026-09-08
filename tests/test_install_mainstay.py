@@ -72,7 +72,7 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     tmp_path: Path,
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
-    answers = "mainstay-testlab\n" + "\n" * 6 + "no\nyes\n"
+    answers = "mainstay-testlab\n" + "\n" * 7 + "no\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -101,6 +101,10 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     assert values["MAINSTAY_SAFEBOX_PORT"] == "8888"
     assert values["MAINSTAY_LIGHTNING_MINT_URL"] == "https://mint.safebox.dev"
     assert (
+        values["SAFEBOX_NIP05_EXTERNAL_RELAYS"]
+        == "wss://spurline.safebox.dev"
+    )
+    assert (
         data_root / ".mainstay-local-managed-data-root"
     ).read_text(encoding="utf-8") == "org.mainstay.local-managed-data-root:v1\n"
     recovery_file = data_root / ".env.recovery"
@@ -113,7 +117,8 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
         result.stdout
     )
     assert result.stdout.count(
-        "Lightning-address delivery requires an operator-funded service-Acorn fee reserve"
+        "Lightning-address delivery requires an operator-funded "
+        "service-Acorn fee reserve"
     ) == 2
     assert "Required action: fund at least 100 sats" in result.stdout
     assert "app.service_acorn_worker fund 100" in result.stdout
@@ -145,7 +150,7 @@ def test_installer_rejects_an_occupied_selected_port_before_writing(
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     environment["MOCK_LISTEN_PORT"] = "9001"
     data_parent = deployment / "data"
-    answers = f"port-test\n{data_parent}\n\n9001\n\n9000\n\nyes\n"
+    answers = f"port-test\n{data_parent}\n\n9001\n\n9000\n\n\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -168,7 +173,7 @@ def test_installer_rejects_an_existing_compose_project_before_writing(
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     environment["MOCK_PROJECT_EXISTS"] = "1"
-    answers = "mainstay-local\n" + "\n" * 6 + "yes\n"
+    answers = "mainstay-local\n" + "\n" * 7 + "yes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -205,7 +210,7 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
         [str(deployment / "install-mainstay.sh")],
         cwd=deployment,
         env=environment,
-        input="\n\n\n\n\n\n\nno\nno\n",
+        input="\n\n\n\n\n\n\n\nno\nno\n",
         capture_output=True,
         text=True,
         check=False,
@@ -216,6 +221,9 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
     assert "Dashboard host port [9876]" in result.stderr
     assert "Safebox Web host port [9999]" in result.stderr
     assert "External Lightning mint URL [https://mint.example.com]" in result.stderr
+    assert "External inbox relay URL (or none) [wss://spurline.safebox.dev]" in (
+        result.stderr
+    )
     assert env_file.read_text(encoding="utf-8") == original
 
 
@@ -228,7 +236,7 @@ def test_installer_reprompts_for_external_https_lightning_mint(
         + "\n" * 5
         + "http://mint.example.com\n"
         + "https://mint.example.com\n"
-        + "no\nyes\n"
+        + "\nno\nyes\n"
     )
 
     result = subprocess.run(
@@ -247,6 +255,25 @@ def test_installer_reprompts_for_external_https_lightning_mint(
         _read_env(deployment / ".env")["MAINSTAY_LIGHTNING_MINT_URL"]
         == "https://mint.example.com"
     )
+
+
+def test_installer_can_disable_external_inbox_relay(tmp_path: Path) -> None:
+    deployment, environment, _docker_log = _stage_installer(tmp_path)
+    answers = "relay-test\n" + "\n" * 6 + "none\nno\nyes\n"
+
+    result = subprocess.run(
+        [str(deployment / "install-mainstay.sh")],
+        cwd=deployment,
+        env=environment,
+        input=answers,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "External relay:  not advertised" in result.stdout
+    assert _read_env(deployment / ".env")["SAFEBOX_NIP05_EXTERNAL_RELAYS"] == ""
 
 
 def test_teardown_removes_installer_managed_data_and_configuration(

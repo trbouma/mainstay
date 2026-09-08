@@ -205,6 +205,34 @@ prompt_https_url() {
     done
 }
 
+prompt_external_relay() {
+    label=$1
+    default_value=$2
+    while :; do
+        relay=$(prompt_value "$label" "$default_value")
+        case $(printf '%s' "$relay" | tr '[:upper:]' '[:lower:]') in
+            none) printf '%s\n' ""; return ;;
+        esac
+        case "$relay" in
+            wss://?*)
+                case "$relay" in
+                    *[[:space:]]*|*'#'*) ;;
+                    *)
+                        authority=${relay#wss://}
+                        authority=${authority%%/*}
+                        case "$authority" in
+                            ''|*@*|*,*) ;;
+                            *) printf '%s\n' "$relay"; return ;;
+                        esac
+                        ;;
+                esac
+                ;;
+        esac
+        printf '%s\n' \
+            'Enter one external wss:// relay URL, none, or abort.' >&2
+    done
+}
+
 prompt_project_name() {
     default_value=$1
     while :; do
@@ -353,6 +381,8 @@ safebox_bind_default=$(env_default MAINSTAY_SAFEBOX_BIND_ADDRESS 0.0.0.0)
 safebox_port_default=$(env_default MAINSTAY_SAFEBOX_PORT 8888)
 lightning_mint_default=$(env_default \
     MAINSTAY_LIGHTNING_MINT_URL https://mint.safebox.dev)
+external_relay_default=$(env_default \
+    SAFEBOX_NIP05_EXTERNAL_RELAYS wss://spurline.safebox.dev)
 dashboard_bind=$(prompt_bind_address \
     'Dashboard bind address' "$dashboard_bind_default")
 dashboard_port=$(prompt_port \
@@ -363,6 +393,8 @@ safebox_port=$(prompt_port \
     'Safebox Web host port' "$safebox_port_default")
 lightning_mint_url=$(prompt_https_url \
     'External Lightning mint URL' "$lightning_mint_default")
+external_relay=$(prompt_external_relay \
+    'External inbox relay URL (or none)' "$external_relay_default")
 
 if [ "$dashboard_bind" = "$safebox_bind" ] && \
     [ "$dashboard_port" = "$safebox_port" ]; then
@@ -434,6 +466,7 @@ printf '  Data root:       %s\n' "${data_root:-Docker-managed named volumes}"
 printf '  Dashboard:       %s:%s\n' "$dashboard_bind" "$dashboard_port"
 printf '  Safebox Web:     %s:%s\n' "$safebox_bind" "$safebox_port"
 printf '  Lightning mint:  %s\n' "$lightning_mint_url"
+printf '  External relay:  %s\n' "${external_relay:-not advertised}"
 printf '%s\n' \
     '  Required action: fund at least 100 sats of service-Acorn fee reserve after startup'
 printf '  Start afterward: %s\n' "$start_after"
@@ -463,6 +496,7 @@ set_env_value MAINSTAY_LOCAL_PORT "$dashboard_port"
 set_env_value MAINSTAY_SAFEBOX_BIND_ADDRESS "$safebox_bind"
 set_env_value MAINSTAY_SAFEBOX_PORT "$safebox_port"
 set_env_value MAINSTAY_LIGHTNING_MINT_URL "$lightning_mint_url"
+set_env_value SAFEBOX_NIP05_EXTERNAL_RELAYS "$external_relay"
 set_env_value COMPOSE_PROJECT_NAME "$compose_project_name"
 set_env_value MAINSTAY_DATA_PARENT "$data_parent"
 set_env_value MAINSTAY_DATA_DIRECTORY_NAME "$data_directory_name"

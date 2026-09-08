@@ -125,6 +125,8 @@ The wizard gathers:
 - dashboard bind address and host port;
 - Safebox Web bind address and host port;
 - the external HTTPS Lightning mint used by Safebox Web and the service Acorn; and
+- the external WSS inbox relay advertised by its NIP-05 addresses, or an
+  explicit choice to advertise none; and
 - whether to start after configuration.
 
 When `.env` exists, its values are displayed as defaults. When an entry is

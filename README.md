@@ -108,8 +108,10 @@ For a first installation, run the interactive operator wizard:
 
 It prompts for a unique Compose project name, a parent data directory, the
 host bind addresses and ports for the dashboard and Safebox Web, and the
-external Lightning mint used by new and service Acorns. The mint defaults to
-`https://mint.safebox.dev` and must use HTTPS. A new instance
+external Lightning mint used by new and service Acorns. It also confirms the
+external inbox relay advertised by NIP-05 addresses, which defaults to
+`wss://spurline.safebox.dev` and may explicitly be disabled. The mint defaults
+to `https://mint.safebox.dev` and must use HTTPS. A new instance
 named `mainstay-testlab` with parent `/mnt/bitcoin/mainstay` uses the dedicated
 root `/mnt/bitcoin/mainstay/mainstay-testlab`. Enter `abort`, `quit`, or `q` at
 any prompt to stop before configuration is written. Existing `.env` values are

@@ -33,6 +33,13 @@ class MainstayLocalTests(unittest.TestCase):
             'SAFEBOX_NIP05_EXTERNAL_RELAYS: "${SAFEBOX_NIP05_EXTERNAL_RELAYS:-}"',
             compose,
         )
+        env_example = (Path(__file__).parents[1] / ".env.example").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "SAFEBOX_NIP05_EXTERNAL_RELAYS=wss://spurline.safebox.dev",
+            env_example,
+        )
         self.assertIn(
             'SAFEBOX_CLEAR_EXTERNAL_MINTS: "${MAINSTAY_EXTERNAL_CLEAR_MINT_URL:-https://clear.safebox.dev}"',
             compose,
