@@ -267,7 +267,8 @@ A deployment directory owns exactly one Mainstay instance. Its `.env`, Compose
 project lifecycle, generated installation identity and teardown authority must
 not be shared with another instance. Operators create a separate checkout or
 deployment directory for every instance, even when the instances run on the
-same host.
+same host. Each directory also uses a unique `COMPOSE_PROJECT_NAME` so Docker
+resources remain instance-scoped.
 
 A fresh interactive installation has one canonical entry point:
 
@@ -281,13 +282,15 @@ It must:
 2. show `.env` values as prompt defaults when present and code defaults when
    absent;
 3. allow the operator to abort before any mutation;
-4. review the data root, exposed addresses and ports before writing;
-5. create or complete `.env` without replacing secrets bound to existing data;
-6. establish `MAINSTAY_DATA_ROOT` before first stateful startup;
-7. delegate startup to `start-mainstay.sh`, which validates Compose, starts the
+4. perform read-only checks for required commands, Docker availability, a
+   unique Compose namespace, writable storage and available exposed ports;
+5. review the data root, exposed addresses and ports before writing;
+6. create or complete `.env` without replacing secrets bound to existing data;
+7. establish `MAINSTAY_DATA_ROOT` before first stateful startup;
+8. delegate startup to `start-mainstay.sh`, which validates Compose, starts the
    bundle and waits for the control plane, managed services and service Acorn
    worker; and
-8. fail with focused status and logs when readiness is not reached.
+9. fail with focused status and logs when readiness is not reached.
 
 Routine starts use `./start-mainstay.sh`. Disposable installations use a
 dedicated, installer-marked data root. `./teardown-mainstay.sh` requires an

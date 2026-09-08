@@ -5,8 +5,6 @@ set -eu
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 env_file="$repo_dir/.env"
 example_file="$repo_dir/.env.example"
-clear_volume="mainstay-local_clear-data"
-safebox_volume="mainstay-local_safebox-web-data"
 installation_identity="$repo_dir/build/mainstay-local/installation-identity.json"
 requested_data_root="${MAINSTAY_DATA_ROOT:-}"
 
@@ -64,6 +62,13 @@ read_value() {
         END { print value }
     ' "$source_file"
 }
+
+compose_project_name=$(read_value COMPOSE_PROJECT_NAME)
+if [ -z "$compose_project_name" ]; then
+    compose_project_name=mainstay-local
+fi
+clear_volume="${compose_project_name}_clear-data"
+safebox_volume="${compose_project_name}_safebox-web-data"
 
 configured_data_root=$(read_value MAINSTAY_DATA_ROOT)
 if [ -n "$requested_data_root" ]; then

@@ -84,6 +84,74 @@ valid_port() {
     }'
 }
 
+port_is_listening() {
+    checked_port=$1
+    if command -v ss >/dev/null 2>&1; then
+        ss -H -ltn 2>/dev/null | awk -v port="$checked_port" '
+            $4 ~ (":" port "$") { found = 1 }
+            END { exit !found }
+        '
+        return
+    fi
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -nP -iTCP:"$checked_port" -sTCP:LISTEN >/dev/null 2>&1
+        return
+    fi
+    return 2
+}
+
+check_available_port() {
+    label=$1
+    selected_port=$2
+    original_port=$3
+    if [ "$env_existed" = true ] && [ "$selected_port" = "$original_port" ]; then
+        return
+    fi
+    if port_is_listening "$selected_port"; then
+        printf '%s\n' "$label port $selected_port is already in use." >&2
+        exit 1
+    else
+        result=$?
+        if [ "$result" -eq 2 ]; then
+            printf '%s\n' \
+                'ADVISORY: Neither ss nor lsof is available; host port occupancy could not be checked.' >&2
+        fi
+    fi
+}
+
+check_data_root_writable() {
+    selected_root=$1
+    if [ -z "$selected_root" ]; then
+        return
+    fi
+    if [ -e "$selected_root" ]; then
+        if [ ! -d "$selected_root" ]; then
+            printf '%s\n' "The selected data root is not a directory: $selected_root" >&2
+            exit 1
+        fi
+        if [ ! -w "$selected_root" ] || [ ! -x "$selected_root" ]; then
+            printf '%s\n' "The selected data root is not writable: $selected_root" >&2
+            exit 1
+        fi
+        return
+    fi
+
+    writable_parent=$selected_root
+    while [ ! -e "$writable_parent" ]; do
+        next_parent=$(dirname -- "$writable_parent")
+        if [ "$next_parent" = "$writable_parent" ]; then
+            break
+        fi
+        writable_parent=$next_parent
+    done
+    if [ ! -d "$writable_parent" ] || [ ! -w "$writable_parent" ] || \
+        [ ! -x "$writable_parent" ]; then
+        printf '%s\n' \
+            "The installer cannot create the data root beneath: $writable_parent" >&2
+        exit 1
+    fi
+}
+
 prompt_port() {
     label=$1
     default_value=$2
@@ -109,6 +177,23 @@ prompt_bind_address() {
                 ;;
             *) printf '%s\n' "$address"; return ;;
         esac
+    done
+}
+
+prompt_project_name() {
+    default_value=$1
+    while :; do
+        project_name=$(prompt_value 'Compose project name' "$default_value")
+        case "$project_name" in
+            [a-z0-9]*)
+                case "$project_name" in
+                    *[!a-z0-9_-]*) ;;
+                    *) printf '%s\n' "$project_name"; return ;;
+                esac
+                ;;
+        esac
+        printf '%s\n' \
+            'Use a unique lowercase name containing only letters, numbers, hyphens, or underscores.' >&2
     done
 }
 
@@ -150,6 +235,8 @@ else
 fi
 printf '\n'
 
+compose_project_default=$(env_default COMPOSE_PROJECT_NAME mainstay-local)
+compose_project_name=$(prompt_project_name "$compose_project_default")
 configured_data_root=$(env_default MAINSTAY_DATA_ROOT "")
 if [ "$env_existed" = false ] && [ -z "$configured_data_root" ]; then
     configured_data_root="$repo_dir/.mainstay-data"
@@ -181,18 +268,18 @@ if [ -n "$data_root" ]; then
     esac
 fi
 
+dashboard_bind_default=$(env_default MAINSTAY_LOCAL_BIND_ADDRESS 0.0.0.0)
+dashboard_port_default=$(env_default MAINSTAY_LOCAL_PORT 8788)
+safebox_bind_default=$(env_default MAINSTAY_SAFEBOX_BIND_ADDRESS 0.0.0.0)
+safebox_port_default=$(env_default MAINSTAY_SAFEBOX_PORT 8888)
 dashboard_bind=$(prompt_bind_address \
-    'Dashboard bind address' \
-    "$(env_default MAINSTAY_LOCAL_BIND_ADDRESS 0.0.0.0)")
+    'Dashboard bind address' "$dashboard_bind_default")
 dashboard_port=$(prompt_port \
-    'Dashboard host port' \
-    "$(env_default MAINSTAY_LOCAL_PORT 8788)")
+    'Dashboard host port' "$dashboard_port_default")
 safebox_bind=$(prompt_bind_address \
-    'Safebox Web bind address' \
-    "$(env_default MAINSTAY_SAFEBOX_BIND_ADDRESS 0.0.0.0)")
+    'Safebox Web bind address' "$safebox_bind_default")
 safebox_port=$(prompt_port \
-    'Safebox Web host port' \
-    "$(env_default MAINSTAY_SAFEBOX_PORT 8888)")
+    'Safebox Web host port' "$safebox_port_default")
 
 if [ "$dashboard_bind" = "$safebox_bind" ] && \
     [ "$dashboard_port" = "$safebox_port" ]; then
@@ -222,7 +309,41 @@ if [ -n "$data_root" ]; then
     fi
 fi
 
+printf '\n%s\n' 'Running read-only preflight checks...'
+if ! command -v docker >/dev/null 2>&1; then
+    printf '%s\n' 'Docker is required to install Mainstay.' >&2
+    exit 1
+fi
+if ! docker compose version >/dev/null 2>&1; then
+    printf '%s\n' 'The Docker Compose plugin is required to install Mainstay.' >&2
+    exit 1
+fi
+if ! docker info >/dev/null 2>&1; then
+    printf '%s\n' 'Start Docker before installing Mainstay.' >&2
+    exit 1
+fi
+if ! command -v openssl >/dev/null 2>&1; then
+    printf '%s\n' 'OpenSSL is required to generate Mainstay secrets.' >&2
+    exit 1
+fi
+if [ "$env_existed" = false ]; then
+    existing_project_containers=$(docker ps -q \
+        --filter "label=com.docker.compose.project=$compose_project_name")
+    if [ -n "$existing_project_containers" ]; then
+        printf '%s\n' \
+            "Compose project '$compose_project_name' already has containers on this host." >&2
+        printf '%s\n' \
+            'Choose a unique project name so this deployment cannot manage another instance.' >&2
+        exit 1
+    fi
+fi
+check_data_root_writable "$data_root"
+check_available_port Dashboard "$dashboard_port" "$dashboard_port_default"
+check_available_port 'Safebox Web' "$safebox_port" "$safebox_port_default"
+printf '%s\n' 'Preflight checks passed. No configuration has been written.'
+
 printf '\n%s\n' 'Review'
+printf '  Compose project: %s\n' "$compose_project_name"
 printf '  Data root:       %s\n' "${data_root:-Docker-managed named volumes}"
 printf '  Dashboard:       %s:%s\n' "$dashboard_bind" "$dashboard_port"
 printf '  Safebox Web:     %s:%s\n' "$safebox_bind" "$safebox_port"
@@ -252,6 +373,7 @@ set_env_value MAINSTAY_LOCAL_BIND_ADDRESS "$dashboard_bind"
 set_env_value MAINSTAY_LOCAL_PORT "$dashboard_port"
 set_env_value MAINSTAY_SAFEBOX_BIND_ADDRESS "$safebox_bind"
 set_env_value MAINSTAY_SAFEBOX_PORT "$safebox_port"
+set_env_value COMPOSE_PROJECT_NAME "$compose_project_name"
 
 if [ -n "$data_root" ] && [ "$managed_data_root" = true ]; then
     marker="$data_root/$managed_marker_name"

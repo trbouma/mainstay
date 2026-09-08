@@ -94,6 +94,9 @@ poetry run ruff check .
 > the instance's `.env`, Compose lifecycle, generated installation identity,
 > and teardown authority. Never run multiple instances from one directory or
 > share one `.env` between deployment directories.
+> Give each directory a unique `COMPOSE_PROJECT_NAME`; the installer prompts
+> for and persists it so Compose containers, networks, and named volumes cannot
+> collide with another Mainstay deployment on the same host.
 
 For a first installation, run the interactive operator wizard:
 
@@ -101,11 +104,13 @@ For a first installation, run the interactive operator wizard:
 ./install-mainstay.sh
 ```
 
-It prompts for the dedicated data root and the host bind addresses and ports
-for the dashboard and Safebox Web. Enter `abort`, `quit`, or `q` at any prompt
-to stop before configuration is written. Existing `.env` values are displayed
-as defaults; otherwise the shipped defaults are used. The final review defaults
-to not writing anything.
+It prompts for a unique Compose project name, the dedicated data root, and the
+host bind addresses and ports for the dashboard and Safebox Web. Enter `abort`,
+`quit`, or `q` at any prompt to stop before configuration is written. Existing
+`.env` values are displayed as defaults; otherwise the shipped defaults are
+used. Before the final review it performs read-only checks for Docker, Compose,
+OpenSSL, a conflicting Compose namespace, data-root writability, and occupied
+host ports. The final review defaults to not writing anything.
 
 For routine starts after `.env` exists, validate Compose, start the bundle, and
 wait for readiness with:

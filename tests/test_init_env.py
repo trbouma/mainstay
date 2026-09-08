@@ -23,11 +23,11 @@ if [ "$1" = "info" ]; then
     exit 0
 fi
 if [ "$1" = "volume" ] && [ "$2" = "inspect" ]; then
-    if [ "$3" = "mainstay-local_clear-data" ] && \
+    if [ "$3" = "${MOCK_CLEAR_VOLUME_NAME:-mainstay-local_clear-data}" ] && \
         [ "${MOCK_CLEAR_VOLUME_EXISTS:-0}" = "1" ]; then
         exit 0
     fi
-    if [ "$3" = "mainstay-local_safebox-web-data" ] && \
+    if [ "$3" = "${MOCK_SAFEBOX_VOLUME_NAME:-mainstay-local_safebox-web-data}" ] && \
         [ "${MOCK_SAFEBOX_VOLUME_EXISTS:-0}" = "1" ]; then
         exit 0
     fi
@@ -184,6 +184,30 @@ def test_init_env_refuses_new_identity_for_existing_volume(tmp_path: Path) -> No
 
     assert result.returncode == 1
     assert not (tmp_path / ".env").exists()
+    assert "Refusing to generate CLEAR_MASTER_SECRET" in result.stderr
+
+
+def test_init_env_checks_volumes_in_configured_compose_project(
+    tmp_path: Path,
+) -> None:
+    script, environment = _stage_helper(tmp_path)
+    environment["MOCK_CLEAR_VOLUME_EXISTS"] = "1"
+    environment["MOCK_CLEAR_VOLUME_NAME"] = "mainstay-testlab_clear-data"
+    (tmp_path / ".env").write_text(
+        "COMPOSE_PROJECT_NAME=mainstay-testlab\n"
+        "CLEAR_MASTER_SECRET=\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [str(script)],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    assert result.returncode == 1
     assert "Refusing to generate CLEAR_MASTER_SECRET" in result.stderr
 
 

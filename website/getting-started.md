@@ -11,7 +11,9 @@ operating context.
     lifecycle, generated installation identity, and teardown authority. Create
     a separate checkout or deployment directory for every instance. Do not run
     multiple instances from one directory and do not share `.env` files between
-    deployment directories.
+    deployment directories. Assign every directory a unique
+    `COMPOSE_PROJECT_NAME` so its containers, network, and named volumes cannot
+    collide with another instance on the same host.
 
 ## Quick Testing Start
 
@@ -30,10 +32,13 @@ cd mainstay
 docker compose ps
 ```
 
-The wizard asks for the dashboard and Safebox Web host ports, their bind
-addresses, and one data root for all service data. Press Enter to accept a
-displayed default. Enter `abort`, `quit`, or `q` at any prompt to leave without
-writing configuration. The final confirmation defaults to no.
+The wizard asks for a unique Compose project name, the dashboard and Safebox
+Web host ports, their bind addresses, and one data root for all service data.
+Press Enter to accept a displayed default. Enter `abort`, `quit`, or `q` at any
+prompt to leave without writing configuration. The final confirmation defaults
+to no. Before that confirmation, a read-only preflight checks Docker, Compose,
+OpenSSL, the Compose namespace, data-root writability, and selected host-port
+availability.
 
 Open the Mainstay dashboard at `http://127.0.0.1:8788/` and Safebox Web at
 `http://127.0.0.1:8888/`. To retrieve the generated onboarding path without

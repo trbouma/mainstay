@@ -30,6 +30,10 @@ def _stage_installer(tmp_path: Path) -> tuple[Path, dict[str, str], Path]:
 printf '%s\n' "$*" >> "$DOCKER_LOG"
 if [ "$1" = "info" ]; then exit 0; fi
 if [ "$1" = "compose" ] && [ "$2" = "version" ]; then exit 0; fi
+if [ "$1" = "ps" ] && [ "${MOCK_PROJECT_EXISTS:-0}" = "1" ]; then
+    printf '%s\n' existing-container
+    exit 0
+fi
 if [ "$1" = "volume" ] && [ "$2" = "inspect" ]; then exit 1; fi
 if [ "$1" = "compose" ] && [ "$2" = "down" ]; then exit 0; fi
 exit 0
@@ -37,6 +41,16 @@ exit 0
         encoding="utf-8",
     )
     docker.chmod(0o755)
+    ss = fake_bin / "ss"
+    ss.write_text(
+        """#!/bin/sh
+if [ -n "${MOCK_LISTEN_PORT:-}" ]; then
+    printf 'LISTEN 0 128 0.0.0.0:%s 0.0.0.0:*\n' "$MOCK_LISTEN_PORT"
+fi
+""",
+        encoding="utf-8",
+    )
+    ss.chmod(0o755)
 
     environment = os.environ.copy()
     environment["PATH"] = f"{fake_bin}:{environment['PATH']}"
@@ -57,7 +71,7 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     tmp_path: Path,
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
-    answers = "\n" * 5 + "no\nyes\n"
+    answers = "mainstay-testlab\n" + "\n" * 5 + "no\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -75,6 +89,7 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     )
     values = _read_env(deployment / ".env")
     data_root = deployment / ".mainstay-data"
+    assert values["COMPOSE_PROJECT_NAME"] == "mainstay-testlab"
     assert values["MAINSTAY_DATA_ROOT"] == str(data_root)
     assert values["MAINSTAY_LOCAL_BIND_ADDRESS"] == "0.0.0.0"
     assert values["MAINSTAY_LOCAL_PORT"] == "8788"
@@ -84,6 +99,9 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
         data_root / ".mainstay-local-managed-data-root"
     ).read_text(encoding="utf-8") == "org.mainstay.local-managed-data-root:v1\n"
     assert "Run ./start-mainstay.sh when you are ready." in result.stdout
+    assert "Preflight checks passed. No configuration has been written." in (
+        result.stdout
+    )
 
 
 def test_installer_can_abort_before_changing_files(tmp_path: Path) -> None:
@@ -105,12 +123,59 @@ def test_installer_can_abort_before_changing_files(tmp_path: Path) -> None:
     assert not (deployment / ".mainstay-data").exists()
 
 
+def test_installer_rejects_an_occupied_selected_port_before_writing(
+    tmp_path: Path,
+) -> None:
+    deployment, environment, _docker_log = _stage_installer(tmp_path)
+    environment["MOCK_LISTEN_PORT"] = "9001"
+    data_root = deployment / "data"
+    answers = f"port-test\n{data_root}\n\n9001\n\n9000\nyes\n"
+
+    result = subprocess.run(
+        [str(deployment / "install-mainstay.sh")],
+        cwd=deployment,
+        env=environment,
+        input=answers,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "Dashboard port 9001 is already in use" in result.stderr
+    assert not (deployment / ".env").exists()
+    assert not data_root.exists()
+
+
+def test_installer_rejects_an_existing_compose_project_before_writing(
+    tmp_path: Path,
+) -> None:
+    deployment, environment, _docker_log = _stage_installer(tmp_path)
+    environment["MOCK_PROJECT_EXISTS"] = "1"
+    answers = "mainstay-local\n" + "\n" * 5 + "yes\n"
+
+    result = subprocess.run(
+        [str(deployment / "install-mainstay.sh")],
+        cwd=deployment,
+        env=environment,
+        input=answers,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "already has containers on this host" in result.stderr
+    assert not (deployment / ".env").exists()
+
+
 def test_existing_env_values_are_displayed_as_defaults_without_mutation(
     tmp_path: Path,
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     env_file = deployment / ".env"
     original = (
+        "COMPOSE_PROJECT_NAME=private-venue\n"
         "MAINSTAY_DATA_ROOT=\n"
         "MAINSTAY_LOCAL_BIND_ADDRESS=127.0.0.1\n"
         "MAINSTAY_LOCAL_PORT=9876\n"
@@ -123,13 +188,14 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
         [str(deployment / "install-mainstay.sh")],
         cwd=deployment,
         env=environment,
-        input="\n\n\n\n\nno\nno\n",
+        input="\n\n\n\n\n\nno\nno\n",
         capture_output=True,
         text=True,
         check=False,
     )
 
     assert result.returncode == 130
+    assert "Compose project name [private-venue]" in result.stderr
     assert "Dashboard host port [9876]" in result.stderr
     assert "Safebox Web host port [9999]" in result.stderr
     assert env_file.read_text(encoding="utf-8") == original
