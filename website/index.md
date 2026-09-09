@@ -213,6 +213,17 @@ wider network when available.
 
 [Understand continuity](continuity.md){ .md-button .md-button--primary }
 
+## Policy briefs
+
+Mainstay policy briefs connect local-first technology to the enduring work of
+communities and institutions. The first brief examines two core capabilities:
+anchoring consequential records and transferring value through the **Clerk and
+Treasury functions**. These are not new institutional inventions, but familiar
+responsibilities being reconstituted with portable identities, verifiable
+records, private bearer instruments, and locally operated infrastructure.
+
+[Read the Clerk and Treasury brief](policy-briefs/clerk-and-treasury-functions.md){ .md-button }
+
 ## A local home when it matters
 
 <section class="lockbox-band" markdown>

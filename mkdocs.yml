@@ -43,6 +43,9 @@ nav:
       - Product Family: product-family.md
       - Continuity: continuity.md
       - Lockbox Appliance: lockbox.md
+  - Policy Briefs:
+      - Overview: policy-briefs/index.md
+      - Clerk and Treasury Functions: policy-briefs/clerk-and-treasury-functions.md
   - Project Status: project-status.md
 
 markdown_extensions:
