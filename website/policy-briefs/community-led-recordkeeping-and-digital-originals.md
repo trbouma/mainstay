@@ -18,7 +18,7 @@ establishing a governed local record: identifying the exact digital artifact,
 recording who examined or authorized it, applying documented rules, and
 preserving the evidence needed to understand its current status.
 
-OpenETR provides the model for doing this. Mainstay provides a local house in
+[OpenETR](http://docs.openetr.org) provides the model for doing this. Mainstay provides a local house in
 which a community can operate the model together.
 
 ```text

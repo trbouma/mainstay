@@ -149,7 +149,8 @@ for the broader institutional model.
 
 ## Clear: an old function with new tools
 
-Clear applies this model to bounded, organization-issued value. **Clear means
+[Clear](https://trbouma.github.io/clear/) applies this model to bounded,
+organization-issued value. **Clear means
 Credit-Liability Ecash: Authorized and Redeemable.** Each Clear Mint Unit is a
 specific issuer-defined unit bound to its own keyset and policy. Its Mint Notes
 are private bearer instruments that can move between compatible wallets
