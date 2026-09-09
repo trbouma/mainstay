@@ -8,6 +8,22 @@ connected and disrupted conditions.
 Mainstay is the application. Lockbox is the appliance. There's no place like
 home.
 
+## Identity Outlives Location
+
+Mainstay treats identity as invariant and reachability as replaceable. A
+service remains the same service when it moves from a Docker name to a LAN
+address, public HTTPS endpoint, VPN route, FreeBSD jail, or future FIPS path.
+Likewise, a wallet `npub`, Clear keyset ID, or Grove content hash does not
+become a different identifier merely because the route used to reach it has
+changed.
+
+This is a digital-resilience capability, not only a configuration convenience.
+DNS and public IP connectivity can remain useful routes without becoming the
+root of identity or a mandatory condition for local operation. Mainstay can
+select a route appropriate to the current context, replace that route as the
+topology changes, and preserve the identity that users and services already
+trust. See [Invariant Identity and Dynamic Resolution](docs/INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md).
+
 ## Documentation
 
 Start with the [first-time start guide](website/getting-started.md) for either
@@ -15,6 +31,7 @@ a quick testing deployment or a planned production initialization.
 
 Design notes:
 
+- [Invariant Identity and Dynamic Resolution](docs/INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md)
 - [Mainstay House Style and Family Audit](docs/MAINSTAY-HOUSE-STYLE.md)
 - [White-Label Branding and Experience Profiles](docs/WHITE-LABEL-BRANDING-DESIGN-NOTE.md)
 - [Mainstay Instance Lifecycle and Recovery](docs/MAINSTAY-INSTANCE-LIFECYCLE.md)

@@ -20,6 +20,13 @@ nearby records and payment capabilities understandable and usable, supporting
 community coordination, and reconciling with external systems when
 connectivity returns.
 
+That distinction is architectural. Service `npubs`, wallet `npubs`, Clear
+keyset IDs, and Grove content hashes can remain stable while their reachable
+paths change. Mainstay resolves an eligible path for the current context rather
+than treating a Docker name, domain, or public IP address as the durable
+identity. Losing one path therefore does not require losing or renaming the
+thing it reached.
+
 Continuity means that keys, records, and value remain usable when external
 conditions change. It does not mean pretending every action has the same level
 of finality.

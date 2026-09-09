@@ -17,6 +17,8 @@ The companion
 [identity and event-native services note](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
 defines how stable identifiers resolve to service identities and how those
 identities advertise capabilities over these scoped routes.
+The broader resilience conclusion is recorded in
+[Invariant Identity and Dynamic Resolution](INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md).
 
 ## Why Separate Identity and Address
 

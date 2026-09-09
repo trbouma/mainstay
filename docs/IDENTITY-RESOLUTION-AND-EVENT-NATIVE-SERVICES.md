@@ -7,9 +7,12 @@ and a direction for incremental experiments; it does not assign final Nostr
 event kinds, replace existing HTTP APIs, or require every Mainstay interaction
 to become a durable event.
 
-The companion [address-space note](ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
-defines internal, local, and external endpoint scopes. This note defines the
-identity and protocol layers above those routes.
+The higher-level
+[invariant identity and dynamic resolution note](INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md)
+explains why this separation is a digital-resilience capability. The companion
+[address-space note](ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md) defines
+internal, local, and external endpoint scopes. This note defines the identity
+and protocol layers above those routes.
 
 The design can be summarized in five steps:
 

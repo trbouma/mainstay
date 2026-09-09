@@ -28,6 +28,27 @@ Mainstay should make sophisticated continuity infrastructure feel ordinary:
 People should not need to understand relays, proof denominations, blob storage,
 or synchronization protocols to know what is available and what to do next.
 
+## Identity outlives location
+
+Mainstay treats identity as invariant and reachability as replaceable. A
+service remains the same service when it moves from a local container to a LAN
+address, public endpoint, VPN route, or future FIPS path. Records, wallets, and
+currencies likewise retain stable identifiers even when the route to the
+service responsible for them changes.
+
+This turns identity-based resolution into a digital-resilience capability.
+DNS, HTTPS, and public IP connectivity can remain useful ways to reach a
+service without becoming the source of its identity or a requirement for local
+operation. Mainstay can use the best eligible route for the present context,
+then use another route when conditions change without asking the user to treat
+the service as something new.
+
+The goal is not an Internet-free system. It is a system in which the Internet
+is one available path rather than the single foundation for identity,
+discovery, and continuity. This also lets autonomous Mainstay venues cooperate
+across a wider network without surrendering their local authority or depending
+on one central host.
+
 ## Product principles
 
 1. **Local-first, not local-only.** Use helpful network services without making
@@ -44,6 +65,9 @@ or synchronization protocols to know what is available and what to do next.
    and continuity rather than obstructing them.
 6. **Bounded economies remain bounded.** Never imply that separate Clear
    currencies are interchangeable, universally accepted, or legal tender.
+7. **Identity outlives location.** Preserve stable identities and resolve a
+   currently eligible path instead of storing one network address as permanent
+   truth.
 
 ## The product model
 
