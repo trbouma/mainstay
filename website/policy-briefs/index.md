@@ -38,3 +38,17 @@ digital communication can support familiar community practices without
 pretending that software creates value, authority, or trust.
 
 [Read the policy brief](credit-clearing-and-transferring-value.md){ .md-button .md-button--primary }
+
+## Community-Led Recordkeeping and Digital Originals
+
+A community can establish which exact digital records are authoritative for
+work within its own legitimate scope. This brief explains how OpenETR combines
+digest-identified artifacts, signed review evidence, consequential state, and
+bounded recognition without claiming that a local record replaces its outside
+issuer for every purpose.
+
+It also presents graduated disclosure as the practical default for sensitive
+records: check first, present when necessary, share only for justified deeper
+review, and surrender only when custody or control is meant to change.
+
+[Read the policy brief](community-led-recordkeeping-and-digital-originals.md){ .md-button .md-button--primary }

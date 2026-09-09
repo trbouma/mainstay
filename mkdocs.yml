@@ -47,6 +47,7 @@ nav:
       - Overview: policy-briefs/index.md
       - Clerk and Treasury Functions: policy-briefs/clerk-and-treasury-functions.md
       - Credit, Clearing, and Transferring Value: policy-briefs/credit-clearing-and-transferring-value.md
+      - Community-Led Recordkeeping and Digital Originals: policy-briefs/community-led-recordkeeping-and-digital-originals.md
   - Project Status: project-status.md
 
 markdown_extensions:

@@ -217,5 +217,9 @@ reconstitute them with technology suited to present conditions: private,
 portable, locally available, verifiable, and capable of working both
 autonomously and across wider networks.
 
+The [community-led recordkeeping](community-led-recordkeeping-and-digital-originals.md)
+and [credit, clearing, and transferring value](credit-clearing-and-transferring-value.md)
+briefs examine the Clerk and Treasury functions in greater depth.
+
 For the detailed architecture behind this policy frame, read the
 [Clerk and Treasury Functions design note](https://github.com/trbouma/mainstay/blob/main/docs/CLERK-AND-TREASURY-FUNCTIONS.md).

@@ -239,10 +239,10 @@ wider network when available.
 
 Mainstay policy briefs connect local-first technology to the enduring work of
 communities and institutions. They examine the **Clerk and Treasury functions**
-and place credit, clearing, and transferable value in a longer cultural history.
-These are not new institutional inventions, but familiar responsibilities being
-reconstituted with portable identities, verifiable records, private bearer
-instruments, and locally operated infrastructure.
+through community-led recordkeeping, Digital Originals, credit, clearing, and
+transferable value. These are not new institutional inventions, but familiar
+responsibilities being reconstituted with portable identities, verifiable
+records, private bearer instruments, and locally operated infrastructure.
 
 [Explore the policy briefs](policy-briefs/index.md){ .md-button }
 
