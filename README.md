@@ -42,6 +42,7 @@ Design notes:
 - [Service Identity and Operator Attestation](docs/SERVICE-IDENTITY-AND-OPERATOR-ATTESTATION-DESIGN-NOTE.md)
 - [Local Clear Transactions](docs/LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md)
 - [Clear Transfer Routing and Reachability](docs/CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md)
+- [Clear Transfer Scope, Acceptance, and Authority](docs/CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md)
 - [Mainstay Clear Context Wrapper](docs/MAINSTAY-CLEAR-CONTEXT-WRAPPER.md)
 - [Mainstay Grove Context Integration](docs/MAINSTAY-GROVE-CONTEXT-INTEGRATION.md)
 - [Mainstay Continuity Coordinator](docs/MAINSTAY-CONTINUITY-COORDINATOR-DESIGN-NOTE.md)

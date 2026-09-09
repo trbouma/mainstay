@@ -33,6 +33,10 @@ Recipient reachability and mint reachability are deliberately separate. A
 gift-wrapped token can reach a remote Acorn while still being unusable there if
 the issuing mint cannot be reached for proof verification and refresh.
 
+The user-facing transfer labels and their separation from acceptance and
+treasury authority are defined in
+[Clear Transfer Scope, Acceptance, and Authority](CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md).
+
 ## Same-Instance Flow
 
 Safebox Web identifies a same-instance recipient when the NIP-05 domain matches
@@ -123,6 +127,7 @@ of that later resolver.
 ## References
 
 - [Local Clear Transactions](LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md)
+- [Clear Transfer Scope, Acceptance, and Authority](CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
 - [Identity, Resolution, and Event-Native Services](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
 - [Safebox Clear Receive Advertisement](https://github.com/trbouma/safebox-web/blob/main/docs/CLEAR-RECEIVE-ADVERTISEMENT.md)
