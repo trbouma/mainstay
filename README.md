@@ -123,6 +123,11 @@ It also marks the operator-funded service-Acorn fee reserve as a required
 post-start action. The installer does not transfer funds automatically and
 prints the stop, fund, restart, and balance-check commands before it exits.
 
+Mainstay enables Safebox Web's informational currency-rate cache by default.
+The singleton service Acorn worker fetches public rates hourly while web
+requests read only the shared last-known-good cache. Set
+`SAFEBOX_CURRENCY_RATES_ENABLED=false` to disable this external dependency.
+
 For routine starts after `.env` exists, validate Compose, start the bundle, and
 wait for readiness with:
 

@@ -60,7 +60,14 @@ def render_safebox_env(bundle: BundleConfig) -> str:
         "SAFEBOX_BLOSSOM_HOME_SERVER": grove_internal,
         "SAFEBOX_MAINSTAY_CONTEXT_URL": "http://mainstay-local:8788/context",
         "GROVE_PUBLIC_URL": grove.preferred_url(purpose="blossom"),
-        "SAFEBOX_CURRENCY_RATES_ENABLED": "false",
+        "SAFEBOX_CURRENCY_RATES_ENABLED": "true",
+        "SAFEBOX_CURRENCY_RATE_SOURCE_URL": "https://blockchain.info/ticker",
+        "SAFEBOX_CURRENCY_RATE_INTERVAL_SECONDS": "3600",
+        "SAFEBOX_CURRENCY_RATE_CURRENCIES": (
+            "CAD,USD,EUR,GBP,JPY,INR,CNY,AUD,CHF,SGD,HKD,BRL"
+        ),
+        "SAFEBOX_DEFAULT_DISPLAY_CURRENCY": "USD",
+        "SAFEBOX_CURRENCY_RATE_STALE_SECONDS": "86400",
         "CLEAR_CURRENCY_NAME": bundle.clear_currency_name,
     }
 

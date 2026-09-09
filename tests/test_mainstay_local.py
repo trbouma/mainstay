@@ -90,6 +90,14 @@ class MainstayLocalTests(unittest.TestCase):
             env,
         )
         self.assertIn('SAFEBOX_BLOSSOM_HOME_SERVER="http://grove:8000"', env)
+        self.assertIn('SAFEBOX_CURRENCY_RATES_ENABLED="true"', env)
+        self.assertIn(
+            'SAFEBOX_CURRENCY_RATE_SOURCE_URL="https://blockchain.info/ticker"',
+            env,
+        )
+        self.assertIn('SAFEBOX_CURRENCY_RATE_INTERVAL_SECONDS="3600"', env)
+        self.assertIn('SAFEBOX_DEFAULT_DISPLAY_CURRENCY="USD"', env)
+        self.assertIn('SAFEBOX_CURRENCY_RATE_STALE_SECONDS="86400"', env)
         self.assertIn(
             'SAFEBOX_MAINSTAY_CONTEXT_URL="http://mainstay-local:8788/context"',
             env,
@@ -198,6 +206,17 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertIn("CLEAR_MINT_SERVICE_NSEC", compose)
         self.assertIn("SAFEBOX_WEB_SERVICE_NSEC", compose)
         self.assertIn("SAFEBOX_WEB_SERVICE_MANAGEMENT", compose)
+        self.assertEqual(
+            compose.count(
+                'SAFEBOX_CURRENCY_RATES_ENABLED: "'
+                '${SAFEBOX_CURRENCY_RATES_ENABLED:-true}"'
+            ),
+            2,
+        )
+        self.assertIn("SAFEBOX_CURRENCY_RATE_SOURCE_URL", compose)
+        self.assertIn("SAFEBOX_CURRENCY_RATE_INTERVAL_SECONDS", compose)
+        self.assertIn("SAFEBOX_CURRENCY_RATE_CURRENCIES", compose)
+        self.assertIn("SAFEBOX_CURRENCY_RATE_STALE_SECONDS", compose)
         self.assertIn('CLEAR_MINT_SERVICE_MANAGEMENT: "mainstay-managed"', compose)
 
     def test_grove_uses_the_private_runtime_namespace(self) -> None:
