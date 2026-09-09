@@ -11,6 +11,12 @@ The central rule is:
 
 > Scope describes who may use an endpoint. Transport describes how to reach it.
 
+This note uses **reachability** for that path-level network property.
+**Availability** remains the broader security outcome within the
+confidentiality, integrity and availability (CIA) triad: an authorized user can
+obtain and use a healthy, eligible service when needed. A reachable endpoint is
+therefore one contributor to availability, not proof of availability by itself.
+
 Internal, local, and external are scopes. HTTP, WebSocket, IPv4, IPv6, DNS, and
 FIPS are transports or locator forms. These dimensions must remain separate.
 The companion

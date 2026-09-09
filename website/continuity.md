@@ -9,7 +9,7 @@ description: How Mainstay keeps records and payments understandable across chang
 
 A community, resort, campus, or co-working facility may still have people,
 staff, devices, local power, and a local network even when outside services are
-slow or unavailable. A payment provider may be unreachable. A booking or access
+slow or unavailable. A payment provider may be unavailable. A booking or access
 system may be offline. A registry, health-record system, or cloud application
 may be temporarily inaccessible. The community still needs to coordinate the
 work in front of it.
@@ -30,6 +30,20 @@ thing it reached.
 Continuity means that keys, records, and value remain usable when external
 conditions change. It does not mean pretending every action has the same level
 of finality.
+
+## Availability is the outcome
+
+Mainstay uses **availability** in the established security sense: authorized
+people can obtain and use the service, information, or value they need when
+they need it. Availability sits alongside confidentiality and integrity; local
+operation should preserve all three rather than trading privacy or correctness
+for access.
+
+**Reachability** is the narrower network question of whether one endpoint can
+be reached from the current location. It is one input to availability, not a
+synonym for it. A reachable service may be unhealthy or unable to complete a
+request, while a service can remain available through another eligible route
+when one path is interrupted.
 
 ## Four operating modes
 
@@ -74,7 +88,7 @@ Mainstay must distinguish two different situations.
 ### External mint unavailable
 
 Acorns can transfer previously issued ecash locally when an external Cashu
-mint or Lightning path is unreachable. The receiver preserves the proofs as
+mint or Lightning path is unavailable. The receiver preserves the proofs as
 pending until the mint can confirm, refresh, or reject them.
 
 ```text
@@ -91,7 +105,7 @@ closest available amounts and ask for explicit approval.
 A Clear mint on the local network can validate, swap, issue, and retire its own
 currency without Bitcoin, Lightning, or global internet access. That provides
 mint-level finality for that bounded currency while the local mint remains
-reachable.
+available.
 
 This is useful for resorts, ships, campuses, remote communities, food-bank
 networks, and shared facilities that retain a local network during an upstream
@@ -103,7 +117,7 @@ Mainstay should make three signals obvious:
 
 - **confirmed** value has finality from the relevant mint;
 - **pending** value is preserved but still needs finalization; and
-- **local availability** explains which services can currently be reached.
+- **local availability** explains which services can currently be used.
 
 The product promise is not uninterrupted access to every external dependency.
 It is continuity without ambiguity.

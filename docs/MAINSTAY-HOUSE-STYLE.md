@@ -1,7 +1,7 @@
 # Mainstay House Style and Family Audit
 
 Status: working standard  
-Audit date: 2026-09-08
+Audit date: 2026-09-09
 
 ## Purpose
 
@@ -26,13 +26,14 @@ defines how those roles are assigned during cross-repository development.
 
 ## Applicability
 
-The family contains three different kinds of component:
+The family contains four different kinds of component:
 
 | Kind | Components | Applicable service requirements |
 | --- | --- | --- |
 | User and control-plane applications | Mainstay Local, Safebox Web | Human interface, operational health, clear authority boundaries |
 | Independently addressable services | Clear, Grove, Spurline | Service identity, health and information surfaces, persistent identity binding |
 | Embedded protocol components | Acorn, Stroma | Package, documentation, security and boundary conventions; no network service identity merely for being imported |
+| Adjacent protocol applications | OpenETR | Shared evidence, recognition, presentation and deployment conventions without implying that OpenETR is part of the local runtime bundle |
 
 Acorn identities identify Acorns that control keys and resources. They are not
 identities for the Acorn Python package. Stroma is a protocol library and does
@@ -84,6 +85,7 @@ Each product retains a distinct palette:
 | Spurline | navy, signal blue and amber; local network movement |
 | Clear | water teal and coral; bounded issuance and redemption |
 | Stroma | violet and stone; layered protocol structure |
+| OpenETR | blue, gold and neutral document tones; independently verifiable evidence |
 
 Shared style does not mean recoloring every product Mainstay blue. Logos,
 palettes and metaphors remain specific to each responsibility. Operational
@@ -102,13 +104,81 @@ Use plain role and state language:
 - **service identity** for the stable key of an addressable service;
 - **installation identity** for the Mainstay control plane and local authority;
 - **operator** for an authority that runs or commissions a service;
-- **endpoint** or **route** for replaceable reachability information; and
+- **endpoint** or **route** for replaceable network-path information; and
 - **reported**, **pending**, **confirmed** and **verified** only when the
   implementation can support the corresponding claim.
 
 Do not call a URL an identity. Do not call possession of an `nsec` legal
 ownership. Do not imply that a friendly currency label makes different
 keysets or issuers interchangeable.
+
+### Availability and reachability
+
+Use **availability** for the security and operating outcome: authorized people
+can obtain and use the required service, information or value when it is
+needed. This is the availability element of the familiar confidentiality,
+integrity and availability (CIA) triad.
+
+Use **reachability** only for the narrower network fact that an eligible path
+to an endpoint exists from the caller's current scope. Reachability can
+contribute to availability, but it does not establish it. A reachable process
+may be unhealthy, uncommissioned or unable to complete the requested work. A
+service may remain available through another route after one endpoint becomes
+unreachable.
+
+User-facing and governance-facing copy should normally say **available**,
+**unavailable** or **usable**. Routing, endpoint-scope, FIPS and diagnostic
+documents may use **reachable** and **reachability** when the network path is
+the actual subject. Do not infer identity, authority, recognition, acceptance
+or trust from either condition.
+
+Where a security posture is summarized, use the full triad:
+
+- **confidentiality** protects appropriate limits on access and disclosure;
+- **integrity** protects the accuracy, authenticity and traceability of
+  information and actions; and
+- **availability** keeps authorized access and practical use dependable when
+  needed.
+
+### Voice and message
+
+The family speaks in a calm, practical and cooperative voice. Lead with what
+people can do in ordinary operations, then explain continuity during changing
+conditions as an additional benefit.
+
+- Describe **cooperative independence**: local capability that continues to
+  work with regional institutions, hosted providers and open networks.
+- Describe **local stewardship and shared governance**: communities and
+  organizations can operate documented rules for access, issuance,
+  recognition and reconciliation together.
+- Prefer concrete operating conditions such as intermittent connectivity,
+  provider changes, site moves and service interruptions over catastrophe or
+  collapse language.
+- Present boundaries as a way to make responsibilities understandable and
+  cooperation dependable, not as a struggle against institutions or
+  infrastructure.
+- State limits plainly without letting warnings dominate the product promise.
+- Use **when conditions change** as the broad continuity frame. Use
+  **emergency preparedness** only where emergency operation is the actual
+  subject.
+
+The family does not frame local operation as rebellion, technological
+self-sufficiency or withdrawal. It gives people and institutions a dependable
+local home from which they can cooperate on clearer terms.
+
+Mainstay may use **Our House. Our Rules. Our Business.** as a governance
+statement when the surrounding copy makes its meaning explicit:
+
+- **our house** means a locally operated domain with clear stewardship;
+- **our rules** means documented, legitimate and accountable procedures within
+  that community or organization's authority; and
+- **our business** means ordinary local work and the reasonable expectation
+  that confidential affairs are not exposed by default.
+
+The line does not imply disregard for law, outside obligations, voluntary
+participants or interoperable relationships. Keep **There's no place like
+home.** as the welcoming general tagline; use the governance statement where
+local policy, privacy and autonomy are already being explained.
 
 ## Identity and Commissioning
 
@@ -277,6 +347,56 @@ Runtime images:
 container interface on the host and therefore requires an explicit local,
 VPN, firewall or reverse-proxy boundary.
 
+## Deployment and Update Convention
+
+Addressable applications and services use the same operator-facing lifecycle,
+even when their internal configuration differs:
+
+```text
+install -> configure -> start -> verify -> update -> back up / recover -> retire
+```
+
+A standalone source deployment uses one dedicated checkout or release
+directory for one running instance. That directory owns its `.env`, Compose
+project and update path. Persistent data and identity-bound secrets must remain
+outside the image and survive container replacement.
+
+Documentation should provide one obvious command or short sequence for each
+applicable lifecycle step. Use these shared meanings:
+
+- **install** obtains a reviewed source revision or release;
+- **configure** selects persistent storage, stable identity, secrets, public
+  routes and exposure before first stateful start;
+- **start** validates configuration and starts or recreates the intended
+  processes without commissioning them implicitly;
+- **verify** reports process health separately from identity, commissioning,
+  funding and policy readiness;
+- **update** advances to a reviewed revision, validates Compose, rebuilds or
+  pulls the image, recreates the service and waits for health;
+- **back up and recover** preserves matching data, identity-bound secrets,
+  policy and the deployed source or image revision; and
+- **retire** is an explicit operation distinct from stopping a process or
+  replacing a container.
+
+Standalone source checkouts use `./refresh-containers.sh` where supplied. The
+script must refuse tracked working-tree changes, use `git pull --ff-only`, run
+`docker compose config --quiet`, recreate the intended service set, wait for
+the service health contract and print focused status and recent logs on
+failure. It does not perform schema rollback, secret rotation, commissioning,
+treasury enablement or destructive data cleanup.
+
+The default published bind address is loopback. An operator may deliberately
+select a LAN, VPN or reverse-proxy interface and then owns the corresponding
+firewall and TLS boundary. Mainstay-managed services are installed and updated
+through the Mainstay deployment directory; their standalone refresh scripts
+must not be run against the Mainstay-managed containers or data.
+
+Embedded components are installed rather than deployed. An application pins a
+reviewed Acorn or Stroma tag or commit in its dependency lock, runs the
+component's compatibility and application tests, and commits the resulting
+lock change before deployment. Updating an embedded library must not silently
+create a new long-running service or service identity.
+
 ## Mainstay First-Start Contract
 
 The complete install, recovery and teardown contract is maintained in
@@ -344,6 +464,7 @@ milestones because they carry policy or value consequences.
 | Safebox Web | Strong human app, security boundary and local-first integration | Standard health envelope; distinct persistent application-service identity and information envelope | Commissioning request, attestation and descriptor support |
 | Safebox Acorn | Strong protocol and authority boundary | No runtime-service changes apply | Continue release hardening and staged Stroma migration |
 | Stroma | Strong narrow protocol boundary and shared FIPS derivation | No runtime-service changes apply | Continue protocol hardening; no service identity is required for the library |
+| OpenETR | Strong evidence, consequential-state and recognition boundaries | Adjacent family scope is explicit; voice, multi-stage container and standalone lifecycle now follow the shared conventions | Continue verifier, retrieval, policy-adapter and domain-profile hardening |
 
 ### Findings retained as explicit gaps
 
@@ -363,6 +484,9 @@ milestones because they carry policy or value consequences.
    runtime surface. A shared package would reduce duplication but would also
    couple independent services at runtime; keep the copies until maintenance
    cost justifies a versioned static design package.
+6. OpenETR is adjacent to the Mainstay runtime family rather than a default
+   managed service. Its protocol and evidence model are shared where useful,
+   but deployment and product claims remain independently scoped.
 
 ## Review Checklist
 
@@ -371,6 +495,8 @@ For a new family component, ask:
 - Is it an app, addressable service or embedded protocol component?
 - Is its responsibility and non-responsibility stated plainly?
 - Does it use the common product-page anatomy while retaining its own palette?
+- Does its voice emphasize ordinary usefulness, shared governance and
+  cooperative independence without adversarial or catastrophic framing?
 - Does every long identifier wrap on mobile?
 - If addressable, does it expose health and non-secret information surfaces?
 - Does it need its own service identity, or would that confuse a library with a
@@ -380,5 +506,10 @@ For a new family component, ask:
 - Are secrets absent from responses, logs and dashboards?
 - Does existing persistent state reject accidental identity replacement?
 - Can a fresh operator start it from documented configuration?
+- Does its update path require a clean tree, fast-forward source update,
+  configuration validation, recreation and a health check?
+- Does **availability** describe authorized practical use while
+  **reachability** is reserved for a specific network path?
+- Are standalone and Mainstay-managed lifecycle ownership kept distinct?
 - Does the container run non-root with explicit state and exposure boundaries?
 - Are tests proportional to the authority, funds and recovery paths changed?

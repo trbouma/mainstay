@@ -5,7 +5,12 @@ set -eu
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 cd "$repo_dir"
 
-printf '%s\n' 'Pulling the latest changes...'
-git pull
+if ! git diff --quiet || ! git diff --cached --quiet; then
+    printf '%s\n' 'Tracked working-tree changes are present; commit or stash them before refreshing.' >&2
+    exit 1
+fi
+
+printf '%s\n' 'Pulling fast-forward changes...'
+git pull --ff-only
 
 exec "$repo_dir/start-mainstay.sh" --force-recreate "$@"

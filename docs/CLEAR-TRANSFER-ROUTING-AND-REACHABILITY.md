@@ -5,6 +5,12 @@
 Implemented interim profile and manually validated on September 6, 2026.
 Multi-route mint identity resolution remains future work.
 
+This note uses **reachability** intentionally for the path-level question of
+whether a recipient or mint endpoint can be reached from the current scope.
+The user-facing outcome is **availability**: whether the required transfer
+service can actually be used. A reachable route alone does not establish
+health, authority, acceptance, recognition, or transfer completion.
+
 ## Result
 
 Clear transfers now feel like one wallet operation while preserving two

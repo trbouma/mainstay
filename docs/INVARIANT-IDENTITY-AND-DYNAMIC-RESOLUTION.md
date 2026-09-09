@@ -13,6 +13,12 @@ HTTP and DNS compatibility paths can yet be removed.
 
 > Mainstay treats identity as invariant and reachability as replaceable.
 
+Here, **reachability** is deliberately narrow: it means the network path a
+caller can use from its current scope. **Availability** is the broader security
+and operating outcome that an authorized person can obtain and use the service
+or information when needed. Dynamic resolution supports availability by
+finding an eligible reachable route; it does not make the two terms synonyms.
+
 A service remains the same service when its network location changes. A record,
 wallet, currency, or relay relationship also retains its identity when a
 different path is required to reach the responsible service.

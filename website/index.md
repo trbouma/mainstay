@@ -53,6 +53,8 @@ interaction into a dependency on a distant platform.
 
 ## A home governed together
 
+**Our House. Our Rules. Our Business.**
+
 A local digital home gives a community practical stewardship over how its
 essential services work. The people responsible for a community, resort,
 campus, or co-working facility can define who may issue local credits, which
@@ -64,12 +66,19 @@ shaped through the community's own procedures while remaining compatible with
 regional institutions, service providers, and open networks. Mainstay gives
 those locally chosen rules a dependable place to operate.
 
+Here, the house is the community's locally operated domain. The rules are its
+legitimate, documented procedures within the authority it actually holds. The
+business is both its ordinary day-to-day work and its reasonable expectation
+that confidential affairs remain private. External obligations and cooperative
+relationships remain visible and respected. It is an expression of ordinary
+civic and institutional dignity, not withdrawal from the wider society.
+
 ## Records, credits, and trusted local work
 
 Mainstay is intended to keep several practical questions clear:
 
 - Which records are available here?
-- Which local services can be reached now?
+- Which local services are available and usable now?
 - Which credits, vouchers, or balances are confirmed?
 - Which transfers or attestations are pending wider reconciliation?
 - Which organization, issuer, professional, or community gives a record or
@@ -216,9 +225,9 @@ coherent.
 ## Continuity without ambiguity
 
 Mainstay should always distinguish what is available now, what is confirmed,
-what remains pending, and what can be finalized later. A locally reachable
+what remains pending, and what can be finalized later. A locally available
 Clear mint can confirm its own currency inside a community network, while
-proofs from an unreachable external mint remain pending until reconciliation.
+proofs from an unavailable external mint remain pending until reconciliation.
 
 Records follow the same principle: local copies preserve continuity, signed
 events preserve evidence, and synchronization reconnects local work to the
@@ -229,13 +238,13 @@ wider network when available.
 ## Policy briefs
 
 Mainstay policy briefs connect local-first technology to the enduring work of
-communities and institutions. The first brief examines two core capabilities:
-anchoring consequential records and transferring value through the **Clerk and
-Treasury functions**. These are not new institutional inventions, but familiar
-responsibilities being reconstituted with portable identities, verifiable
-records, private bearer instruments, and locally operated infrastructure.
+communities and institutions. They examine the **Clerk and Treasury functions**
+and place credit, clearing, and transferable value in a longer cultural history.
+These are not new institutional inventions, but familiar responsibilities being
+reconstituted with portable identities, verifiable records, private bearer
+instruments, and locally operated infrastructure.
 
-[Read the Clerk and Treasury brief](policy-briefs/clerk-and-treasury-functions.md){ .md-button }
+[Explore the policy briefs](policy-briefs/index.md){ .md-button }
 
 ## A local home when it matters
 

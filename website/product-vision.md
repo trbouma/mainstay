@@ -5,9 +5,8 @@ description: The product promise, principles, and direction for Mainstay.
 
 # Product Vision
 
-**Mainstay is a local-first application for keys, records, payments, and
-community resource coordination that keeps working across connected and
-disrupted conditions.**
+**Mainstay is a unified local-first application that keeps essential
+information and value available and usable when conditions change.**
 
 It gives individuals, organizations, and communities a dependable place to
 manage the information and value they need to continue operating. Hosted
@@ -30,9 +29,9 @@ or synchronization protocols to know what is available and what to do next.
 
 ## Identity outlives location
 
-Mainstay treats identity as invariant and reachability as replaceable. A
-service remains the same service when it moves from a local container to a LAN
-address, public endpoint, VPN route, or future FIPS path. Records, wallets, and
+Mainstay treats identity as durable while routes remain replaceable. A service
+remains the same service when it moves from a local container to a LAN address,
+public endpoint, VPN route, or future FIPS path. Records, wallets, and
 currencies likewise retain stable identifiers even when the route to the
 service responsible for them changes.
 
@@ -72,6 +71,9 @@ on one central host.
    organization a dependable place to operate its own documented rules for
    access, recognition, issuance, and reconciliation while remaining connected
    to compatible outside systems.
+9. **Security includes availability.** Treat confidentiality, integrity, and
+   availability as complementary obligations. A network route is only one
+   contributor to keeping authorized services and information usable.
 
 ## The product model
 
@@ -80,6 +82,10 @@ Mainstay is the application.
 Lockbox is the appliance.
 There's no place like home.
 ```
+
+**Our House. Our Rules. Our Business.** is the governance expression of that
+model: local stewardship, accountable procedures, ordinary work, and
+appropriate confidentiality within a community's legitimate scope.
 
 Mainstay is the primary user entry point. Lockbox is the preferred integrated
 deployment when durable local operation, appliance simplicity, and

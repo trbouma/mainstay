@@ -1,17 +1,16 @@
 # Mainstay
 
-Mainstay is the future unified local-first application for records, identity,
-payments, and community resource coordination. It brings the Safebox, Acorn,
-Stroma, Grove, Spurline, and Clear product family into one coherent experience across
-connected and disrupted conditions.
+Mainstay is a unified local-first application that keeps essential information
+and value available and usable when conditions change. It brings Safebox,
+Acorn, Stroma, Grove, Spurline, and Clear into one coherent product family.
 
 Mainstay is the application. Lockbox is the appliance. There's no place like
 home.
 
 ## Identity Outlives Location
 
-Mainstay treats identity as invariant and reachability as replaceable. A
-service remains the same service when it moves from a Docker name to a LAN
+Mainstay treats identity as durable and availability as an operating objective.
+A service remains the same service when it moves from a Docker name to a LAN
 address, public HTTPS endpoint, VPN route, FreeBSD jail, or future FIPS path.
 Likewise, a wallet `npub`, Clear keyset ID, or Grove content hash does not
 become a different identifier merely because the route used to reach it has
@@ -19,7 +18,7 @@ changed.
 
 This is a digital-resilience capability, not only a configuration convenience.
 DNS and public IP connectivity can remain useful routes without becoming the
-root of identity or a mandatory condition for local operation. Mainstay can
+root of identity or a mandatory condition for local availability. Mainstay can
 select a route appropriate to the current context, replace that route as the
 topology changes, and preserve the identity that users and services already
 trust. See [Invariant Identity and Dynamic Resolution](docs/INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md).
@@ -449,19 +448,21 @@ http://<host-address>:8788/status
 Use a host firewall or VPN ACL when the host has interfaces that should not
 reach the control plane.
 
-On a deployment host, pull, rebuild, recreate, and check the managed service
-bundle with:
+On a deployment host, update, rebuild, recreate, and check the managed service
+bundle from its dedicated Mainstay deployment directory with:
 
 ```bash
 ./refresh-containers.sh
 ```
 
-The refresh script runs `init-env.sh` after pulling changes, so a new deployment
-gets its environment automatically and an older environment gains missing
-Clear and Safebox secrets and migrates legacy generic image tags into the
-deployment's Compose-project namespace before Compose evaluates the bundle. It
-waits for both the managed HTTP status check and the service Acorn's persisted
-initialization state.
+The refresh script refuses tracked working-tree changes, accepts only a
+fast-forward source update, and then delegates to the same validated start path
+used for routine operation. That path runs `init-env.sh`, so an older
+environment gains missing Clear and Safebox secrets and migrates legacy generic
+image tags into the deployment's Compose-project namespace before Compose
+evaluates the bundle. It waits for both the managed HTTP status check and the
+service Acorn's persisted initialization state. Update services owned by this
+bundle here rather than by running their standalone repository refresh scripts.
 
 Install and preview the MkDocs site locally:
 

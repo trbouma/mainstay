@@ -105,7 +105,7 @@ authoritative.
 | --- | --- | --- |
 | First installation | `./install-mainstay.sh` | Gather choices, run read-only preflight, generate initial secrets after confirmation, optionally start |
 | Routine start | `./start-mainstay.sh` | Complete safe initialization, refresh recovery copy, validate Compose, start and wait for readiness |
-| Code and image refresh | `./refresh-containers.sh` | Pull source and delegate recreation to the canonical start path |
+| Code and image refresh | `./refresh-containers.sh` | Require a clean tracked tree, fast-forward source, and delegate recreation to the canonical start path |
 | Save recovery configuration | `./save-recovery-env.sh` | Atomically refresh `.env.recovery` without accepting identity mismatch |
 | Recovery | `./recover-mainstay.sh` | Attach a fresh deployment directory to existing state without generating secrets |
 | Destructive teardown | `./teardown-mainstay.sh` | Remove one Compose project and only installer-marked bind data after explicit confirmation |
@@ -171,11 +171,16 @@ The start path:
 6. waits for the Mainstay status surface; and
 7. waits for the service-Acorn worker health check.
 
-`refresh-containers.sh` first pulls the deployment repository, then uses the
-same start path with forced container recreation. It does not maintain a
-separate readiness implementation. During that safe initialization step,
-missing image settings and former generic local tags are migrated to the
-current Compose project's image namespace before anything is rebuilt.
+`refresh-containers.sh` first refuses tracked working-tree changes and updates
+the deployment repository with `git pull --ff-only`. It then uses the same
+start path with forced container recreation. It does not maintain a separate
+readiness implementation. During that safe initialization step, missing image
+settings and former generic local tags are migrated to the current Compose
+project's image namespace before anything is rebuilt.
+
+Mainstay owns the lifecycle of every service in this Compose project. Update
+those services from this deployment directory rather than running a component
+repository's standalone refresh script against a Mainstay-managed instance.
 
 ## Recovery Configuration
 

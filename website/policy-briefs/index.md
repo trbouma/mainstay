@@ -25,3 +25,16 @@ instruments, and infrastructure that can continue operating when outside
 services are unavailable.
 
 [Read the policy brief](clerk-and-treasury-functions.md){ .md-button .md-button--primary }
+
+## Credit, Clearing, and Transferring Value
+
+Credit relationships are older than coinage and modern banking. Drawing on
+David Graeber's *Debt: The First 5,000 Years*, this brief places Clear and the
+Treasury function in that longer cultural history.
+
+It distinguishes transferring a claim from clearing the obligation behind it,
+then considers how cryptographic signatures, private bearer instruments, and
+digital communication can support familiar community practices without
+pretending that software creates value, authority, or trust.
+
+[Read the policy brief](credit-clearing-and-transferring-value.md){ .md-button .md-button--primary }
