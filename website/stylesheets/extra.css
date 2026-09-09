@@ -134,6 +134,74 @@
   margin: 1.5rem 0 1.25rem;
 }
 
+.family-strip--support {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.family-value-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.75rem;
+}
+
+.family-value-grid > p,
+.family-strip > p {
+  display: contents;
+}
+
+.family-feature,
+.family-access {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  min-width: 0;
+  padding: 1rem;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--md-default-fg-color) 15%, transparent);
+  border-radius: 8px;
+}
+
+.family-feature:hover,
+.family-access:hover {
+  border-color: var(--mainstay-amber);
+}
+
+.family-feature img,
+.family-access img {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: contain;
+}
+
+.family-feature span,
+.family-access span {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.family-feature strong,
+.family-access strong {
+  color: var(--md-primary-fg-color);
+  font-size: 1.05rem;
+}
+
+.family-feature small,
+.family-access small {
+  color: var(--md-default-fg-color--light);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.family-access {
+  max-width: 42rem;
+  margin: 1rem 0 1.75rem;
+  border-left: 0.3rem solid var(--mainstay-amber);
+}
+
 .family-mark {
   display: grid;
   min-width: 0;
@@ -208,6 +276,7 @@
   .mainstay-grid--four,
   .product-grid,
   .family-strip,
+  .family-value-grid,
   .lockbox-band {
     grid-template-columns: 1fr;
   }

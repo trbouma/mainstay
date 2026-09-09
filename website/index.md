@@ -169,56 +169,62 @@ mesh.
 
 </div>
 
-## A family with clear responsibilities
+## One house, distinct roles
 
-Each sibling product remains independently useful. Mainstay coordinates them
-without becoming the authority or collapsing them into a monolith.
+Mainstay is the unified local operating context. Within it, Clear and OpenETR
+create new practical value, Safebox Web gives people access to that value, and
+the supporting components provide the focused capabilities that make the whole
+system work. Each remains independently useful and replaceable.
 
-### Good boundaries, not barriers
+### Value
 
-Continuity depends on knowing which component holds which responsibility and
-which authority. Clear boundaries keep a relay from becoming a mint, an
-application from becoming the system of record, and one failure from silently
-changing the meaning of another component's state.
+<div class="family-value-grid" markdown>
 
-Those boundaries should not become walls. Open protocols let keys, records,
-funds, and signed evidence move across compatible applications, operators, and
-infrastructure. Mainstay coordinates the family at those boundaries so each
-product remains independently useful while the overall experience remains
-coherent.
-
-<div class="family-strip" markdown>
-
-<a class="family-mark" href="https://trbouma.github.io/safebox-web/">
-  <img src="assets/safebox-logo.png" alt="Safebox Web">
-  <strong>Safebox Web</strong><span>User app</span>
+<a class="family-feature" href="https://trbouma.github.io/clear/">
+  <img src="assets/clear-logo.svg" alt="Clear">
+  <span><strong>Clear</strong><small>Issue, transfer, clear, and redeem community-defined value.</small></span>
 </a>
+<a class="family-feature" href="https://trbouma.github.io/openetr/">
+  <img src="assets/openetr-logo.png" alt="OpenETR">
+  <span><strong>OpenETR</strong><small>Establish, recognize, and disclose authoritative digital records.</small></span>
+</a>
+
+</div>
+
+### Access
+
+<a class="family-access" href="https://trbouma.github.io/safebox-web/">
+  <img src="assets/safebox-logo.png" alt="Safebox Web">
+  <span><strong>Safebox Web</strong><small>The application through which people use records, payments, identity, and recovery.</small></span>
+</a>
+
+### Supporting capabilities
+
+<div class="family-strip family-strip--support" markdown>
+
 <a class="family-mark" href="https://trbouma.github.io/safebox-acorn/">
   <img src="assets/acorn-logo.png" alt="Acorn">
   <strong>Acorn</strong><span>Portable authority</span>
 </a>
-<a class="family-mark" href="https://trbouma.github.io/stroma/">
-  <img src="assets/stroma-logo.png" alt="Stroma">
-  <strong>Stroma</strong><span>Nostr wire format</span>
+<a class="family-mark" href="https://trbouma.github.io/spurline/">
+  <img src="assets/spurline-logo.svg" alt="Spurline">
+  <strong>Spurline</strong><span>Signed events</span>
 </a>
 <a class="family-mark" href="https://trbouma.github.io/grove/">
   <img src="assets/grove-logo.png" alt="Grove">
-  <strong>Grove</strong><span>Encrypted blobs</span>
+  <strong>Grove</strong><span>Encrypted storage</span>
 </a>
-<a class="family-mark" href="https://trbouma.github.io/spurline/">
-  <img src="assets/spurline-logo.svg" alt="Spurline">
-  <strong>Spurline</strong><span>Local events</span>
-</a>
-<a class="family-mark" href="https://trbouma.github.io/clear/">
-  <img src="assets/clear-logo.svg" alt="Clear">
-  <strong>Clear</strong><span>Local currencies</span>
-</a>
-<a class="family-mark" href="https://trbouma.github.io/openetr/">
-  <img src="assets/openetr-logo.png" alt="OpenETR">
-  <strong>OpenETR</strong><span>Transferable records</span>
+<a class="family-mark" href="https://trbouma.github.io/stroma/">
+  <img src="assets/stroma-logo.png" alt="Stroma">
+  <strong>Stroma</strong><span>Protocol library</span>
 </a>
 
 </div>
+
+Clear boundaries keep an application from becoming the authority, a relay from
+becoming a mint, and storage from determining the meaning of a record. Open
+protocols let keys, records, value, and signed evidence move across compatible
+applications and infrastructure without collapsing those responsibilities.
 
 [See how the family fits together](product-family.md){ .md-button }
 
