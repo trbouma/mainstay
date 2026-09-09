@@ -173,7 +173,9 @@ The start path:
 
 `refresh-containers.sh` first pulls the deployment repository, then uses the
 same start path with forced container recreation. It does not maintain a
-separate readiness implementation.
+separate readiness implementation. During that safe initialization step,
+missing image settings and former generic local tags are migrated to the
+current Compose project's image namespace before anything is rebuilt.
 
 ## Recovery Configuration
 
@@ -263,6 +265,16 @@ An unmarked directory is preserved even after explicit confirmation. The data
 parent is never removed merely because an instance beneath it was deleted.
 Built images remain cached to make recreation faster.
 
+To remove this deployment's locally built images as part of teardown, use:
+
+```bash
+./teardown-mainstay.sh --remove-images
+```
+
+Only image tags exactly matching the deployment's derived
+`COMPOSE_PROJECT_NAME` namespace are removed. Explicit custom image overrides
+are preserved because they may be shared or managed outside Mainstay.
+
 Teardown is destruction, not a backup or migration operation. Copy required
 data and recovery material before invoking it.
 
@@ -323,6 +335,9 @@ absolute paths and attaches the selected Compose namespace.
 - Existing explicit `MAINSTAY_LOCAL_DATA_SOURCE` values remain authoritative.
 - Existing deployments without `COMPOSE_PROJECT_NAME` continue to use
   `mainstay-local`.
+- Missing image settings and the former generic local defaults are migrated to
+  tags derived from `COMPOSE_PROJECT_NAME`. Explicit custom image overrides
+  remain authoritative.
 - Docker-managed volumes remain supported when no data parent is selected, but
   do not receive an in-root `.env.recovery` because no host instance root
   exists.

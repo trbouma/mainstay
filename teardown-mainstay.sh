@@ -5,6 +5,20 @@ set -eu
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 env_file="$repo_dir/.env"
 managed_marker_name=".mainstay-local-managed-data-root"
+remove_images=false
+
+usage() {
+    printf '%s\n' 'Usage: ./teardown-mainstay.sh [--remove-images]'
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --remove-images) remove_images=true ;;
+        -h|--help) usage; exit 0 ;;
+        *) printf '%s\n' "Unknown argument: $1" >&2; usage >&2; exit 2 ;;
+    esac
+    shift
+done
 
 abort_teardown() {
     printf '\n%s\n' 'Teardown aborted. No data was removed.' >&2
@@ -28,6 +42,8 @@ read_value() {
 }
 
 data_root=$(read_value MAINSTAY_DATA_ROOT)
+compose_project_name=$(read_value COMPOSE_PROJECT_NAME)
+compose_project_name=${compose_project_name:-mainstay-local}
 managed_data_root=false
 if [ -n "$data_root" ]; then
     marker="$data_root/$managed_marker_name"
@@ -55,7 +71,14 @@ else
     printf '%s\n' "The unmarked data root will be preserved: $data_root"
 fi
 printf '%s\n' \
-    'The .env file and generated installation-identity state will also be deleted. Built images are retained.'
+    'The .env file and generated installation-identity state will also be deleted.'
+if [ "$remove_images" = true ]; then
+    printf '%s\n' \
+        'Project-derived built images will be removed; custom image overrides will be preserved.'
+else
+    printf '%s\n' \
+        'Built images are retained. Use --remove-images for project-derived image cleanup.'
+fi
 printf '%s\n' \
     'Enter DELETE to continue, or enter abort, quit, q, or anything else to stop.'
 printf '> '
@@ -77,6 +100,39 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 
 docker compose down --volumes --remove-orphans
+
+if [ "$remove_images" = true ]; then
+    remove_project_image() {
+        key=$1
+        legacy_value=$2
+        suffix=$3
+        expected_image="$compose_project_name-$suffix:local"
+        configured_image=$(read_value "$key")
+        case "$configured_image" in
+            ''|"$legacy_value") configured_image=$expected_image ;;
+        esac
+        if [ "$configured_image" != "$expected_image" ]; then
+            printf '%s\n' \
+                "Preserving custom image override: $configured_image"
+            return
+        fi
+        if docker image inspect "$configured_image" >/dev/null 2>&1; then
+            if ! docker image rm "$configured_image"; then
+                printf '%s\n' \
+                    "WARNING: Docker could not remove image: $configured_image" >&2
+            fi
+        fi
+    }
+
+    remove_project_image MAINSTAY_LOCAL_IMAGE mainstay-local:local control
+    remove_project_image SAFEBOX_IMAGE safebox-web:local safebox-web
+    remove_project_image \
+        MAINSTAY_SPURLINE_IMAGE mainstay-local-spurline:local spurline
+    remove_project_image \
+        MAINSTAY_GROVE_IMAGE mainstay-local-grove:local grove
+    remove_project_image \
+        MAINSTAY_CLEAR_IMAGE mainstay-local-clear:local clear
+fi
 
 if [ "$managed_data_root" = true ]; then
     rm -rf -- "$data_root"

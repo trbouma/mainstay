@@ -78,6 +78,11 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
     assert len(values["SAFEBOX_COOKIE_KEY"]) == 44
     assert values["SAFEBOX_COOKIE_KEY"].endswith("=")
     assert len(values["SAFEBOX_ONBOARD_INVITE_CODE"]) == 32
+    assert values["MAINSTAY_LOCAL_IMAGE"] == "mainstay-local-control:local"
+    assert values["SAFEBOX_IMAGE"] == "mainstay-local-safebox-web:local"
+    assert values["MAINSTAY_SPURLINE_IMAGE"] == "mainstay-local-spurline:local"
+    assert values["MAINSTAY_GROVE_IMAGE"] == "mainstay-local-grove:local"
+    assert values["MAINSTAY_CLEAR_IMAGE"] == "mainstay-local-clear:local"
     assert values["CLEAR_MASTER_SECRET"] != values["CLEAR_OPERATOR_TOKEN"]
     assert values["CLEAR_MINT_SERVICE_NSEC"] not in {
         values["CLEAR_MASTER_SECRET"],
@@ -302,7 +307,7 @@ def test_init_env_fills_missing_secrets_in_existing_file(tmp_path: Path) -> None
     )
 
     values = _read_env(env_file)
-    assert result.stdout.startswith("Added missing Mainstay secrets to .env.\n")
+    assert result.stdout.startswith("Updated the Mainstay environment.\n")
     assert "operator-funded service-Acorn fee reserve" in result.stdout
     assert values["MAINSTAY_LOCAL_PORT"] == "9876"
     assert len(values["CLEAR_MASTER_SECRET"]) == 64
@@ -336,6 +341,48 @@ def test_init_env_is_idempotent(tmp_path: Path) -> None:
     )
     assert "operator-funded service-Acorn fee reserve" in result.stdout
     assert env_file.read_text(encoding="utf-8") == original
+
+
+def test_init_env_migrates_legacy_images_and_preserves_custom_overrides(
+    tmp_path: Path,
+) -> None:
+    script, environment = _stage_helper(tmp_path)
+    subprocess.run([str(script)], check=True, env=environment)
+    env_file = tmp_path / ".env"
+    content = env_file.read_text(encoding="utf-8")
+    content = content.replace(
+        "COMPOSE_PROJECT_NAME=mainstay-local",
+        "COMPOSE_PROJECT_NAME=private-venue",
+    )
+    content = content.replace(
+        "MAINSTAY_LOCAL_IMAGE=mainstay-local-control:local",
+        "MAINSTAY_LOCAL_IMAGE=mainstay-local:local",
+    )
+    content = content.replace(
+        "SAFEBOX_IMAGE=mainstay-local-safebox-web:local",
+        "SAFEBOX_IMAGE=safebox-web:local",
+    )
+    content = content.replace(
+        "MAINSTAY_GROVE_IMAGE=mainstay-local-grove:local",
+        "MAINSTAY_GROVE_IMAGE=registry.example/grove:stable",
+    )
+    env_file.write_text(content, encoding="utf-8")
+
+    result = subprocess.run(
+        [str(script)],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    values = _read_env(env_file)
+    assert result.stdout.startswith("Updated the Mainstay environment.\n")
+    assert values["MAINSTAY_LOCAL_IMAGE"] == "private-venue-control:local"
+    assert values["SAFEBOX_IMAGE"] == "private-venue-safebox-web:local"
+    assert values["MAINSTAY_SPURLINE_IMAGE"] == "private-venue-spurline:local"
+    assert values["MAINSTAY_GROVE_IMAGE"] == "registry.example/grove:stable"
+    assert values["MAINSTAY_CLEAR_IMAGE"] == "private-venue-clear:local"
 
 
 def test_init_env_assigns_first_service_identity_to_existing_clear_volume(

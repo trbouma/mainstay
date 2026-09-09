@@ -2,7 +2,7 @@ name: ${COMPOSE_PROJECT_NAME:-mainstay-local}
 
 services:
   mainstay-local:
-    image: ${MAINSTAY_LOCAL_IMAGE:-mainstay-local:local}
+    image: ${MAINSTAY_LOCAL_IMAGE:-${COMPOSE_PROJECT_NAME:-mainstay-local}-control:local}
     build:
       context: .
       dockerfile: Dockerfile
@@ -36,7 +36,7 @@ services:
     stop_grace_period: 30s
 
   safebox-web:
-    image: ${SAFEBOX_IMAGE:-safebox-web:local}
+    image: ${SAFEBOX_IMAGE:-${COMPOSE_PROJECT_NAME:-mainstay-local}-safebox-web:local}
     build:
       context: "${MAINSTAY_SAFEBOX_BUILD_CONTEXT:-https://github.com/trbouma/safebox-web.git#main}"
       dockerfile: Dockerfile
@@ -111,7 +111,7 @@ services:
     stop_grace_period: 120s
 
   service-acorn-worker:
-    image: ${SAFEBOX_IMAGE:-safebox-web:local}
+    image: ${SAFEBOX_IMAGE:-${COMPOSE_PROJECT_NAME:-mainstay-local}-safebox-web:local}
     command: ["python", "-m", "app.service_acorn_worker", "run"]
     restart: unless-stopped
     init: true
@@ -161,7 +161,7 @@ services:
     stop_grace_period: 30s
 
   spurline:
-    image: ${MAINSTAY_SPURLINE_IMAGE:-mainstay-local-spurline:local}
+    image: ${MAINSTAY_SPURLINE_IMAGE:-${COMPOSE_PROJECT_NAME:-mainstay-local}-spurline:local}
     build:
       context: "${MAINSTAY_SPURLINE_BUILD_CONTEXT:-https://github.com/trbouma/spurline.git#main}"
       dockerfile: Dockerfile
@@ -190,7 +190,7 @@ services:
     stop_grace_period: 30s
 
   grove:
-    image: ${MAINSTAY_GROVE_IMAGE:-mainstay-local-grove:local}
+    image: ${MAINSTAY_GROVE_IMAGE:-${COMPOSE_PROJECT_NAME:-mainstay-local}-grove:local}
     build:
       context: "${MAINSTAY_GROVE_BUILD_CONTEXT:-https://github.com/trbouma/grove.git#main}"
       dockerfile: Dockerfile
@@ -219,7 +219,7 @@ services:
     stop_grace_period: 30s
 
   clear:
-    image: ${MAINSTAY_CLEAR_IMAGE:-mainstay-local-clear:local}
+    image: ${MAINSTAY_CLEAR_IMAGE:-${COMPOSE_PROJECT_NAME:-mainstay-local}-clear:local}
     build:
       context: "${MAINSTAY_CLEAR_BUILD_CONTEXT:-https://github.com/trbouma/clear.git#main}"
       dockerfile: Dockerfile

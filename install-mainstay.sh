@@ -45,6 +45,21 @@ env_default() {
     ' "$source_file"
 }
 
+deployment_image() {
+    key=$1
+    legacy_value=$2
+    suffix=$3
+    configured_value=$(env_default "$key" "")
+    case "$configured_value" in
+        ''|"$legacy_value")
+            printf '%s-%s:local\n' "$compose_project_name" "$suffix"
+            ;;
+        *)
+            printf '%s\n' "$configured_value"
+            ;;
+    esac
+}
+
 prompt_value() {
     label=$1
     default_value=$2
@@ -305,6 +320,15 @@ printf '\n'
 
 compose_project_default=$(env_default COMPOSE_PROJECT_NAME mainstay-local)
 compose_project_name=$(prompt_project_name "$compose_project_default")
+mainstay_local_image=$(deployment_image \
+    MAINSTAY_LOCAL_IMAGE mainstay-local:local control)
+safebox_image=$(deployment_image SAFEBOX_IMAGE safebox-web:local safebox-web)
+spurline_image=$(deployment_image \
+    MAINSTAY_SPURLINE_IMAGE mainstay-local-spurline:local spurline)
+grove_image=$(deployment_image \
+    MAINSTAY_GROVE_IMAGE mainstay-local-grove:local grove)
+clear_image=$(deployment_image \
+    MAINSTAY_CLEAR_IMAGE mainstay-local-clear:local clear)
 configured_data_root=$(env_default MAINSTAY_DATA_ROOT "")
 configured_data_parent=$(env_default MAINSTAY_DATA_PARENT "")
 configured_data_directory_name=$(env_default MAINSTAY_DATA_DIRECTORY_NAME "")
@@ -459,6 +483,7 @@ printf '%s\n' 'Preflight checks passed. No configuration has been written.'
 
 printf '\n%s\n' 'Review'
 printf '  Compose project: %s\n' "$compose_project_name"
+printf '  Image namespace: %s-*\n' "$compose_project_name"
 if [ "$legacy_data_layout" = false ]; then
     printf '  Data parent:     %s\n' "${data_parent:-Docker-managed named volumes}"
 fi
@@ -498,6 +523,11 @@ set_env_value MAINSTAY_SAFEBOX_PORT "$safebox_port"
 set_env_value MAINSTAY_LIGHTNING_MINT_URL "$lightning_mint_url"
 set_env_value SAFEBOX_NIP05_EXTERNAL_RELAYS "$external_relay"
 set_env_value COMPOSE_PROJECT_NAME "$compose_project_name"
+set_env_value MAINSTAY_LOCAL_IMAGE "$mainstay_local_image"
+set_env_value SAFEBOX_IMAGE "$safebox_image"
+set_env_value MAINSTAY_SPURLINE_IMAGE "$spurline_image"
+set_env_value MAINSTAY_GROVE_IMAGE "$grove_image"
+set_env_value MAINSTAY_CLEAR_IMAGE "$clear_image"
 set_env_value MAINSTAY_DATA_PARENT "$data_parent"
 set_env_value MAINSTAY_DATA_DIRECTORY_NAME "$data_directory_name"
 

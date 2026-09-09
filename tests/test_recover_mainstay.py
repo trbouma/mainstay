@@ -109,6 +109,11 @@ def test_recovery_uses_existing_data_root_name_as_compose_name(
     assert result.returncode == 0, result.stderr
     values = _read_env(deployment / ".env")
     assert values["COMPOSE_PROJECT_NAME"] == "private-venue"
+    assert values["MAINSTAY_LOCAL_IMAGE"] == "private-venue-control:local"
+    assert values["SAFEBOX_IMAGE"] == "private-venue-safebox-web:local"
+    assert values["MAINSTAY_SPURLINE_IMAGE"] == "private-venue-spurline:local"
+    assert values["MAINSTAY_GROVE_IMAGE"] == "private-venue-grove:local"
+    assert values["MAINSTAY_CLEAR_IMAGE"] == "private-venue-clear:local"
     assert values["MAINSTAY_DATA_PARENT"] == str(data_root.parent)
     assert values["MAINSTAY_DATA_DIRECTORY_NAME"] == "private-venue"
     assert values["MAINSTAY_DATA_ROOT"] == str(data_root)
@@ -145,10 +150,38 @@ def test_recovery_allows_a_different_compose_name_after_warning(
     assert result.returncode == 0, result.stderr
     values = _read_env(deployment / ".env")
     assert values["COMPOSE_PROJECT_NAME"] == "new-runtime"
+    assert values["SAFEBOX_IMAGE"] == "new-runtime-safebox-web:local"
     assert values["MAINSTAY_DATA_DIRECTORY_NAME"] == "old-directory"
     assert values["MAINSTAY_DATA_ROOT"] == str(data_root)
     assert "Compose project name will differ" in result.stderr
     assert "Compose and data-root names will remain different" in result.stdout
+
+
+def test_recovery_preserves_custom_image_override(tmp_path: Path) -> None:
+    deployment, environment, _docker_log = _stage_recovery(tmp_path)
+    data_root = _create_recovered_instance(tmp_path, "custom-images")
+    recovery_file = data_root / ".env.recovery"
+    recovery_file.write_text(
+        recovery_file.read_text(encoding="utf-8")
+        + "SAFEBOX_IMAGE=registry.example/safebox-web:stable\n",
+        encoding="utf-8",
+    )
+    answers = f"{data_root}\n1\n" + "\n" * 4 + "no\nyes\n"
+
+    result = subprocess.run(
+        [str(deployment / "recover-mainstay.sh")],
+        cwd=deployment,
+        env=environment,
+        input=answers,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    values = _read_env(deployment / ".env")
+    assert values["SAFEBOX_IMAGE"] == "registry.example/safebox-web:stable"
+    assert values["MAINSTAY_CLEAR_IMAGE"] == "custom-images-clear:local"
 
 
 def test_recovery_can_abort_before_writing(tmp_path: Path) -> None:

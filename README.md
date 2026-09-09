@@ -192,6 +192,11 @@ present. The shared parent and unmarked operator-owned directories are never
 recursively deleted. Built images remain available, making the next disposable
 installation quicker.
 
+Each installation derives local image tags from `COMPOSE_PROJECT_NAME`, so a
+Mainstay build cannot retag an independent service image or another Mainstay
+instance's image. Use `./teardown-mainstay.sh --remove-images` to also remove
+only this deployment's derived image tags; custom image overrides are retained.
+
 `init-env.sh` copies `.env.example` when `.env` is absent and generates
 independent Clear master/operator secrets, a valid Safebox cookie-encryption
 key, and a private Safebox onboarding invite code without printing them. It
@@ -434,8 +439,9 @@ bundle with:
 
 The refresh script runs `init-env.sh` after pulling changes, so a new deployment
 gets its environment automatically and an older environment gains missing
-Clear and Safebox secrets before Compose evaluates the bundle. It waits for
-both the managed HTTP status check and the service Acorn's persisted
+Clear and Safebox secrets and migrates legacy generic image tags into the
+deployment's Compose-project namespace before Compose evaluates the bundle. It
+waits for both the managed HTTP status check and the service Acorn's persisted
 initialization state.
 
 Install and preview the MkDocs site locally:

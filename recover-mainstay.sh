@@ -48,6 +48,21 @@ recovery_default() {
     fi
 }
 
+recovery_image() {
+    key=$1
+    legacy_value=$2
+    suffix=$3
+    recovered_value=$(read_value "$recovery_file" "$key")
+    case "$recovered_value" in
+        ''|"$legacy_value")
+            printf '%s-%s:local\n' "$compose_project_name" "$suffix"
+            ;;
+        *)
+            printf '%s\n' "$recovered_value"
+            ;;
+    esac
+}
+
 prompt_value() {
     label=$1
     default_value=$2
@@ -282,6 +297,16 @@ case "$choice" in
         ;;
 esac
 
+mainstay_local_image=$(recovery_image \
+    MAINSTAY_LOCAL_IMAGE mainstay-local:local control)
+safebox_image=$(recovery_image SAFEBOX_IMAGE safebox-web:local safebox-web)
+spurline_image=$(recovery_image \
+    MAINSTAY_SPURLINE_IMAGE mainstay-local-spurline:local spurline)
+grove_image=$(recovery_image \
+    MAINSTAY_GROVE_IMAGE mainstay-local-grove:local grove)
+clear_image=$(recovery_image \
+    MAINSTAY_CLEAR_IMAGE mainstay-local-clear:local clear)
+
 dashboard_bind=$(prompt_bind_address \
     'Dashboard bind address' \
     "$(recovery_default MAINSTAY_LOCAL_BIND_ADDRESS 0.0.0.0)")
@@ -335,6 +360,7 @@ printf '\n%s\n' 'Recovery review'
 printf '  Existing data root: %s\n' "$data_root"
 printf '  Data-root name:     %s\n' "$data_directory_name"
 printf '  Compose project:    %s\n' "$compose_project_name"
+printf '  Image namespace:    %s-*\n' "$compose_project_name"
 printf '  Control data:       %s\n' "$control_data_source"
 printf '  Dashboard:          %s:%s\n' "$dashboard_bind" "$dashboard_port"
 printf '  Safebox Web:        %s:%s\n' "$safebox_bind" "$safebox_port"
@@ -360,6 +386,11 @@ cleanup() {
 trap cleanup EXIT HUP INT TERM
 awk \
     -v compose_project_name="$compose_project_name" \
+    -v mainstay_local_image="$mainstay_local_image" \
+    -v safebox_image="$safebox_image" \
+    -v spurline_image="$spurline_image" \
+    -v grove_image="$grove_image" \
+    -v clear_image="$clear_image" \
     -v data_parent="$data_parent" \
     -v data_directory_name="$data_directory_name" \
     -v data_root="$data_root" \
@@ -375,6 +406,11 @@ awk \
     -v safebox_port="$safebox_port" '
     BEGIN {
         values["COMPOSE_PROJECT_NAME"] = compose_project_name
+        values["MAINSTAY_LOCAL_IMAGE"] = mainstay_local_image
+        values["SAFEBOX_IMAGE"] = safebox_image
+        values["MAINSTAY_SPURLINE_IMAGE"] = spurline_image
+        values["MAINSTAY_GROVE_IMAGE"] = grove_image
+        values["MAINSTAY_CLEAR_IMAGE"] = clear_image
         values["MAINSTAY_DATA_PARENT"] = data_parent
         values["MAINSTAY_DATA_DIRECTORY_NAME"] = data_directory_name
         values["MAINSTAY_DATA_ROOT"] = data_root

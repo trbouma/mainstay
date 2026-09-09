@@ -67,6 +67,31 @@ compose_project_name=$(read_value COMPOSE_PROJECT_NAME)
 if [ -z "$compose_project_name" ]; then
     compose_project_name=mainstay-local
 fi
+
+deployment_image() {
+    key=$1
+    legacy_value=$2
+    suffix=$3
+    configured_value=$(read_value "$key")
+    case "$configured_value" in
+        ''|"$legacy_value")
+            printf '%s-%s:local\n' "$compose_project_name" "$suffix"
+            ;;
+        *)
+            printf '%s\n' "$configured_value"
+            ;;
+    esac
+}
+
+mainstay_local_image=$(deployment_image \
+    MAINSTAY_LOCAL_IMAGE mainstay-local:local control)
+safebox_image=$(deployment_image SAFEBOX_IMAGE safebox-web:local safebox-web)
+spurline_image=$(deployment_image \
+    MAINSTAY_SPURLINE_IMAGE mainstay-local-spurline:local spurline)
+grove_image=$(deployment_image \
+    MAINSTAY_GROVE_IMAGE mainstay-local-grove:local grove)
+clear_image=$(deployment_image \
+    MAINSTAY_CLEAR_IMAGE mainstay-local-clear:local clear)
 clear_volume="${compose_project_name}_clear-data"
 safebox_volume="${compose_project_name}_safebox-web-data"
 
@@ -170,6 +195,12 @@ if [ -n "$data_root" ]; then
     [ "$(read_value MAINSTAY_GROVE_DATA_SOURCE)" = "$grove_data_source" ] || storage_complete=false
     [ "$(read_value MAINSTAY_CLEAR_DATA_SOURCE)" = "$clear_data_source" ] || storage_complete=false
 fi
+images_complete=true
+[ "$(read_value MAINSTAY_LOCAL_IMAGE)" = "$mainstay_local_image" ] || images_complete=false
+[ "$(read_value SAFEBOX_IMAGE)" = "$safebox_image" ] || images_complete=false
+[ "$(read_value MAINSTAY_SPURLINE_IMAGE)" = "$spurline_image" ] || images_complete=false
+[ "$(read_value MAINSTAY_GROVE_IMAGE)" = "$grove_image" ] || images_complete=false
+[ "$(read_value MAINSTAY_CLEAR_IMAGE)" = "$clear_image" ] || images_complete=false
 
 if [ -n "$master_secret" ] && [ -n "$operator_token" ] && \
     [ -n "$mint_service_nsec" ] && \
@@ -178,7 +209,7 @@ if [ -n "$master_secret" ] && [ -n "$operator_token" ] && \
     [ -n "$safebox_web_service_nsec" ] && \
     [ -n "$installation_nsec" ] && \
     [ -n "$cookie_key" ] && [ -n "$invite_code" ] && \
-    [ "$storage_complete" = true ]; then
+    [ "$storage_complete" = true ] && [ "$images_complete" = true ]; then
     ensure_data_directories
     chmod 600 "$env_file"
     printf '%s\n' '.env already contains the required Mainstay secrets.'
@@ -274,6 +305,11 @@ cleanup() {
 trap cleanup EXIT HUP INT TERM
 
 awk \
+    -v mainstay_local_image="$mainstay_local_image" \
+    -v safebox_image="$safebox_image" \
+    -v spurline_image="$spurline_image" \
+    -v grove_image="$grove_image" \
+    -v clear_image="$clear_image" \
     -v data_root="$data_root" \
     -v data_runtime_user="$data_runtime_user" \
     -v local_data_source="$local_data_source" \
@@ -291,6 +327,11 @@ awk \
     -v cookie_key="$cookie_key" \
     -v invite_code="$invite_code" '
     BEGIN {
+        found_mainstay_local_image = 0
+        found_safebox_image = 0
+        found_spurline_image = 0
+        found_grove_image = 0
+        found_clear_image = 0
         found_data_root = 0
         found_data_runtime_user = 0
         found_local_data = 0
@@ -307,6 +348,41 @@ awk \
         found_installation = 0
         found_cookie = 0
         found_invite = 0
+    }
+    /^MAINSTAY_LOCAL_IMAGE=/ {
+        if (!found_mainstay_local_image) {
+            print "MAINSTAY_LOCAL_IMAGE=" mainstay_local_image
+            found_mainstay_local_image = 1
+        }
+        next
+    }
+    /^SAFEBOX_IMAGE=/ {
+        if (!found_safebox_image) {
+            print "SAFEBOX_IMAGE=" safebox_image
+            found_safebox_image = 1
+        }
+        next
+    }
+    /^MAINSTAY_SPURLINE_IMAGE=/ {
+        if (!found_spurline_image) {
+            print "MAINSTAY_SPURLINE_IMAGE=" spurline_image
+            found_spurline_image = 1
+        }
+        next
+    }
+    /^MAINSTAY_GROVE_IMAGE=/ {
+        if (!found_grove_image) {
+            print "MAINSTAY_GROVE_IMAGE=" grove_image
+            found_grove_image = 1
+        }
+        next
+    }
+    /^MAINSTAY_CLEAR_IMAGE=/ {
+        if (!found_clear_image) {
+            print "MAINSTAY_CLEAR_IMAGE=" clear_image
+            found_clear_image = 1
+        }
+        next
     }
     /^MAINSTAY_DATA_ROOT=/ {
         if (!found_data_root) {
@@ -422,6 +498,21 @@ awk \
     }
     { print }
     END {
+        if (!found_mainstay_local_image) {
+            print "MAINSTAY_LOCAL_IMAGE=" mainstay_local_image
+        }
+        if (!found_safebox_image) {
+            print "SAFEBOX_IMAGE=" safebox_image
+        }
+        if (!found_spurline_image) {
+            print "MAINSTAY_SPURLINE_IMAGE=" spurline_image
+        }
+        if (!found_grove_image) {
+            print "MAINSTAY_GROVE_IMAGE=" grove_image
+        }
+        if (!found_clear_image) {
+            print "MAINSTAY_CLEAR_IMAGE=" clear_image
+        }
         if (!found_data_root) {
             print "MAINSTAY_DATA_ROOT=" data_root
         }
@@ -481,6 +572,6 @@ ensure_data_directories
 if [ "$created" = true ]; then
     printf '%s\n' 'Created .env with generated Mainstay secrets.'
 else
-    printf '%s\n' 'Added missing Mainstay secrets to .env.'
+    printf '%s\n' 'Updated the Mainstay environment.'
 fi
 print_reserve_advisory

@@ -58,6 +58,25 @@ class MainstayLocalTests(unittest.TestCase):
             )
         self.assertNotIn("context: ../", compose)
 
+    def test_default_images_are_scoped_to_the_compose_project(self) -> None:
+        compose = (Path(__file__).parents[1] / DEFAULT_COMPOSE_PATH).read_text(
+            encoding="utf-8"
+        )
+
+        for suffix in ("control", "safebox-web", "spurline", "grove", "clear"):
+            self.assertIn(
+                "${COMPOSE_PROJECT_NAME:-mainstay-local}-"
+                f"{suffix}:local",
+                compose,
+            )
+        self.assertEqual(
+            compose.count(
+                "${SAFEBOX_IMAGE:-${COMPOSE_PROJECT_NAME:-mainstay-local}"
+                "-safebox-web:local}"
+            ),
+            2,
+        )
+
     def test_default_registry_renders_safebox_env(self) -> None:
         env = render_safebox_env(BundleConfig.default())
 

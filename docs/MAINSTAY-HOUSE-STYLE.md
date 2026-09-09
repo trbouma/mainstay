@@ -284,7 +284,10 @@ project lifecycle, generated installation identity and teardown authority must
 not be shared with another instance. Operators create a separate checkout or
 deployment directory for every instance, even when the instances run on the
 same host. Each directory also uses a unique `COMPOSE_PROJECT_NAME` so Docker
-resources remain instance-scoped.
+resources remain instance-scoped. Locally built image tags derive from that
+project name as well. This prevents one Mainstay refresh from retagging the
+image used by another Mainstay or independently deployed service; Docker may
+still deduplicate identical layers beneath those distinct tags.
 
 A fresh interactive installation has one canonical entry point:
 
@@ -302,19 +305,23 @@ It must:
    unique Compose namespace, writable storage and available exposed ports;
 5. derive an instance-specific data root beneath the selected parent using the
    Compose project name, then review it with the exposed addresses and ports;
-6. create or complete `.env` without replacing secrets bound to existing data;
-7. establish `MAINSTAY_DATA_ROOT` before first stateful startup;
-8. delegate startup to `start-mainstay.sh`, which validates Compose, starts the
+6. derive deployment-specific image tags while preserving explicit custom
+   image overrides;
+7. create or complete `.env` without replacing secrets bound to existing data;
+8. establish `MAINSTAY_DATA_ROOT` before first stateful startup;
+9. delegate startup to `start-mainstay.sh`, which validates Compose, starts the
    bundle and waits for the control plane, managed services and service Acorn
    worker; and
-9. fail with focused status and logs when readiness is not reached.
+10. fail with focused status and logs when readiness is not reached.
 
 Routine starts use `./start-mainstay.sh`. Disposable installations use a
 dedicated, installer-marked instance root beneath an operator-selected parent.
 `./teardown-mainstay.sh` requires an explicit destructive confirmation, removes
 Compose volumes and generated configuration, and recursively deletes only an
 instance root bearing that marker. It preserves the shared parent, unmarked
-operator-owned storage and built images.
+operator-owned storage and, by default, built images. The optional
+`--remove-images` flag removes only exact project-derived tags and preserves
+custom image overrides.
 
 Starting services is not commissioning them, opening Clear treasury authority,
 funding the service Acorn, configuring public federation routes, terminating

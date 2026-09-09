@@ -92,6 +92,11 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     data_parent = deployment / ".mainstay-data"
     data_root = data_parent / "mainstay-testlab"
     assert values["COMPOSE_PROJECT_NAME"] == "mainstay-testlab"
+    assert values["MAINSTAY_LOCAL_IMAGE"] == "mainstay-testlab-control:local"
+    assert values["SAFEBOX_IMAGE"] == "mainstay-testlab-safebox-web:local"
+    assert values["MAINSTAY_SPURLINE_IMAGE"] == "mainstay-testlab-spurline:local"
+    assert values["MAINSTAY_GROVE_IMAGE"] == "mainstay-testlab-grove:local"
+    assert values["MAINSTAY_CLEAR_IMAGE"] == "mainstay-testlab-clear:local"
     assert values["MAINSTAY_DATA_PARENT"] == str(data_parent)
     assert values["MAINSTAY_DATA_DIRECTORY_NAME"] == "mainstay-testlab"
     assert values["MAINSTAY_DATA_ROOT"] == str(data_root)
@@ -346,3 +351,40 @@ def test_teardown_preserves_unmarked_bind_data(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stderr
     assert state.read_text(encoding="utf-8") == "keep"
     assert "data root was not installer-managed" in result.stdout
+
+
+def test_teardown_can_remove_only_project_derived_images(tmp_path: Path) -> None:
+    deployment, environment, docker_log = _stage_installer(tmp_path)
+    (deployment / ".env").write_text(
+        """COMPOSE_PROJECT_NAME=private-venue
+MAINSTAY_DATA_ROOT=
+MAINSTAY_LOCAL_IMAGE=private-venue-control:local
+SAFEBOX_IMAGE=private-venue-safebox-web:local
+MAINSTAY_SPURLINE_IMAGE=private-venue-spurline:local
+MAINSTAY_GROVE_IMAGE=registry.example/grove:stable
+MAINSTAY_CLEAR_IMAGE=private-venue-clear:local
+""",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [str(deployment / "teardown-mainstay.sh"), "--remove-images"],
+        cwd=deployment,
+        env=environment,
+        input="DELETE\n",
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    docker_calls = docker_log.read_text(encoding="utf-8")
+    for image in (
+        "private-venue-control:local",
+        "private-venue-safebox-web:local",
+        "private-venue-spurline:local",
+        "private-venue-clear:local",
+    ):
+        assert f"image rm {image}" in docker_calls
+    assert "image rm registry.example/grove:stable" not in docker_calls
+    assert "Preserving custom image override" in result.stdout
