@@ -301,3 +301,5 @@ reach, authority, and acceptance collapse into one national currency boundary.
 - [Invariant Identity and Dynamic Resolution](INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
 - [Service Identity and Operator Attestation](SERVICE-IDENTITY-AND-OPERATOR-ATTESTATION-DESIGN-NOTE.md)
+- [Ecosystem Responsibility Boundaries and Iterative Development](ECOSYSTEM-RESPONSIBILITY-BOUNDARIES-AND-ITERATION.md)
+- [Clear CMU Transferability, Acceptance, and Authority](https://github.com/trbouma/clear/blob/main/docs/CMU-TRANSFERABILITY-ACCEPTANCE-AND-AUTHORITY.md)

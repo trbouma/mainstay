@@ -20,6 +20,9 @@ The standard has four goals:
 
 The family principle is **good boundaries, not barriers**. Shared conventions
 make components easier to combine while preserving their independent roles.
+The companion
+[ecosystem responsibility note](ECOSYSTEM-RESPONSIBILITY-BOUNDARIES-AND-ITERATION.md)
+defines how those roles are assigned during cross-repository development.
 
 ## Applicability
 

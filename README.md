@@ -33,6 +33,7 @@ Design notes:
 
 - [Invariant Identity and Dynamic Resolution](docs/INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md)
 - [Mainstay House Style and Family Audit](docs/MAINSTAY-HOUSE-STYLE.md)
+- [Ecosystem Responsibility Boundaries and Iterative Development](docs/ECOSYSTEM-RESPONSIBILITY-BOUNDARIES-AND-ITERATION.md)
 - [White-Label Branding and Experience Profiles](docs/WHITE-LABEL-BRANDING-DESIGN-NOTE.md)
 - [Mainstay Instance Lifecycle and Recovery](docs/MAINSTAY-INSTANCE-LIFECYCLE.md)
 - [Clerk and Treasury Functions](docs/CLERK-AND-TREASURY-FUNCTIONS.md)
