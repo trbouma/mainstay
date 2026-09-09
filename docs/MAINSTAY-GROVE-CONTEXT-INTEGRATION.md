@@ -62,3 +62,11 @@ report a matching service `npub`. Acorn then independently verifies the
 ciphertext hash before decryption and the plaintext hash afterward. Mainstay
 selects the local context; it does not replace resource-integrity checks or
 take ownership of the wallet's records.
+
+## Consumer Invariant
+
+Applications must treat `blobsha256` as the indication that a record has an
+attachment. They must not use `blobref` presence to decide whether to show,
+download, preserve, or delete it. For an identity-aware record, an absent
+`blobref` deliberately means “resolve the named Grove service now,” not “no
+attachment.” The current endpoint may change without rewriting the record.
