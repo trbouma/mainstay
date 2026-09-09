@@ -68,6 +68,10 @@ on one central host.
 7. **Identity outlives location.** Preserve stable identities and resolve a
    currently eligible path instead of storing one network address as permanent
    truth.
+8. **Local stewardship, shared governance.** Give each community or
+   organization a dependable place to operate its own documented rules for
+   access, recognition, issuance, and reconciliation while remaining connected
+   to compatible outside systems.
 
 ## The product model
 

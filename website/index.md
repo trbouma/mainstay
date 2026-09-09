@@ -51,6 +51,19 @@ same pattern also fits hospitality resorts, cruise ships, campuses, and
 co-working facilities that need smooth local operations without turning every
 interaction into a dependency on a distant platform.
 
+## A home governed together
+
+A local digital home gives a community practical stewardship over how its
+essential services work. The people responsible for a community, resort,
+campus, or co-working facility can define who may issue local credits, which
+records and attestations are recognized, what approvals are required, and when
+local activity is reconciled with outside systems.
+
+The aim is shared governance. The rules can be documented, accountable, and
+shaped through the community's own procedures while remaining compatible with
+regional institutions, service providers, and open networks. Mainstay gives
+those locally chosen rules a dependable place to operate.
+
 ## Records, credits, and trusted local work
 
 Mainstay is intended to keep several practical questions clear:
