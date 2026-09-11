@@ -140,8 +140,9 @@ containers. Change `MAINSTAY_LOCAL_PORT` or `MAINSTAY_SAFEBOX_PORT` in the
 instance's `.env`, then rerun `./start-mainstay.sh --no-build`.
 
 `MAINSTAY_INSTANCE_NAME` is presentation configuration. Changing it updates
-the dashboard and identity response without renaming the Compose project,
-storage, service identities, or command-line program.
+the dashboard, identity response, and Safebox availability context without
+renaming the Compose project, storage, service identities, or command-line
+program.
 
 When `.env` exists, its values are displayed as defaults. When an entry is
 absent, the code default is displayed. Entering `abort`, `quit` or `q` stops the

@@ -43,7 +43,7 @@ made at that other layer.
 
 ## Worked Example: Clear Availability
 
-The `Private / Local / Across networks` terminology shows the method clearly.
+The `Instance / Local / Across networks` terminology shows the method clearly.
 
 The user asks a simple question:
 
@@ -83,9 +83,10 @@ proof export when the recipient cannot use an internal-only mint.
 
 ### Safebox Web explains and confirms
 
-Safebox Web presents the derived availability as `Private`, `Local`, or `Across
-networks`, shows treasury and recognition information separately, and asks for
-the user's decision. It does not infer trust from reachability.
+Safebox Web presents the derived availability as `Within this instance`, `On
+the local network`, or `Across networks`, shows treasury and recognition
+information separately, and asks for the user's decision. It does not infer
+trust from reachability.
 
 ### Spurline delivers without interpreting
 

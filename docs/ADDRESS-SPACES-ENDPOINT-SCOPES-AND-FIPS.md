@@ -21,10 +21,11 @@ Internal, local, and external are scopes. HTTP, WebSocket, IPv4, IPv6, DNS, and
 FIPS are transports or locator forms. These dimensions must remain separate.
 
 Clear translates those technical endpoint scopes into three wallet-facing
-availability states: `internal` becomes **Private**, `local` becomes **Local**,
-and an eligible `external` route becomes **Across networks**. The first label
-means private to one Mainstay instance and its members. It does not replace the
-separate cryptographic privacy of every Clear bearer transfer.
+availability states: `internal` becomes **Instance**, `local` becomes **Local**,
+and an eligible `external` route becomes **Across networks**. Wallets show
+these as **Within this instance**, **On the local network**, and **Across
+networks**. Availability remains separate from the cryptographic privacy of
+every Clear bearer transfer.
 The companion
 [identity and event-native services note](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
 defines how stable identifiers resolve to service identities and how those

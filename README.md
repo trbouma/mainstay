@@ -148,9 +148,10 @@ Every running instance on one host needs its own `MAINSTAY_LOCAL_PORT` and
 the container and Compose project that already owns a selected port and stop
 before starting a partial service set. To resolve a conflict, choose unused
 ports in that instance's `.env` and run `./start-mainstay.sh --no-build`.
-`MAINSTAY_INSTANCE_NAME` controls the dashboard label independently of the
-Docker namespace, so a display name such as `Cedar Resort` can use a technical
-Compose project name such as `cedar-resort-prod`.
+`MAINSTAY_INSTANCE_NAME` controls the dashboard label and Safebox availability
+context independently of the Docker namespace, so a display name such as
+`Cedar Resort` can use a technical Compose project name such as
+`cedar-resort-prod`.
 The final review defaults to not writing anything.
 It also marks the operator-funded service-Acorn fee reserve as a required
 post-start action. The installer does not transfer funds automatically and

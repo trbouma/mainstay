@@ -33,6 +33,10 @@ class MainstayLocalTests(unittest.TestCase):
             'SAFEBOX_NIP05_EXTERNAL_RELAYS: "${SAFEBOX_NIP05_EXTERNAL_RELAYS:-}"',
             compose,
         )
+        self.assertIn(
+            'SAFEBOX_MAINSTAY_INSTANCE_NAME: "${MAINSTAY_INSTANCE_NAME:-Mainstay Local}"',
+            compose,
+        )
         env_example = (Path(__file__).parents[1] / ".env.example").read_text(
             encoding="utf-8"
         )

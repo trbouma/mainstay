@@ -83,6 +83,7 @@ services:
       SAFEBOX_DEFAULT_HOME_MINT: "${MAINSTAY_LIGHTNING_MINT_URL:-https://mint.safebox.dev}"
       SAFEBOX_BLOSSOM_HOME_SERVER: "${SAFEBOX_BLOSSOM_HOME_SERVER:-http://grove:8000}"
       SAFEBOX_MAINSTAY_CONTEXT_URL: "http://mainstay-local:8788/context"
+      SAFEBOX_MAINSTAY_INSTANCE_NAME: "${MAINSTAY_INSTANCE_NAME:-Mainstay Local}"
       SAFEBOX_DATABASE_URL: "${SAFEBOX_DATABASE_URL:-sqlite:///data/database.db}"
       SAFEBOX_CLEAR_RECEIVE_ENABLED: "${SAFEBOX_CLEAR_RECEIVE_ENABLED:-true}"
       SAFEBOX_CLEAR_MINTS: "http://clear:3339,${MAINSTAY_EXTERNAL_CLEAR_MINT_URL:-https://clear.safebox.dev}"

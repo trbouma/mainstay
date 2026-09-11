@@ -182,18 +182,21 @@ documents may use **reachable** and **reachability** when the network path is
 the actual subject. Do not infer identity, authority, recognition, acceptance
 or trust from either condition.
 
-For Clear balances, use three derived availability states:
+For Clear balances, use three derived availability states and plain-language
+wallet labels:
 
-- **Private** means usable by members within one Mainstay instance;
-- **Local** means usable between participating instances over shared local
-  infrastructure without requiring internet access; and
+- **Instance**, shown as **Within this instance**, means usable by members
+  served by one Mainstay instance. Add its configured display name when useful;
+- **Local**, shown as **On the local network**, means usable between
+  participating instances over shared local infrastructure without requiring
+  internet access; and
 - **Across networks** means eligible routes cross the local network boundary.
 
-All Clear bearer transfers remain cryptographically private. The **Private**
-availability label describes the instance membership boundary, not the
-confidentiality mechanism. These states do not imply acceptance, recognition,
-treasury authority, or universal access, and they are not permanent token
-properties.
+All Clear bearer transfers remain cryptographically private. Privacy describes
+the confidentiality mechanism, not an availability boundary, and must not be
+used as an availability label. These states do not imply acceptance,
+recognition, treasury authority, or universal access, and they are not
+permanent token properties.
 
 Where a security posture is summarized, use the full triad:
 
@@ -478,7 +481,8 @@ still deduplicate identical layers beneath those distinct tags.
 
 The instance's human-facing name is independent of those runtime identifiers.
 `MAINSTAY_INSTANCE_NAME` supplies the dashboard label and may contain a
-community, venue or facility name such as `Cedar Resort`; changing it must not
+community, venue or facility name such as `Cedar Resort`. Mainstay also passes
+it to Safebox for instance-scoped availability labels; changing it must not
 rename Docker resources, storage paths or service identities.
 
 A fresh interactive installation has one canonical entry point:

@@ -11,10 +11,10 @@ future multi-route mint resolver.
 ## Summary
 
 Safebox Web should describe the practical availability of a Clear balance with
-three user-facing values:
+three derived states, presented with these user-facing labels:
 
-- **Private**
-- **Local**
+- **Within this instance** (`Instance`)
+- **On the local network** (`Local`)
 - **Across networks**
 
 Availability answers where a token can be sent with a usable route back to
@@ -38,31 +38,31 @@ keyset.
 
 Mainstay distinguishes three practical cases for a wallet user.
 
-### Private
+### Within this instance
 
 The token can be transferred among authorized members whose wallets share one
 Mainstay instance and its internal Clear and Spurline services.
 
 ```text
-Availability: Private
+Availability: Within this instance (North Shore Mainstay)
 ```
 
 Supporting copy:
 
 > Usable by members of this Mainstay instance.
 
-All Clear bearer transfers are cryptographically private. This label adds a
-different fact: the usable service boundary is private to one instance and its
-members.
+All Clear bearer transfers are cryptographically private. Privacy is separate
+from the availability boundary and is therefore not used as an availability
+label.
 
-### Local
+### On the local network
 
 The token can be transferred between participating Mainstay instances using
 shared local infrastructure. The Clear mint and recipient delivery route are
 available on that infrastructure without requiring internet access.
 
 ```text
-Availability: Local
+Availability: On the local network
 ```
 
 Supporting copy:
@@ -211,8 +211,8 @@ Operational state answers:
 
 | Availability | Acceptance | Treasury recognition | User meaning |
 | --- | --- | --- | --- |
-| Private | Accepted | Recognized | Usable by participating members of this instance |
-| Private | Not established | Unknown or unrecognized | Instance services are usable, but no acceptance should be implied |
+| Instance | Accepted | Recognized | Usable by participating members of this instance |
+| Instance | Not established | Unknown or unrecognized | Instance services are usable, but no acceptance should be implied |
 | Local | Accepted | Recognized | Usable between participating instances on local infrastructure |
 | Local | Not established | Unknown or unrecognized | A local route exists, but no acceptance should be implied |
 | Across networks | Accepted | Recognized | Recipient accepts the CMU and can reach its mint outside the sender's context |
@@ -229,14 +229,14 @@ For example:
 
 ```text
 Clear Credits                         120 credits
-Availability: Private
+Availability: Within this instance (North Shore Mainstay)
 Treasurer: North Shore Cooperative
 Recognition: Recognized by this community
 ```
 
 ```text
 Market Credits                        75 credits
-Availability: Local
+Availability: On the local network
 Treasurer: Regional Cooperative
 Recognition: Recognized by this community
 ```
@@ -259,9 +259,10 @@ Recognition: Not established
 
 The send confirmation should explain the practical boundary:
 
-- for **Private**, the recipient must be a member using the same instance;
-- for **Local**, the recipient's instance and mint must share eligible local
-  routes;
+- for **Instance**, shown as **Within this instance**, the recipient must be a
+  member using the same instance;
+- for **Local**, shown as **On the local network**, the recipient's instance
+  and mint must share eligible local routes;
 - for **Across networks**, the mint advertises a route outside the local
   context, but the receiver still chooses whether to accept the CMU; and
 - when availability cannot be established, Safebox must stop before exporting
@@ -275,12 +276,12 @@ The labels describe availability boundaries rather than acceptance:
 | --- | --- |
 | `Local / Global` | Global suggests universal reach and acceptance |
 | `Locally accepted / Widely accepted` | Acceptance cannot be inferred from network paths |
-| `Private / Public` | Public overstates exposure and acceptance; Private is retained only for the instance membership boundary |
+| `Private / Public` | Privacy describes confidentiality, while public overstates exposure and acceptance |
 | `Trusted / Untrusted` | Reachability does not establish treasury trust |
 | `Venue only / Beyond venue` | Useful for some brands, but too specific as a universal product term |
 | `Non-local transferable` | Technically suggestive but awkward for users |
 
-`Private / Local / Across networks` distinguishes one house, cooperation among
+`Instance / Local / Across networks` distinguishes one house, cooperation among
 nearby houses, and cooperation across network boundaries. It remains neutral
 across communities, Indigenous Nations, cooperatives, organizations, resorts,
 campuses, and independent deployments. Experience profiles may adapt
@@ -314,8 +315,9 @@ reach, authority, and acceptance collapse into one national currency boundary.
 
 ## Implementation Direction
 
-1. Add `Private`, `Local`, and `Across networks` as derived Safebox display
-   states, not new CMU identifiers or token fields.
+1. Add `Instance`, `Local`, and `Across networks` as derived Safebox states,
+   presented as `Within this instance`, `On the local network`, and `Across
+   networks`, not as new CMU identifiers or token fields.
 2. Base the first version on internal, private-address or LAN, and external
    HTTPS route rules.
 3. Keep treasury, recognition, service identity, and current health in separate
