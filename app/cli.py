@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 from stroma import KeyError as StromaKeyError
@@ -357,6 +358,9 @@ def _serve(config_path: Path, *, host: str | None, port: int | None) -> int:
             safebox_port=_env_int("MAINSTAY_SAFEBOX_PORT") or 8888
         )
     )
+    instance_name = os.getenv("MAINSTAY_INSTANCE_NAME", "").strip()
+    if instance_name:
+        bundle = replace(bundle, name=instance_name)
     installation_secret = os.getenv("MAINSTAY_INSTALLATION_NSEC", "").strip()
     installation_npub = None
     if installation_secret:

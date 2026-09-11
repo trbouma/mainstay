@@ -130,9 +130,10 @@ For a first installation, run the interactive operator wizard:
 ./install-mainstay.sh
 ```
 
-It prompts for a unique Compose project name, a parent data directory, the
-host bind addresses and ports for the dashboard and Safebox Web, and the
-external Lightning mint used by new and service Acorns. It also confirms the
+It prompts for a human-facing instance name, a unique Compose project name, a
+parent data directory, the host bind addresses and ports for the dashboard and
+Safebox Web, and the external Lightning mint used by new and service Acorns. It
+also confirms the
 external inbox relay advertised by NIP-05 addresses, which defaults to
 `wss://spurline.safebox.dev` and may explicitly be disabled. The mint defaults
 to `https://mint.safebox.dev` and must use HTTPS. A new instance
@@ -147,6 +148,9 @@ Every running instance on one host needs its own `MAINSTAY_LOCAL_PORT` and
 the container and Compose project that already owns a selected port and stop
 before starting a partial service set. To resolve a conflict, choose unused
 ports in that instance's `.env` and run `./start-mainstay.sh --no-build`.
+`MAINSTAY_INSTANCE_NAME` controls the dashboard label independently of the
+Docker namespace, so a display name such as `Cedar Resort` can use a technical
+Compose project name such as `cedar-resort-prod`.
 The final review defaults to not writing anything.
 It also marks the operator-funded service-Acorn fee reserve as a required
 post-start action. The installer does not transfer funds automatically and

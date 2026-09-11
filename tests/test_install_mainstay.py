@@ -83,7 +83,11 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     tmp_path: Path,
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
-    answers = "mainstay-testlab\n" + "\n" * 7 + "no\nyes\n"
+    answers = (
+        "mainstay-testlab\nMainstay Test Lab\n"
+        + "\n" * 7
+        + "no\nyes\n"
+    )
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -103,6 +107,7 @@ def test_installer_uses_shipped_defaults_and_can_configure_without_starting(
     data_parent = deployment / ".mainstay-data"
     data_root = data_parent / "mainstay-testlab"
     assert values["COMPOSE_PROJECT_NAME"] == "mainstay-testlab"
+    assert values["MAINSTAY_INSTANCE_NAME"] == "Mainstay Test Lab"
     assert values["MAINSTAY_LOCAL_IMAGE"] == "mainstay-testlab-control:local"
     assert values["SAFEBOX_IMAGE"] == "mainstay-testlab-safebox-web:local"
     assert values["MAINSTAY_SPURLINE_IMAGE"] == "mainstay-testlab-spurline:local"
@@ -166,7 +171,9 @@ def test_installer_rejects_an_occupied_selected_port_before_writing(
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     environment["MOCK_LISTEN_PORT"] = "9001"
     data_parent = deployment / "data"
-    answers = f"port-test\n{data_parent}\n\n9001\n\n9000\n\n\nyes\n"
+    answers = (
+        f"port-test\nPort Test\n{data_parent}\n\n9001\n\n9000\n\n\nyes\n"
+    )
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -207,7 +214,7 @@ def test_existing_install_rejects_a_port_owned_by_another_project(
         [str(deployment / "install-mainstay.sh")],
         cwd=deployment,
         env=environment,
-        input="\n" * 9,
+        input="\n" * 10,
         capture_output=True,
         text=True,
         check=False,
@@ -227,7 +234,7 @@ def test_installer_rejects_an_existing_compose_project_before_writing(
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     environment["MOCK_PROJECT_EXISTS"] = "1"
-    answers = "mainstay-local\n" + "\n" * 7 + "yes\n"
+    answers = "mainstay-local\n" + "\n" * 8 + "yes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],
@@ -267,7 +274,7 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
         [str(deployment / "install-mainstay.sh")],
         cwd=deployment,
         env=environment,
-        input="\n\n\n\n\n\n\n\nno\nno\n",
+        input="\n" * 9 + "no\nno\n",
         capture_output=True,
         text=True,
         check=False,
@@ -275,6 +282,7 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
 
     assert result.returncode == 130
     assert "Compose project name [private-venue]" in result.stderr
+    assert "Instance display name [Mainstay Local]" in result.stderr
     assert "Dashboard host port [9876]" in result.stderr
     assert "Safebox Web host port [9999]" in result.stderr
     assert "External Lightning mint URL [https://mint.example.com]" in result.stderr
@@ -290,7 +298,7 @@ def test_installer_reprompts_for_external_https_lightning_mint(
     deployment, environment, _docker_log = _stage_installer(tmp_path)
     answers = (
         "mint-test\n"
-        + "\n" * 5
+        + "\n" * 6
         + "http://mint.example.com\n"
         + "https://mint.example.com\n"
         + "\nno\nyes\n"
@@ -316,7 +324,7 @@ def test_installer_reprompts_for_external_https_lightning_mint(
 
 def test_installer_can_disable_external_inbox_relay(tmp_path: Path) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
-    answers = "relay-test\n" + "\n" * 6 + "none\nno\nyes\n"
+    answers = "relay-test\n" + "\n" * 7 + "none\nno\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "install-mainstay.sh")],

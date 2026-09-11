@@ -60,6 +60,7 @@ def _create_recovered_instance(tmp_path: Path, name: str) -> Path:
         (data_root / directory).mkdir(parents=True, exist_ok=True)
     (data_root / ".env.recovery").write_text(
         """COMPOSE_PROJECT_NAME=old-project
+MAINSTAY_INSTANCE_NAME=Original Venue
 MAINSTAY_DATA_ROOT=/old/location/old-project
 MAINSTAY_LOCAL_BIND_ADDRESS=0.0.0.0
 MAINSTAY_LOCAL_PORT=8788
@@ -94,7 +95,7 @@ def test_recovery_uses_existing_data_root_name_as_compose_name(
 ) -> None:
     deployment, environment, docker_log = _stage_recovery(tmp_path)
     data_root = _create_recovered_instance(tmp_path, "private-venue")
-    answers = f"{data_root}\n1\n" + "\n" * 4 + "no\nyes\n"
+    answers = f"{data_root}\n1\n" + "\n" * 5 + "no\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "recover-mainstay.sh")],
@@ -109,6 +110,7 @@ def test_recovery_uses_existing_data_root_name_as_compose_name(
     assert result.returncode == 0, result.stderr
     values = _read_env(deployment / ".env")
     assert values["COMPOSE_PROJECT_NAME"] == "private-venue"
+    assert values["MAINSTAY_INSTANCE_NAME"] == "Original Venue"
     assert values["MAINSTAY_LOCAL_IMAGE"] == "private-venue-control:local"
     assert values["SAFEBOX_IMAGE"] == "private-venue-safebox-web:local"
     assert values["MAINSTAY_SPURLINE_IMAGE"] == "private-venue-spurline:local"
@@ -133,7 +135,7 @@ def test_recovery_allows_a_different_compose_name_after_warning(
     data_root = _create_recovered_instance(tmp_path, "old-directory")
     answers = (
         f"{data_root}\n2\nnew-runtime\nyes\n"
-        + "\n" * 4
+        + "\n" * 5
         + "no\nyes\n"
     )
 
@@ -166,7 +168,7 @@ def test_recovery_preserves_custom_image_override(tmp_path: Path) -> None:
         + "SAFEBOX_IMAGE=registry.example/safebox-web:stable\n",
         encoding="utf-8",
     )
-    answers = f"{data_root}\n1\n" + "\n" * 4 + "no\nyes\n"
+    answers = f"{data_root}\n1\n" + "\n" * 5 + "no\nyes\n"
 
     result = subprocess.run(
         [str(deployment / "recover-mainstay.sh")],

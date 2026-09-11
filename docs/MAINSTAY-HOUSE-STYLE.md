@@ -359,6 +359,7 @@ stopped. Recovery never performs that filesystem or ZFS rename itself.
 
 Configuration distinguishes:
 
+- human-facing instance presentation, including `MAINSTAY_INSTANCE_NAME`;
 - secrets and identity-bound recovery material;
 - durable policy and canonical identifiers;
 - replaceable internal, local, external and FIPS reachability; and
@@ -461,6 +462,11 @@ resources remain instance-scoped. Locally built image tags derive from that
 project name as well. This prevents one Mainstay refresh from retagging the
 image used by another Mainstay or independently deployed service; Docker may
 still deduplicate identical layers beneath those distinct tags.
+
+The instance's human-facing name is independent of those runtime identifiers.
+`MAINSTAY_INSTANCE_NAME` supplies the dashboard label and may contain a
+community, venue or facility name such as `Cedar Resort`; changing it must not
+rename Docker resources, storage paths or service identities.
 
 A fresh interactive installation has one canonical entry point:
 

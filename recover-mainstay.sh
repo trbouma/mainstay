@@ -121,6 +121,24 @@ prompt_project_name() {
     done
 }
 
+prompt_instance_name() {
+    default_value=$1
+    while :; do
+        instance_name=$(prompt_value 'Instance display name' "$default_value")
+        if printf '%s\n' "$instance_name" | awk '
+            length($0) <= 80 && $0 ~ /[^[:space:]]/ && $0 !~ /[#$]/ {
+                valid = 1
+            }
+            END { exit !valid }
+        '; then
+            printf '%s\n' "$instance_name"
+            return
+        fi
+        printf '%s\n' \
+            'Use 1 through 80 characters, excluding # and $.' >&2
+    done
+}
+
 valid_port() {
     awk -v port="$1" 'BEGIN {
         exit !(port ~ /^[0-9]+$/ && port + 0 >= 1 && port + 0 <= 65535)
@@ -313,6 +331,9 @@ case "$choice" in
         ;;
 esac
 
+instance_name=$(prompt_instance_name \
+    "$(recovery_default MAINSTAY_INSTANCE_NAME 'Mainstay Local')")
+
 mainstay_local_image=$(recovery_image \
     MAINSTAY_LOCAL_IMAGE mainstay-local:local control)
 safebox_image=$(recovery_image SAFEBOX_IMAGE safebox-web:local safebox-web)
@@ -376,6 +397,7 @@ printf '\n%s\n' 'Recovery review'
 printf '  Existing data root: %s\n' "$data_root"
 printf '  Data-root name:     %s\n' "$data_directory_name"
 printf '  Compose project:    %s\n' "$compose_project_name"
+printf '  Instance name:      %s\n' "$instance_name"
 printf '  Image namespace:    %s-*\n' "$compose_project_name"
 printf '  Control data:       %s\n' "$control_data_source"
 printf '  Dashboard:          %s:%s\n' "$dashboard_bind" "$dashboard_port"
@@ -402,6 +424,7 @@ cleanup() {
 trap cleanup EXIT HUP INT TERM
 awk \
     -v compose_project_name="$compose_project_name" \
+    -v instance_name="$instance_name" \
     -v mainstay_local_image="$mainstay_local_image" \
     -v safebox_image="$safebox_image" \
     -v spurline_image="$spurline_image" \
@@ -422,6 +445,7 @@ awk \
     -v safebox_port="$safebox_port" '
     BEGIN {
         values["COMPOSE_PROJECT_NAME"] = compose_project_name
+        values["MAINSTAY_INSTANCE_NAME"] = instance_name
         values["MAINSTAY_LOCAL_IMAGE"] = mainstay_local_image
         values["SAFEBOX_IMAGE"] = safebox_image
         values["MAINSTAY_SPURLINE_IMAGE"] = spurline_image

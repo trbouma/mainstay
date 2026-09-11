@@ -206,6 +206,20 @@ class MainstayLocalTests(unittest.TestCase):
             "http://127.0.0.1:9000",
         )
 
+    @patch("app.cli.serve")
+    def test_server_uses_instance_display_name_from_environment(self, serve) -> None:
+        missing_config = Path("does-not-exist.json")
+
+        with patch.dict(
+            os.environ,
+            {"MAINSTAY_INSTANCE_NAME": "Cedar Resort"},
+        ):
+            result = _serve(missing_config, host=None, port=None)
+
+        self.assertEqual(result, 0)
+        bundle = serve.call_args.args[0]
+        self.assertEqual(bundle.name, "Cedar Resort")
+
     def test_clear_uses_the_private_runtime_namespace(self) -> None:
         clear = BundleConfig.default().require_service("clear")
 

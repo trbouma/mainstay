@@ -286,6 +286,24 @@ prompt_project_name() {
     done
 }
 
+prompt_instance_name() {
+    default_value=$1
+    while :; do
+        instance_name=$(prompt_value 'Instance display name' "$default_value")
+        if printf '%s\n' "$instance_name" | awk '
+            length($0) <= 80 && $0 ~ /[^[:space:]]/ && $0 !~ /[#$]/ {
+                valid = 1
+            }
+            END { exit !valid }
+        '; then
+            printf '%s\n' "$instance_name"
+            return
+        fi
+        printf '%s\n' \
+            'Use 1 through 80 characters, excluding # and $.' >&2
+    done
+}
+
 set_env_value() {
     key=$1
     value=$2
@@ -341,6 +359,8 @@ printf '\n'
 
 compose_project_default=$(env_default COMPOSE_PROJECT_NAME mainstay-local)
 compose_project_name=$(prompt_project_name "$compose_project_default")
+instance_name_default=$(env_default MAINSTAY_INSTANCE_NAME 'Mainstay Local')
+instance_name=$(prompt_instance_name "$instance_name_default")
 mainstay_local_image=$(deployment_image \
     MAINSTAY_LOCAL_IMAGE mainstay-local:local control)
 safebox_image=$(deployment_image SAFEBOX_IMAGE safebox-web:local safebox-web)
@@ -506,6 +526,7 @@ printf '%s\n' 'Preflight checks passed. No configuration has been written.'
 
 printf '\n%s\n' 'Review'
 printf '  Compose project: %s\n' "$compose_project_name"
+printf '  Instance name:   %s\n' "$instance_name"
 printf '  Image namespace: %s-*\n' "$compose_project_name"
 if [ "$legacy_data_layout" = false ]; then
     printf '  Data parent:     %s\n' "${data_parent:-Docker-managed named volumes}"
@@ -546,6 +567,7 @@ set_env_value MAINSTAY_SAFEBOX_PORT "$safebox_port"
 set_env_value MAINSTAY_LIGHTNING_MINT_URL "$lightning_mint_url"
 set_env_value SAFEBOX_NIP05_EXTERNAL_RELAYS "$external_relay"
 set_env_value COMPOSE_PROJECT_NAME "$compose_project_name"
+set_env_value MAINSTAY_INSTANCE_NAME "$instance_name"
 set_env_value MAINSTAY_LOCAL_IMAGE "$mainstay_local_image"
 set_env_value SAFEBOX_IMAGE "$safebox_image"
 set_env_value MAINSTAY_SPURLINE_IMAGE "$spurline_image"

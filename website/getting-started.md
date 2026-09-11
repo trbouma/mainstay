@@ -32,8 +32,10 @@ cd mainstay
 docker compose ps
 ```
 
-The wizard asks for a unique Compose project name, the dashboard and Safebox
-Web host ports, their bind addresses, and a parent directory for service data.
+The wizard asks for a human-facing instance name, a unique Compose project
+name, the dashboard and Safebox Web host ports, their bind addresses, and a
+parent directory for service data. The instance name is shown in the dashboard;
+the Compose name remains a technical Docker namespace.
 It creates one instance-specific root beneath that parent using the Compose
 project name. For example, parent `/mnt/bitcoin/mainstay` and name
 `mainstay-testlab` produce `/mnt/bitcoin/mainstay/mainstay-testlab`. Press Enter

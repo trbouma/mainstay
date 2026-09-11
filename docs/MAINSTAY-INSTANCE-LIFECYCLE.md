@@ -24,6 +24,7 @@ FreeBSD jails without changing the logical ownership of the data.
 | Mainstay instance | The complete operational unit: control plane, Safebox Web, Spurline, Grove, Clear, service Acorn, configuration and identities |
 | Deployment directory | One checkout or release directory containing Compose files, scripts and the active `.env` for exactly one instance |
 | Compose project name | Replaceable Docker namespace for an instance's containers, network and named volumes |
+| Instance display name | Human-facing dashboard label; independent of Docker and storage names |
 | Data parent | Host directory under which one or more instance roots may live |
 | Instance data root | Complete persistent filesystem boundary for one Mainstay instance |
 | Data-directory name | Basename of the instance data root; normally equal to the Compose project name on first installation |
@@ -120,6 +121,7 @@ Run from the instance's dedicated deployment directory:
 
 The wizard gathers:
 
+- a human-facing instance display name;
 - a unique Compose project name;
 - a data parent, or an explicit choice to use Docker-managed volumes;
 - dashboard bind address and host port;
@@ -136,6 +138,10 @@ as happens during a routine restart. A port owned by another project, another
 service, or a non-Docker listener fails preflight before Compose starts any
 containers. Change `MAINSTAY_LOCAL_PORT` or `MAINSTAY_SAFEBOX_PORT` in the
 instance's `.env`, then rerun `./start-mainstay.sh --no-build`.
+
+`MAINSTAY_INSTANCE_NAME` is presentation configuration. Changing it updates
+the dashboard and identity response without renaming the Compose project,
+storage, service identities, or command-line program.
 
 When `.env` exists, its values are displayed as defaults. When an entry is
 absent, the code default is displayed. Entering `abort`, `quit` or `q` stops the
