@@ -14,7 +14,10 @@ SUPPORTED_LANGUAGES = {
     "de": "Deutsch",
     "it": "Italiano",
     "zh-Hans": "简体中文",
+    "ar": "العربية",
 }
+
+RIGHT_TO_LEFT_LANGUAGES = {"ar"}
 
 _LANGUAGE_TAG_PATTERN = re.compile(
     r"^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$"
@@ -41,7 +44,7 @@ _ENGLISH = {
     "required_bootstrap": "Required bootstrap step",
     "confirm_reserve": "Confirm Lightning fee reserve",
     "reserve_explanation": (
-        "The service Acorn needs at least {amount} sats of operator-funded "
+        "The service Acorn needs at least {amount} of operator-funded "
         "reserve to cover mint input fees while delivering Lightning-address "
         "payments. A healthy worker can create invoices before this reserve "
         "exists."
@@ -88,7 +91,7 @@ _FRENCH = {
     "required_bootstrap": "Étape d’amorçage requise",
     "confirm_reserve": "Confirmer la réserve pour les frais Lightning",
     "reserve_explanation": (
-        "L’Acorn de service a besoin d’une réserve d’au moins {amount} sats "
+        "L’Acorn de service a besoin d’une réserve d’au moins {amount} "
         "financée par l’opérateur pour couvrir les frais d’entrée du service "
         "de monnaie lors de la livraison de paiements à une adresse Lightning. "
         "Un processus sain peut créer des factures avant que cette réserve "
@@ -137,7 +140,7 @@ _SPANISH = {
     "required_bootstrap": "Paso de inicialización obligatorio",
     "confirm_reserve": "Confirmar la reserva para comisiones Lightning",
     "reserve_explanation": (
-        "El Acorn de servicio necesita una reserva de al menos {amount} sats "
+        "El Acorn de servicio necesita una reserva de al menos {amount} "
         "financiada por el operador para cubrir las comisiones de entrada del "
         "servicio de moneda al entregar pagos a direcciones Lightning. Un "
         "proceso en buen estado puede crear facturas antes de que exista esta "
@@ -185,7 +188,7 @@ _PORTUGUESE = {
     "required_bootstrap": "Etapa de inicialização obrigatória",
     "confirm_reserve": "Confirmar a reserva para taxas Lightning",
     "reserve_explanation": (
-        "O Acorn de serviço precisa de uma reserva de pelo menos {amount} sats "
+        "O Acorn de serviço precisa de uma reserva de pelo menos {amount} "
         "financiada pelo operador para cobrir as taxas de entrada do serviço "
         "de moeda ao entregar pagamentos para endereços Lightning. Um processo "
         "saudável pode criar faturas antes que essa reserva exista."
@@ -233,7 +236,7 @@ _GERMAN = {
     "confirm_reserve": "Lightning-Gebührenreserve bestätigen",
     "reserve_explanation": (
         "Der Dienst-Acorn benötigt eine vom Betreiber finanzierte Reserve von "
-        "mindestens {amount} sats, um die Eingangsgebühren des Gelddienstes bei "
+        "mindestens {amount}, um die Eingangsgebühren des Gelddienstes bei "
         "der Zustellung von Zahlungen an Lightning-Adressen zu decken. Ein "
         "fehlerfrei laufender Prozess kann Rechnungen erstellen, bevor diese "
         "Reserve vorhanden ist."
@@ -281,7 +284,7 @@ _ITALIAN = {
     "required_bootstrap": "Passaggio di inizializzazione obbligatorio",
     "confirm_reserve": "Conferma la riserva per le commissioni Lightning",
     "reserve_explanation": (
-        "L’Acorn di servizio richiede una riserva di almeno {amount} sats "
+        "L’Acorn di servizio richiede una riserva di almeno {amount} "
         "finanziata dall’operatore per coprire le commissioni in entrata del "
         "servizio monetario durante la consegna di pagamenti a indirizzi "
         "Lightning. Un processo integro può creare fatture prima che questa "
@@ -329,7 +332,7 @@ _SIMPLIFIED_CHINESE = {
     "required_bootstrap": "必需的初始化步骤",
     "confirm_reserve": "确认 Lightning 手续费储备",
     "reserve_explanation": (
-        "服务 Acorn 至少需要由运营方提供 {amount} sats 储备，以便在交付至 "
+        "服务 Acorn 至少需要由运营方提供 {amount} 储备，以便在交付至 "
         "Lightning 地址的付款时支付货币服务的输入手续费。即使尚无此储备，"
         "运行正常的进程仍可创建发票。"
     ),
@@ -354,6 +357,52 @@ _SIMPLIFIED_CHINESE = {
     "service_report": "服务报告",
 }
 
+_ARABIC = {
+    "tagline": "لا مكان كالبيت.",
+    "language": "اللغة",
+    "api_endpoints": "نقاط نهاية API",
+    "identity": "الهوية",
+    "health": "الحالة",
+    "registry": "السجل",
+    "status_json": "الحالة بصيغة JSON",
+    "mainstay_installation": "نسخة Mainstay",
+    "installation_role": "هوية النسخة ومستوى التحكم المحلي",
+    "installation_identity_unavailable": "هوية النسخة غير متاحة",
+    "unavailable": "غير متاح",
+    "service_network": "شبكة الخدمات",
+    "services_summary": "عدد الخدمات المنسقة داخل هذه النسخة: {count}",
+    "checking_services": "جار التحقق من الخدمات",
+    "registry_detail": "السجل: {name}",
+    "control_plane": "مستوى التحكم: المنفذ {port}",
+    "waiting_first_check": "في انتظار أول تحقق",
+    "required_bootstrap": "خطوة تهيئة أولية مطلوبة",
+    "confirm_reserve": "تأكيد احتياطي رسوم Lightning",
+    "reserve_explanation": (
+        "يحتاج Acorn الخاص بالخدمة إلى احتياطي لا يقل عن {amount} يموله "
+        "المشغل لتغطية رسوم إدخال خدمة النقد عند تسليم المدفوعات إلى عناوين "
+        "Lightning. ويمكن للعملية السليمة إنشاء فواتير قبل توفر هذا الاحتياطي."
+    ),
+    "reserve_instruction": (
+        "لا يقيس Mainstay الاحتياطي تلقائيا حتى الآن. تحقق منه من مضيف النشر "
+        "باستخدام ./reserve-balance.sh، وموله بعد أول تشغيل، ثم جدده كلما "
+        "استهلكته الرسوم."
+    ),
+    "disabled": "معطل",
+    "checking": "جار التحقق",
+    "operator": "المشغل",
+    "internal": "داخلي",
+    "local": "محلي",
+    "external": "خارجي",
+    "available": "متاح",
+    "all_services_available": "جميع الخدمات متاحة",
+    "service_attention_needed": "بعض الخدمات تحتاج إلى اهتمام",
+    "status_check_failed": "فشل التحقق من الحالة",
+    "checked_at": "تم التحقق في {time}",
+    "service_report_unavailable": "تقرير الخدمة غير متاح",
+    "homepage_unreadable": "تعذرت قراءة الصفحة الرئيسية.",
+    "service_report": "تقرير الخدمة",
+}
+
 _CATALOGS = {
     "en": _ENGLISH,
     "fr": _FRENCH,
@@ -362,6 +411,7 @@ _CATALOGS = {
     "de": _GERMAN,
     "it": _ITALIAN,
     "zh-Hans": _SIMPLIFIED_CHINESE,
+    "ar": _ARABIC,
 }
 
 for _language, _catalog in _CATALOGS.items():
@@ -437,6 +487,12 @@ def resolve_language(explicit: str | None, accept_language: str | None) -> str:
         if language != DEFAULT_LANGUAGE or language_range.lower().startswith("en"):
             return language
     return DEFAULT_LANGUAGE
+
+
+def language_direction(language: str) -> str:
+    """Return the HTML writing direction for a supported language."""
+
+    return "rtl" if supported_language(language) in RIGHT_TO_LEFT_LANGUAGES else "ltr"
 
 
 def translator(language: str) -> Callable[..., str]:

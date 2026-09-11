@@ -72,10 +72,10 @@ running, shows a bounded report from its internal homepage. Registry endpoints
 are scoped as `internal`, `local`, or `external`; Safebox dependencies use
 internal endpoints even when a service also publishes another route.
 
-The dashboard supports English, French, Spanish, Portuguese, German, Italian
-and Simplified Chinese. Select a language in the header or use a bookmarkable
-`?lang=` query; an unqualified first visit follows the browser's supported
-`Accept-Language` preference.
+The dashboard supports English, French, Spanish, Portuguese, German, Italian,
+Simplified Chinese and Arabic, including right-to-left layout. Select a
+language in the header or use a bookmarkable `?lang=` query; an unqualified
+first visit follows the browser's supported `Accept-Language` preference.
 
 Commission the managed Clear service under this Mainstay installation after
 the updated Clear image is running:

@@ -15,6 +15,7 @@ from stroma import fips_ipv6_address
 from . import __version__
 from .localization import (
     SUPPORTED_LANGUAGES,
+    language_direction,
     resolve_language,
     supported_language,
     translator,
@@ -34,6 +35,10 @@ def _json_for_script(value: Any) -> str:
     )
 
 
+def _bidi_isolate(value: object) -> str:
+    return f"\u2068{value}\u2069"
+
+
 def render_dashboard(
     bundle: BundleConfig,
     *,
@@ -41,6 +46,7 @@ def render_dashboard(
     language: str = "en",
 ) -> str:
     language = supported_language(language)
+    direction = language_direction(language)
     _ = translator(language)
     service_rows = "\n".join(
         _render_service_row(name, endpoint, _)
@@ -71,7 +77,7 @@ def render_dashboard(
         }
     )
     return f"""<!doctype html>
-<html lang="{escape(language)}">
+<html lang="{escape(language)}" dir="{direction}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -101,6 +107,8 @@ def render_dashboard(
       color: var(--ink);
       font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }}
+    bdi {{ unicode-bidi: isolate; }}
+    .technical {{ direction: ltr; unicode-bidi: isolate; text-align: start; }}
     header {{
       color: #f7fbf9;
       background: var(--deep);
@@ -122,7 +130,7 @@ def render_dashboard(
     .tagline {{ margin: 5px 0 0; color: #b9cbc5; font-size: 13px; }}
     .header-actions {{ display: flex; align-items: flex-end; flex-direction: column; gap: 11px; }}
     .language-form {{ display: flex; align-items: center; gap: 8px; color: #d8e8e2; font-size: 12px; }}
-    .language-form select {{ min-height: 34px; padding: 5px 30px 5px 9px; border: 1px solid #66827a; border-radius: 5px; color: #14201c; background: #f7fbf9; font: inherit; }}
+    .language-form select {{ min-height: 34px; padding-block: 5px; padding-inline: 9px 30px; border: 1px solid #66827a; border-radius: 5px; color: #14201c; background: #f7fbf9; font: inherit; }}
     .language-form select:focus-visible {{ outline: 3px solid var(--amber); outline-offset: 2px; }}
     nav {{ display: flex; gap: 16px; flex-wrap: wrap; }}
     a {{ color: var(--accent); text-underline-offset: 3px; }}
@@ -169,10 +177,10 @@ def render_dashboard(
       overflow: hidden;
       color: #f7fbf9;
       background: var(--deep-soft);
-      border-left: 6px solid var(--amber);
+      border-inline-start: 6px solid var(--amber);
       border-radius: 6px;
     }}
-    .installation::after {{ content: ""; position: absolute; right: 0; top: 0; width: 10px; height: 100%; background: var(--blue); }}
+    .installation::after {{ content: ""; position: absolute; inset-inline-end: 0; top: 0; width: 10px; height: 100%; background: var(--blue); }}
     .eyebrow {{ display: block; margin-bottom: 7px; color: #f3c972; font-size: 11px; font-weight: 800; text-transform: uppercase; }}
     .installation h2 {{ font-size: 20px; }}
     .installation-role {{ margin: 5px 0 0; color: #b9cbc5; font-size: 13px; }}
@@ -189,7 +197,7 @@ def render_dashboard(
       margin: 0 0 20px;
       padding: 16px 18px;
       border: 1px solid #e3c791;
-      border-left: 4px solid var(--warning);
+      border-inline-start: 4px solid var(--warning);
       border-radius: 6px;
       background: #fffaf0;
     }}
@@ -206,13 +214,13 @@ def render_dashboard(
       min-height: 92px;
       padding: 18px 20px;
       border-top: 1px solid var(--line);
-      border-left: 4px solid var(--accent);
+      border-inline-start: 4px solid var(--accent);
     }}
     .service:first-child {{ border-top: 0; }}
-    .service[data-service="safebox_web"] {{ border-left-color: var(--blue); }}
-    .service[data-service="clear"] {{ border-left-color: var(--amber); }}
-    .service[data-service="grove"] {{ border-left-color: var(--accent); }}
-    .service[data-service="spurline"] {{ border-left-color: var(--coral); }}
+    .service[data-service="safebox_web"] {{ border-inline-start-color: var(--blue); }}
+    .service[data-service="clear"] {{ border-inline-start-color: var(--amber); }}
+    .service[data-service="grove"] {{ border-inline-start-color: var(--accent); }}
+    .service[data-service="spurline"] {{ border-inline-start-color: var(--coral); }}
     .service-name {{ margin: 0; font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }}
     .kind {{ display: inline-block; margin-top: 4px; padding: 2px 5px; color: #4d5f57; background: #edf2ef; border-radius: 3px; font-size: 11px; }}
     .addresses {{ min-width: 0; }}
@@ -286,7 +294,7 @@ def render_dashboard(
     <section class="overview" aria-labelledby="services-title">
       <div>
         <h2 id="services-title">{escape(_("service_network"))}</h2>
-        <p class="summary">{escape(_("services_summary", count=len(bundle.services)))}</p>
+        <p class="summary">{escape(_("services_summary", count=_bidi_isolate(len(bundle.services))))}</p>
       </div>
       <div class="bundle-state" aria-live="polite">
         <span class="dot" id="bundle-dot"></span>
@@ -298,8 +306,8 @@ def render_dashboard(
       {service_rows}
     </div>
     <p class="detail">
-      <span>{escape(_("registry_detail", name=bundle.name))}</span>
-      <span>{escape(_("control_plane", port=bundle.port))}</span>
+      <span>{escape(_("registry_detail", name=_bidi_isolate(bundle.name)))}</span>
+      <span>{escape(_("control_plane", port=_bidi_isolate(bundle.port)))}</span>
       <span id="last-checked">{escape(_("waiting_first_check"))}</span>
     </p>
   </main>
@@ -417,7 +425,7 @@ def render_dashboard(
       if (!homepage.ok) {{
         summary.textContent = messages.serviceReportUnavailable;
         const message = document.createElement("p");
-        message.className = "report-error";
+        message.className = homepage.detail ? "report-error technical" : "report-error";
         message.textContent = homepage.detail || messages.homepageUnreadable;
         report.append(message);
         return;
@@ -438,7 +446,7 @@ def render_dashboard(
         return;
       }}
       const list = document.createElement("dl");
-      list.className = "report-grid";
+      list.className = "report-grid technical";
       fields.forEach(([name, value]) => {{
         const term = document.createElement("dt");
         const description = document.createElement("dd");
@@ -492,8 +500,8 @@ def _render_service_row(
     )
     return f"""<article class="service" data-service="{escape(name)}" data-enabled="{str(endpoint.enabled).lower()}">
         <div>
-          <p class="service-name">{escape(name.replace("_", " "))}</p>
-          <span class="kind">{escape(endpoint.kind)}</span>
+          <p class="service-name"><bdi dir="auto">{escape(name.replace("_", " "))}</bdi></p>
+          <span class="kind technical" dir="ltr">{escape(endpoint.kind)}</span>
         </div>
         <div class="addresses">
           {endpoint_rows}
@@ -501,13 +509,13 @@ def _render_service_row(
         <div class="service-state"><span class="dot"></span><span class="state-label">{initial_state}</span></div>
         <div class="service-identity" hidden>
           <span class="identity-label">{escape(translate("identity"))}</span>
-          <code class="identity-npub"></code>
-          <span class="identity-meta"></span>
-          <span class="fips-label fips-field" hidden>FIPS IPv6</span>
-          <code class="identity-fips fips-field" hidden></code>
+          <code class="identity-npub technical" dir="ltr"></code>
+          <span class="identity-meta technical" dir="ltr"></span>
+          <span class="fips-label fips-field" dir="ltr" hidden>FIPS IPv6</span>
+          <code class="identity-fips fips-field technical" dir="ltr" hidden></code>
           <span class="operator-label operator-field" hidden>{escape(translate("operator"))}</span>
-          <code class="operator-npub operator-field" hidden></code>
-          <span class="operator-meta operator-field" hidden></span>
+          <code class="operator-npub operator-field technical" dir="ltr" hidden></code>
+          <span class="operator-meta operator-field technical" dir="ltr" hidden></span>
         </div>
         <details class="service-report" hidden>
           <summary>{escape(translate("service_report"))}</summary>
@@ -546,19 +554,24 @@ def _render_installation_panel(
             f'{escape(translate("installation_identity_unavailable"))}</p>'
         )
     else:
-        fips_address = identity.get("fips_ipv6_address") or translate("unavailable")
+        fips_address = identity.get("fips_ipv6_address")
+        fips_value = (
+            f'<code class="technical" dir="ltr">{escape(str(fips_address))}</code>'
+            if fips_address
+            else f'<span>{escape(translate("unavailable"))}</span>'
+        )
         fields = f"""<div class="identity-field">
           <span>{escape(translate("identity"))}</span>
-          <code>{escape(str(identity["npub"]))}</code>
+          <code class="technical" dir="ltr">{escape(str(identity["npub"]))}</code>
         </div>
         <div class="identity-field">
-          <span>FIPS IPv6</span>
-          <code>{escape(str(fips_address))}</code>
+          <span dir="ltr">FIPS IPv6</span>
+          {fips_value}
         </div>"""
     return f"""<section class="installation" aria-labelledby="installation-title">
       <div>
         <span class="eyebrow">{escape(translate("mainstay_installation"))}</span>
-        <h2 id="installation-title">{escape(bundle.name)}</h2>
+        <h2 id="installation-title"><bdi dir="auto">{escape(bundle.name)}</bdi></h2>
         <p class="installation-role">{escape(translate("installation_role"))}</p>
       </div>
       <div class="identity-fields">{fields}</div>
@@ -584,9 +597,9 @@ def _render_reserve_advisory(
         <h2 id="reserve-title">{escape(translate("confirm_reserve"))}</h2>
       </div>
       <div>
-        <p>{escape(translate("reserve_explanation", amount=amount))}</p>
-        <p>{escape(translate("reserve_instruction")).replace("./reserve-balance.sh", "<code>./reserve-balance.sh</code>")}</p>
-        <p><code>{escape(command)}</code></p>
+        <p>{escape(translate("reserve_explanation", amount=_bidi_isolate(f"{amount} sats")))}</p>
+        <p>{escape(translate("reserve_instruction")).replace("./reserve-balance.sh", '<code class="technical" dir="ltr">./reserve-balance.sh</code>')}</p>
+        <p><code class="technical" dir="ltr">{escape(command)}</code></p>
       </div>
     </section>"""
 
@@ -602,9 +615,9 @@ def _render_endpoint_address(
         data_attribute = (
             f' data-local-url="{escaped_url}"' if scope == "local" else ""
         )
-        markup = f'<a href="{escaped_url}"{data_attribute}>{escaped_url}</a>'
+        markup = f'<a class="technical" dir="ltr" href="{escaped_url}"{data_attribute}>{escaped_url}</a>'
     else:
-        markup = f"<code>{escaped_url}</code>"
+        markup = f'<code class="technical" dir="ltr">{escaped_url}</code>'
     scope_label = translate(scope) if scope in {"internal", "local", "external"} else scope.title()
     return (
         '<div class="address">'
