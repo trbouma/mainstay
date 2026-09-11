@@ -297,7 +297,10 @@ class MainstayLocalTests(unittest.TestCase):
     def test_dashboard_lists_services_and_api_endpoints(self) -> None:
         page = render_dashboard(BundleConfig.default())
 
-        self.assertIn("There's no place like home.", page)
+        self.assertIn("There&#x27;s no place like home.", page)
+        self.assertIn('<html lang="en">', page)
+        self.assertIn('<select id="language" name="lang"', page)
+        self.assertIn('<option value="en" selected>English</option>', page)
         self.assertIn('data-service="safebox_web"', page)
         self.assertIn('href="registry"', page)
         self.assertIn('fetch("status"', page)

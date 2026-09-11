@@ -32,6 +32,7 @@ Design notes:
 
 - [Invariant Identity and Dynamic Resolution](docs/INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md)
 - [Mainstay House Style and Family Audit](docs/MAINSTAY-HOUSE-STYLE.md)
+- [Product-Family Localization](docs/LOCALIZATION-DESIGN-NOTE.md)
 - [Ecosystem Responsibility Boundaries and Iterative Development](docs/ECOSYSTEM-RESPONSIBILITY-BOUNDARIES-AND-ITERATION.md)
 - [White-Label Branding and Experience Profiles](docs/WHITE-LABEL-BRANDING-DESIGN-NOTE.md)
 - [Mainstay Instance Lifecycle and Recovery](docs/MAINSTAY-INSTANCE-LIFECYCLE.md)
@@ -70,6 +71,11 @@ Web. The dashboard checks each enabled service and, when it is
 running, shows a bounded report from its internal homepage. Registry endpoints
 are scoped as `internal`, `local`, or `external`; Safebox dependencies use
 internal endpoints even when a service also publishes another route.
+
+The dashboard supports English, French, Spanish, Portuguese, German, Italian
+and Simplified Chinese. Select a language in the header or use a bookmarkable
+`?lang=` query; an unqualified first visit follows the browser's supported
+`Accept-Language` preference.
 
 Commission the managed Clear service under this Mainstay installation after
 the updated Clear image is running:

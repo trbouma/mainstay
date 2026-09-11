@@ -50,9 +50,9 @@ when one path is interrupted.
 | Mode | Meaning |
 | --- | --- |
 | **Connected Mode** | Hosted services, public relays, external mints, synchronization, and updates are available. |
-| **Local Mode** | The user reaches nearby Lockbox services directly without depending on upstream internet. |
+| **Local Mode** | The user reaches local and nearby Mainstay services directly without depending on upstream internet. |
 | **Mobile Mode** | A phone or nearby device supplies temporary upstream connectivity while local services remain primary. |
-| **Community Mode** | Participating devices and Lockboxes exchange signed events, encrypted records, and value across a local network or mesh. |
+| **Community Mode** | Participating Mainstay instances exchange signed events, encrypted records, and value across a local network or mesh. A Lockbox can host one of those instances. |
 
 The same user app should work across all four. A mode change should alter
 availability and finality messaging, not force people into an unfamiliar

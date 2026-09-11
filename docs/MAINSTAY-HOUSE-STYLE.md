@@ -1,7 +1,7 @@
 # Mainstay House Style and Family Audit
 
 Status: working standard  
-Audit date: 2026-09-09
+Audit date: 2026-09-11
 
 ## Purpose
 
@@ -92,6 +92,56 @@ palettes and metaphors remain specific to each responsibility. Operational
 interfaces should favor clarity over marketing composition, keep cards to
 individual repeated items or bounded tools, and avoid placing critical state
 inside decorative layers.
+
+### White-label inheritance
+
+White-labelled deployments use the same semantic presentation system without
+requiring Mainstay or Safebox Web to remain the public-facing name. Branding is
+resolved in layers:
+
+```text
+native product defaults
+    -> Mainstay-managed base profile
+    -> instance-managed override
+    -> one validated effective profile
+```
+
+Mainstay owns profile validation, resolution, activation and rollback. Each
+instance selects one base profile and may override only the presentation fields
+allowed by that profile. Safebox Web and the Mainstay dashboard consume the
+same resolved snapshot; they do not merge profile layers independently.
+
+White labelling changes presentation, not authority. It must not alter service
+identities, member keys, mint units, keysets, signed evidence, commissioning
+relationships, endpoint scope or security and recovery language. Operator
+surfaces continue to identify Mainstay and the actual component names even when
+routine member surfaces use only the experience owner's brand.
+
+The detailed package, inheritance and lifecycle contract is defined in
+[White-Label Branding and Experience Profiles](WHITE-LABEL-BRANDING-DESIGN-NOTE.md).
+
+### Localization ownership
+
+Each application owns its interface strings, translation catalogs, supported
+language list and contextual review. Mainstay may carry an instance default and
+coordinate a member's preferred BCP 47 language tag, but it does not translate
+another component's messages or claim support on that component's behalf.
+
+Safebox Web's server-side localization model is the family reference for
+member-facing applications. Supporting services should localize their compact
+browser home pages as time permits, while keeping APIs, protocol identifiers,
+service identities, endpoint values and machine-readable error codes stable.
+Missing translations fall back honestly to the application's own default
+language.
+
+White-label profiles own translations of brand-specific copy such as taglines,
+descriptions and approved local terminology. They must not override protected
+security, recovery, custody or transaction language. A member's supported
+language preference takes precedence over the instance default.
+
+The shared behavioral contract, implementation profiles, locale precedence,
+review expectations and release checklist are defined in the
+[Product-Family Localization Design Note](LOCALIZATION-DESIGN-NOTE.md).
 
 ### Language
 

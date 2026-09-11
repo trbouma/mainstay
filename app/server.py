@@ -4,36 +4,74 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from html import escape
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from stroma import fips_ipv6_address
 
 from . import __version__
+from .localization import (
+    SUPPORTED_LANGUAGES,
+    resolve_language,
+    supported_language,
+    translator,
+)
 from .registry import BundleConfig, ServiceEndpoint
 from .status import check_bundle, inspect_homepage
 
 GROVE_CAPABILITIES = ("blossom.read", "blossom.write", "blossom.delete")
 
 
+def _json_for_script(value: Any) -> str:
+    return (
+        json.dumps(value, ensure_ascii=False)
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("&", "\\u0026")
+    )
+
+
 def render_dashboard(
     bundle: BundleConfig,
     *,
     installation_npub: str | None = None,
+    language: str = "en",
 ) -> str:
+    language = supported_language(language)
+    _ = translator(language)
     service_rows = "\n".join(
-        _render_service_row(name, endpoint)
+        _render_service_row(name, endpoint, _)
         for name, endpoint in bundle.services.items()
     )
-    reserve_advisory = _render_reserve_advisory(bundle)
+    reserve_advisory = _render_reserve_advisory(bundle, _)
     installation_panel = _render_installation_panel(
         bundle,
         installation_npub=installation_npub,
+        translate=_,
+    )
+    language_options = "\n".join(
+        f'<option value="{escape(tag)}"'
+        f'{" selected" if tag == language else ""}>{escape(label)}</option>'
+        for tag, label in SUPPORTED_LANGUAGES.items()
+    )
+    messages_json = _json_for_script(
+        {
+            "available": _("available"),
+            "unavailable": _("unavailable"),
+            "allServicesAvailable": _("all_services_available"),
+            "serviceAttentionNeeded": _("service_attention_needed"),
+            "statusCheckFailed": _("status_check_failed"),
+            "checkedAt": _("checked_at", time="{time}"),
+            "serviceReportUnavailable": _("service_report_unavailable"),
+            "homepageUnreadable": _("homepage_unreadable"),
+            "serviceReport": _("service_report"),
+        }
     )
     return f"""<!doctype html>
-<html lang="en">
+<html lang="{escape(language)}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -82,6 +120,10 @@ def render_dashboard(
     .brand-copy {{ min-width: 0; }}
     h1 {{ margin: 0; font-size: 24px; line-height: 1.15; letter-spacing: 0; }}
     .tagline {{ margin: 5px 0 0; color: #b9cbc5; font-size: 13px; }}
+    .header-actions {{ display: flex; align-items: flex-end; flex-direction: column; gap: 11px; }}
+    .language-form {{ display: flex; align-items: center; gap: 8px; color: #d8e8e2; font-size: 12px; }}
+    .language-form select {{ min-height: 34px; padding: 5px 30px 5px 9px; border: 1px solid #66827a; border-radius: 5px; color: #14201c; background: #f7fbf9; font: inherit; }}
+    .language-form select:focus-visible {{ outline: 3px solid var(--amber); outline-offset: 2px; }}
     nav {{ display: flex; gap: 16px; flex-wrap: wrap; }}
     a {{ color: var(--accent); text-underline-offset: 3px; }}
     nav a {{ color: #d8e8e2; font-size: 13px; font-weight: 650; text-decoration: none; border-bottom: 2px solid transparent; }}
@@ -197,6 +239,7 @@ def render_dashboard(
     .detail span + span::before {{ content: " / "; color: #a3aaa5; }}
     @media (max-width: 700px) {{
       .header-inner {{ align-items: flex-start; flex-direction: column; gap: 14px; padding: 18px 0; }}
+      .header-actions {{ width: 100%; align-items: flex-start; }}
       .brand-logo {{ width: 48px; height: 48px; }}
       .overview {{ align-items: flex-start; flex-direction: column; gap: 12px; }}
       .installation {{ grid-template-columns: 1fr; gap: 18px; padding: 21px 20px; }}
@@ -218,15 +261,23 @@ def render_dashboard(
         <img class="brand-logo" src="assets/mainstay-logo.svg" alt="">
         <div class="brand-copy">
           <h1>Mainstay Local</h1>
-          <p class="tagline">There's no place like home.</p>
+          <p class="tagline">{escape(_("tagline"))}</p>
         </div>
       </div>
-      <nav aria-label="API endpoints">
-        <a href="identity">Identity</a>
-        <a href="health">Health</a>
-        <a href="registry">Registry</a>
-        <a href="status">Status JSON</a>
-      </nav>
+      <div class="header-actions">
+        <form class="language-form" method="get">
+          <label for="language">{escape(_("language"))}</label>
+          <select id="language" name="lang" onchange="this.form.submit()">
+            {language_options}
+          </select>
+        </form>
+        <nav aria-label="{escape(_("api_endpoints"))}">
+          <a href="identity">{escape(_("identity"))}</a>
+          <a href="health">{escape(_("health"))}</a>
+          <a href="registry">{escape(_("registry"))}</a>
+          <a href="status">{escape(_("status_json"))}</a>
+        </nav>
+      </div>
     </div>
   </header>
   <div class="signal-line" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
@@ -234,12 +285,12 @@ def render_dashboard(
     {installation_panel}
     <section class="overview" aria-labelledby="services-title">
       <div>
-        <h2 id="services-title">Service network</h2>
-        <p class="summary">{len(bundle.services)} services coordinated inside this installation</p>
+        <h2 id="services-title">{escape(_("service_network"))}</h2>
+        <p class="summary">{escape(_("services_summary", count=len(bundle.services)))}</p>
       </div>
       <div class="bundle-state" aria-live="polite">
         <span class="dot" id="bundle-dot"></span>
-        <span id="bundle-state">Checking services</span>
+        <span id="bundle-state">{escape(_("checking_services"))}</span>
       </div>
     </section>
     {reserve_advisory}
@@ -247,12 +298,14 @@ def render_dashboard(
       {service_rows}
     </div>
     <p class="detail">
-      <span>Registry: {escape(bundle.name)}</span>
-      <span>Control plane: port {bundle.port}</span>
-      <span id="last-checked">Waiting for first check</span>
+      <span>{escape(_("registry_detail", name=bundle.name))}</span>
+      <span>{escape(_("control_plane", port=bundle.port))}</span>
+      <span id="last-checked">{escape(_("waiting_first_check"))}</span>
     </p>
   </main>
   <script>
+    const messages = {messages_json};
+    const documentLanguage = {_json_for_script(language)};
     const loopbackHosts = new Set(["127.0.0.1", "localhost", "::1"]);
     document.querySelectorAll("[data-local-url]").forEach((link) => {{
       const url = new URL(link.dataset.localUrl);
@@ -277,20 +330,21 @@ def render_dashboard(
           const dot = row.querySelector(".dot");
           const label = row.querySelector(".state-label");
           dot.className = `dot ${{result.ok ? "ok" : "error"}}`;
-          label.textContent = result.ok ? "Available" : "Unavailable";
+          label.textContent = result.ok ? messages.available : messages.unavailable;
           row.title = result.detail || "";
           renderIdentity(row.querySelector(".service-identity"), result.homepage);
           renderHomepage(row.querySelector(".service-report"), result.homepage);
         }});
         const healthy = payload.status === "ok";
         bundleDot.className = `dot ${{healthy ? "ok" : "error"}}`;
-        bundleLabel.textContent = healthy ? "All services available" : "Service attention needed";
+        bundleLabel.textContent = healthy ? messages.allServicesAvailable : messages.serviceAttentionNeeded;
       }} catch (error) {{
         bundleDot.className = "dot error";
-        bundleLabel.textContent = "Status check failed";
+        bundleLabel.textContent = messages.statusCheckFailed;
       }} finally {{
+        const checkedTime = new Date().toLocaleTimeString(documentLanguage, {{ hour: "2-digit", minute: "2-digit" }});
         document.getElementById("last-checked").textContent =
-          `Checked ${{new Date().toLocaleTimeString([], {{ hour: "2-digit", minute: "2-digit" }})}}`;
+          messages.checkedAt.replace("{{time}}", checkedTime);
       }}
     }}
 
@@ -361,15 +415,15 @@ def render_dashboard(
       const report = container.querySelector(".report-content");
       report.replaceChildren();
       if (!homepage.ok) {{
-        summary.textContent = "Service report unavailable";
+        summary.textContent = messages.serviceReportUnavailable;
         const message = document.createElement("p");
         message.className = "report-error";
-        message.textContent = homepage.detail || "The homepage could not be read.";
+        message.textContent = homepage.detail || messages.homepageUnreadable;
         report.append(message);
         return;
       }}
 
-      summary.textContent = "Service report";
+      summary.textContent = messages.serviceReport;
       const reportValue = homepage.report &&
         typeof homepage.report === "object" && !Array.isArray(homepage.report)
           ? Object.fromEntries(
@@ -423,13 +477,19 @@ def render_dashboard(
 """
 
 
-def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
+def _render_service_row(
+    name: str,
+    endpoint: ServiceEndpoint,
+    translate: Callable[..., str],
+) -> str:
     endpoint_rows = "\n".join(
-        _render_endpoint_address(address.scope, address.url)
+        _render_endpoint_address(address.scope, address.url, translate)
         for address in endpoint.endpoints
     )
 
-    initial_state = "Disabled" if not endpoint.enabled else "Checking"
+    initial_state = (
+        translate("disabled") if not endpoint.enabled else translate("checking")
+    )
     return f"""<article class="service" data-service="{escape(name)}" data-enabled="{str(endpoint.enabled).lower()}">
         <div>
           <p class="service-name">{escape(name.replace("_", " "))}</p>
@@ -440,17 +500,17 @@ def _render_service_row(name: str, endpoint: ServiceEndpoint) -> str:
         </div>
         <div class="service-state"><span class="dot"></span><span class="state-label">{initial_state}</span></div>
         <div class="service-identity" hidden>
-          <span class="identity-label">Identity</span>
+          <span class="identity-label">{escape(translate("identity"))}</span>
           <code class="identity-npub"></code>
           <span class="identity-meta"></span>
           <span class="fips-label fips-field" hidden>FIPS IPv6</span>
           <code class="identity-fips fips-field" hidden></code>
-          <span class="operator-label operator-field" hidden>Operator</span>
+          <span class="operator-label operator-field" hidden>{escape(translate("operator"))}</span>
           <code class="operator-npub operator-field" hidden></code>
           <span class="operator-meta operator-field" hidden></span>
         </div>
         <details class="service-report" hidden>
-          <summary>Service report</summary>
+          <summary>{escape(translate("service_report"))}</summary>
           <div class="report-content"></div>
         </details>
       </article>"""
@@ -477,14 +537,18 @@ def _render_installation_panel(
     bundle: BundleConfig,
     *,
     installation_npub: str | None,
+    translate: Callable[..., str],
 ) -> str:
     identity = installation_identity(installation_npub)
     if identity is None:
-        fields = '<p class="identity-missing">Installation identity unavailable</p>'
+        fields = (
+            '<p class="identity-missing">'
+            f'{escape(translate("installation_identity_unavailable"))}</p>'
+        )
     else:
-        fips_address = identity.get("fips_ipv6_address") or "Unavailable"
+        fips_address = identity.get("fips_ipv6_address") or translate("unavailable")
         fields = f"""<div class="identity-field">
-          <span>Identity</span>
+          <span>{escape(translate("identity"))}</span>
           <code>{escape(str(identity["npub"]))}</code>
         </div>
         <div class="identity-field">
@@ -493,15 +557,18 @@ def _render_installation_panel(
         </div>"""
     return f"""<section class="installation" aria-labelledby="installation-title">
       <div>
-        <span class="eyebrow">Mainstay installation</span>
+        <span class="eyebrow">{escape(translate("mainstay_installation"))}</span>
         <h2 id="installation-title">{escape(bundle.name)}</h2>
-        <p class="installation-role">Installation identity and local control plane</p>
+        <p class="installation-role">{escape(translate("installation_role"))}</p>
       </div>
       <div class="identity-fields">{fields}</div>
     </section>"""
 
 
-def _render_reserve_advisory(bundle: BundleConfig) -> str:
+def _render_reserve_advisory(
+    bundle: BundleConfig,
+    translate: Callable[..., str],
+) -> str:
     safebox_web = bundle.services.get("safebox_web")
     if safebox_web is None or not safebox_web.enabled:
         return ""
@@ -513,18 +580,22 @@ def _render_reserve_advisory(bundle: BundleConfig) -> str:
     )
     return f"""<section class="advisory" aria-labelledby="reserve-title">
       <div>
-        <span class="advisory-label">Required bootstrap step</span>
-        <h2 id="reserve-title">Confirm Lightning fee reserve</h2>
+        <span class="advisory-label">{escape(translate("required_bootstrap"))}</span>
+        <h2 id="reserve-title">{escape(translate("confirm_reserve"))}</h2>
       </div>
       <div>
-        <p>The service Acorn needs at least {amount} sats of operator-funded reserve to cover mint input fees while delivering Lightning-address payments. A healthy worker can create invoices before this reserve exists.</p>
-        <p>Mainstay does not yet measure the reserve automatically. Check it from the deployment host with <code>./reserve-balance.sh</code>, fund it after first startup, and replenish it as fees consume it.</p>
+        <p>{escape(translate("reserve_explanation", amount=amount))}</p>
+        <p>{escape(translate("reserve_instruction")).replace("./reserve-balance.sh", "<code>./reserve-balance.sh</code>")}</p>
         <p><code>{escape(command)}</code></p>
       </div>
     </section>"""
 
 
-def _render_endpoint_address(scope: str, url: str) -> str:
+def _render_endpoint_address(
+    scope: str,
+    url: str,
+    translate: Callable[..., str],
+) -> str:
     escaped_url = escape(url)
     scheme = urlsplit(url).scheme
     if scope in {"local", "external"} and scheme in {"http", "https"}:
@@ -534,9 +605,10 @@ def _render_endpoint_address(scope: str, url: str) -> str:
         markup = f'<a href="{escaped_url}"{data_attribute}>{escaped_url}</a>'
     else:
         markup = f"<code>{escaped_url}</code>"
+    scope_label = translate(scope) if scope in {"internal", "local", "external"} else scope.title()
     return (
         '<div class="address">'
-        f'<span class="address-label">{escape(scope.title())}</span>'
+        f'<span class="address-label">{escape(scope_label)}</span>'
         f"<span>{markup}</span></div>"
     )
 
@@ -617,22 +689,33 @@ def _handler_for(
 ) -> type[BaseHTTPRequestHandler]:
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
-            if self.path == "/":
+            request_url = urlsplit(self.path)
+            if request_url.path == "/":
+                query = parse_qs(request_url.query)
+                language = resolve_language(
+                    (query.get("lang") or [None])[0],
+                    self.headers.get("Accept-Language"),
+                )
                 self._send_text(
                     render_dashboard(
                         bundle,
                         installation_npub=installation_npub,
+                        language=language,
                     ),
                     content_type="text/html; charset=utf-8",
+                    headers={
+                        "Content-Language": language,
+                        "Vary": "Accept-Language",
+                    },
                 )
                 return
-            if self.path == "/assets/mainstay-logo.svg":
+            if request_url.path == "/assets/mainstay-logo.svg":
                 self._send_bytes(
                     MAINSTAY_LOGO_SVG,
                     content_type="image/svg+xml; charset=utf-8",
                 )
                 return
-            if self.path == "/identity":
+            if request_url.path == "/identity":
                 self._send_json(
                     {
                         "name": bundle.name,
@@ -642,7 +725,7 @@ def _handler_for(
                     }
                 )
                 return
-            if self.path == "/health":
+            if request_url.path == "/health":
                 self._send_json(
                     {
                         "status": "ok",
@@ -651,10 +734,10 @@ def _handler_for(
                     }
                 )
                 return
-            if self.path == "/registry":
+            if request_url.path == "/registry":
                 self._send_json(bundle.to_dict())
                 return
-            if self.path == "/context":
+            if request_url.path == "/context":
                 self._send_json(
                     render_service_context(
                         bundle,
@@ -662,7 +745,7 @@ def _handler_for(
                     )
                 )
                 return
-            if self.path == "/status":
+            if request_url.path == "/status":
                 results = check_bundle(bundle, timeout=1.0)
                 self._send_json(
                     {
@@ -699,12 +782,30 @@ def _handler_for(
             self.end_headers()
             self.wfile.write(body)
 
-        def _send_text(self, text: str, *, content_type: str) -> None:
-            self._send_bytes(text.encode("utf-8"), content_type=content_type)
+        def _send_text(
+            self,
+            text: str,
+            *,
+            content_type: str,
+            headers: dict[str, str] | None = None,
+        ) -> None:
+            self._send_bytes(
+                text.encode("utf-8"),
+                content_type=content_type,
+                headers=headers,
+            )
 
-        def _send_bytes(self, body: bytes, *, content_type: str) -> None:
+        def _send_bytes(
+            self,
+            body: bytes,
+            *,
+            content_type: str,
+            headers: dict[str, str] | None = None,
+        ) -> None:
             self.send_response(200)
             self.send_header("Content-Type", content_type)
+            for name, value in (headers or {}).items():
+                self.send_header(name, value)
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)

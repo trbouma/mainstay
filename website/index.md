@@ -145,7 +145,8 @@ connectivity.
 
 ### Local
 
-Reach nearby Lockbox services directly when upstream access is unavailable.
+Reach local and nearby Mainstay services directly when upstream access is
+unavailable.
 
 </article>
 
@@ -262,9 +263,10 @@ records, private bearer instruments, and locally operated infrastructure.
 
 ### Lockbox
 
-Lockbox is the hardware-first appliance direction for Mainstay. It provides a
-dedicated local home for the family on a small, durable platform with local
-storage, service supervision, hardware-backed controls, and physical presence.
+Lockbox is a hardware platform for supporting a locally running Mainstay
+instance and its services. It provides a dedicated local home for the family
+on a small, durable appliance with local storage, service supervision,
+hardware-backed controls, and physical presence.
 
 The initial target is FreeBSD on Raspberry Pi 4 with a keypad and TROPIC01 HSM.
 

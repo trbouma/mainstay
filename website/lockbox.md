@@ -7,10 +7,10 @@ description: The hardware-first local appliance direction for Mainstay and its s
 
 **Mainstay is the application. Lockbox is the appliance.**
 
-Lockbox is the hardware-first deployment that gives Mainstay and its supporting
-services a dedicated local home. It is intended for people and communities
-that need durable storage, predictable service operation, local networking,
-and hardware-backed controls.
+Lockbox is the hardware platform for supporting a locally running Mainstay
+instance and its services. It gives that deployment a dedicated local home and
+is intended for people and communities that need durable storage, predictable
+service operation, local networking, and hardware-backed controls.
 
 <img class="lockbox-hero-image" src="../assets/lockbox-appliance-concept.jpg" alt="Lockbox appliance with a phone on a table">
 
