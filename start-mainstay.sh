@@ -14,6 +14,75 @@ usage() {
         'Usage: ./start-mainstay.sh [--data-root PATH] [--no-build] [--force-recreate]'
 }
 
+env_value() {
+    key=$1
+    fallback=$2
+    awk -v key="$key" -v fallback="$fallback" '
+        index($0, key "=") == 1 {
+            print substr($0, length(key) + 2)
+            found = 1
+            exit
+        }
+        END { if (!found) print fallback }
+    ' .env
+}
+
+port_is_listening() {
+    checked_port=$1
+    if command -v ss >/dev/null 2>&1; then
+        ss -H -ltn 2>/dev/null | awk -v port="$checked_port" '
+            $4 ~ (":" port "$") { found = 1 }
+            END { exit !found }
+        '
+        return
+    fi
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -nP -iTCP:"$checked_port" -sTCP:LISTEN >/dev/null 2>&1
+        return
+    fi
+    return 2
+}
+
+check_available_port() {
+    label=$1
+    env_key=$2
+    expected_service=$3
+    selected_port=$4
+    owner_rows=$(docker ps \
+        --filter "publish=$selected_port" \
+        --format '{{.Names}}|{{.Label "com.docker.compose.project"}}|{{.Label "com.docker.compose.service"}}' \
+        2>/dev/null || true)
+    if [ -n "$owner_rows" ]; then
+        foreign_rows=$(printf '%s\n' "$owner_rows" | awk \
+            -F'|' -v project="$compose_project_name" \
+            -v service="$expected_service" \
+            '$2 != project || $3 != service { print }')
+        if [ -z "$foreign_rows" ]; then
+            return
+        fi
+        printf '%s\n' \
+            "$label host port $selected_port is already published by:" >&2
+        printf '%s\n' "$foreign_rows" | awk -F'|' '
+            { printf "  %s%s\n", $1, ($2 == "" ? "" : " (project " $2 ")") }
+        ' >&2
+        printf '%s\n' \
+            "Set $env_key to an unused host port for project '$compose_project_name'." >&2
+        exit 1
+    fi
+    if port_is_listening "$selected_port"; then
+        printf '%s\n' "$label host port $selected_port is already in use." >&2
+        printf '%s\n' \
+            "Set $env_key to an unused host port for project '$compose_project_name'." >&2
+        exit 1
+    else
+        result=$?
+        if [ "$result" -eq 2 ]; then
+            printf '%s\n' \
+                'ADVISORY: Neither ss nor lsof is available; host port occupancy could not be checked.' >&2
+        fi
+    fi
+}
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --data-root)
@@ -69,6 +138,15 @@ fi
 printf '%s\n' 'Validating the Mainstay Compose configuration...'
 docker compose config --quiet
 
+compose_project_name=${COMPOSE_PROJECT_NAME:-$(env_value COMPOSE_PROJECT_NAME mainstay-local)}
+mainstay_port=${MAINSTAY_LOCAL_PORT:-$(env_value MAINSTAY_LOCAL_PORT 8788)}
+safebox_port=${MAINSTAY_SAFEBOX_PORT:-$(env_value MAINSTAY_SAFEBOX_PORT 8888)}
+printf '%s\n' 'Checking published host ports...'
+check_available_port \
+    Dashboard MAINSTAY_LOCAL_PORT mainstay-local "$mainstay_port"
+check_available_port \
+    'Safebox Web' MAINSTAY_SAFEBOX_PORT safebox-web "$safebox_port"
+
 printf '%s\n' 'Starting the Mainstay service bundle...'
 if [ "$build" = true ] && [ "$force_recreate" = true ]; then
     docker compose up --build --force-recreate --detach
@@ -120,8 +198,6 @@ do
     sleep 2
 done
 
-mainstay_port=$(awk -F= '$1 == "MAINSTAY_LOCAL_PORT" { print $2 }' .env)
-safebox_port=$(awk -F= '$1 == "MAINSTAY_SAFEBOX_PORT" { print $2 }' .env)
 printf '%s\n' 'Mainstay is ready.'
 printf '%s\n' "Dashboard: http://127.0.0.1:${mainstay_port:-8788}/"
 printf '%s\n' "Safebox Web: http://127.0.0.1:${safebox_port:-8888}/"

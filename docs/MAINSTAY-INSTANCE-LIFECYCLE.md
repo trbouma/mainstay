@@ -129,6 +129,14 @@ The wizard gathers:
   explicit choice to advertise none; and
 - whether to start after configuration.
 
+Each running instance on a Docker host must have distinct dashboard and
+Safebox Web host ports. The lifecycle scripts allow an occupied port only when
+it is already published by the expected service in the same Compose project,
+as happens during a routine restart. A port owned by another project, another
+service, or a non-Docker listener fails preflight before Compose starts any
+containers. Change `MAINSTAY_LOCAL_PORT` or `MAINSTAY_SAFEBOX_PORT` in the
+instance's `.env`, then rerun `./start-mainstay.sh --no-build`.
+
 When `.env` exists, its values are displayed as defaults. When an entry is
 absent, the code default is displayed. Entering `abort`, `quit` or `q` stops the
 wizard. The final write confirmation defaults to no.
@@ -353,11 +361,12 @@ absolute paths and attaches the selected Compose namespace.
 
 1. One deployment directory owns one Mainstay instance.
 2. Compose project names are unique among instances on one Docker host.
-3. No two running service sets attach to the same instance data root.
-4. Recovery never generates identity-bound secrets.
-5. Routine startup never silently changes an existing data root.
-6. Recovery never renames storage.
-7. Teardown recursively removes only an installer-marked instance root.
-8. The shared data parent is not an instance and is not a teardown target.
-9. `.env.recovery` stays outside all container mounts and is never public.
-10. Same-disk recovery material does not replace an encrypted off-host backup.
+3. Published host ports are unique among running instances on one host.
+4. No two running service sets attach to the same instance data root.
+5. Recovery never generates identity-bound secrets.
+6. Routine startup never silently changes an existing data root.
+7. Recovery never renames storage.
+8. Teardown recursively removes only an installer-marked instance root.
+9. The shared data parent is not an instance and is not a teardown target.
+10. `.env.recovery` stays outside all container mounts and is never public.
+11. Same-disk recovery material does not replace an encrypted off-host backup.

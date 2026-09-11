@@ -142,6 +142,11 @@ any prompt to stop before configuration is written. Existing `.env` values are
 displayed as defaults; otherwise the shipped defaults are used. Before the
 final review it performs read-only checks for Docker, Compose, OpenSSL, a
 conflicting Compose namespace, data-root writability, and occupied host ports.
+Every running instance on one host needs its own `MAINSTAY_LOCAL_PORT` and
+`MAINSTAY_SAFEBOX_PORT`. Installation, startup, refresh, and recovery report
+the container and Compose project that already owns a selected port and stop
+before starting a partial service set. To resolve a conflict, choose unused
+ports in that instance's `.env` and run `./start-mainstay.sh --no-build`.
 The final review defaults to not writing anything.
 It also marks the operator-funded service-Acorn fee reserve as a required
 post-start action. The installer does not transfer funds automatically and
@@ -317,7 +322,8 @@ docker compose ps safebox-web
 The `mainstay-local` Compose project gives this instance its own container and
 persistent data source; it does not reuse a standalone Safebox Web project's
 state.
-Set `MAINSTAY_SAFEBOX_PORT` to another unused host port if `8888` is occupied.
+Set `MAINSTAY_SAFEBOX_PORT` to another unused host port if `8888` is occupied;
+set `MAINSTAY_LOCAL_PORT` similarly when the dashboard port is occupied.
 
 Safebox Web initializes and migrates its SQLite database during application
 startup. Mainstay bootstrap owns the secrets that must exist first:

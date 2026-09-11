@@ -117,13 +117,34 @@ port_is_listening() {
 
 check_available_port() {
     label=$1
-    selected_port=$2
-    original_port=$3
-    if [ "$env_existed" = true ] && [ "$selected_port" = "$original_port" ]; then
-        return
+    env_key=$2
+    expected_service=$3
+    selected_port=$4
+    owner_rows=$(docker ps \
+        --filter "publish=$selected_port" \
+        --format '{{.Names}}|{{.Label "com.docker.compose.project"}}|{{.Label "com.docker.compose.service"}}' \
+        2>/dev/null || true)
+    if [ -n "$owner_rows" ]; then
+        foreign_rows=$(printf '%s\n' "$owner_rows" | awk \
+            -F'|' -v project="$compose_project_name" \
+            -v service="$expected_service" \
+            '$2 != project || $3 != service { print }')
+        if [ -z "$foreign_rows" ]; then
+            return
+        fi
+        printf '%s\n' \
+            "$label host port $selected_port is already published by:" >&2
+        printf '%s\n' "$foreign_rows" | awk -F'|' '
+            { printf "  %s%s\n", $1, ($2 == "" ? "" : " (project " $2 ")") }
+        ' >&2
+        printf '%s\n' \
+            "Set $env_key to an unused host port for project '$compose_project_name'." >&2
+        exit 1
     fi
     if port_is_listening "$selected_port"; then
-        printf '%s\n' "$label port $selected_port is already in use." >&2
+        printf '%s\n' "$label host port $selected_port is already in use." >&2
+        printf '%s\n' \
+            "Set $env_key to an unused host port for project '$compose_project_name'." >&2
         exit 1
     else
         result=$?
@@ -477,8 +498,10 @@ if [ "$env_existed" = false ]; then
     fi
 fi
 check_data_root_writable "$data_root"
-check_available_port Dashboard "$dashboard_port" "$dashboard_port_default"
-check_available_port 'Safebox Web' "$safebox_port" "$safebox_port_default"
+check_available_port \
+    Dashboard MAINSTAY_LOCAL_PORT mainstay-local "$dashboard_port"
+check_available_port \
+    'Safebox Web' MAINSTAY_SAFEBOX_PORT safebox-web "$safebox_port"
 printf '%s\n' 'Preflight checks passed. No configuration has been written.'
 
 printf '\n%s\n' 'Review'

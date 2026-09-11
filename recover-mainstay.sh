@@ -173,9 +173,25 @@ port_is_listening() {
 
 check_available_port() {
     label=$1
-    port=$2
+    env_key=$2
+    port=$3
+    owner_rows=$(docker ps \
+        --filter "publish=$port" \
+        --format '{{.Names}}|{{.Label "com.docker.compose.project"}}|{{.Label "com.docker.compose.service"}}' \
+        2>/dev/null || true)
+    if [ -n "$owner_rows" ]; then
+        printf '%s\n' "$label host port $port is already published by:" >&2
+        printf '%s\n' "$owner_rows" | awk -F'|' '
+            { printf "  %s%s\n", $1, ($2 == "" ? "" : " (project " $2 ")") }
+        ' >&2
+        printf '%s\n' \
+            "Choose another port for $env_key before recovery." >&2
+        exit 1
+    fi
     if port_is_listening "$port"; then
-        printf '%s\n' "$label port $port is already in use." >&2
+        printf '%s\n' "$label host port $port is already in use." >&2
+        printf '%s\n' \
+            "Choose another port for $env_key before recovery." >&2
         exit 1
     else
         result=$?
@@ -351,8 +367,8 @@ if [ "$recovered_project_name" != "$compose_project_name" ]; then
         exit 1
     fi
 fi
-check_available_port Dashboard "$dashboard_port"
-check_available_port 'Safebox Web' "$safebox_port"
+check_available_port Dashboard MAINSTAY_LOCAL_PORT "$dashboard_port"
+check_available_port 'Safebox Web' MAINSTAY_SAFEBOX_PORT "$safebox_port"
 docker compose --env-file "$recovery_file" config --quiet
 printf '%s\n' 'Recovery preflight passed. No deployment configuration has been written.'
 

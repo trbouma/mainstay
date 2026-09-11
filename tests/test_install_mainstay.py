@@ -31,6 +31,17 @@ def _stage_installer(tmp_path: Path) -> tuple[Path, dict[str, str], Path]:
 printf '%s\n' "$*" >> "$DOCKER_LOG"
 if [ "$1" = "info" ]; then exit 0; fi
 if [ "$1" = "compose" ] && [ "$2" = "version" ]; then exit 0; fi
+if [ "$1" = "ps" ] && [ -n "${MOCK_PORT_OWNER_PROJECT:-}" ]; then
+    case "$*" in
+        *"publish=${MOCK_LISTEN_PORT}"*)
+            printf '%s|%s|%s\n' \
+                "${MOCK_PORT_OWNER_NAME:-port-owner}" \
+                "$MOCK_PORT_OWNER_PROJECT" \
+                "${MOCK_PORT_OWNER_SERVICE:-mainstay-local}"
+            exit 0
+            ;;
+    esac
+fi
 if [ "$1" = "ps" ] && [ "${MOCK_PROJECT_EXISTS:-0}" = "1" ]; then
     printf '%s\n' existing-container
     exit 0
@@ -168,9 +179,47 @@ def test_installer_rejects_an_occupied_selected_port_before_writing(
     )
 
     assert result.returncode == 1
-    assert "Dashboard port 9001 is already in use" in result.stderr
+    assert "Dashboard host port 9001 is already in use" in result.stderr
     assert not (deployment / ".env").exists()
     assert not data_parent.exists()
+
+
+def test_existing_install_rejects_a_port_owned_by_another_project(
+    tmp_path: Path,
+) -> None:
+    deployment, environment, _docker_log = _stage_installer(tmp_path)
+    env_file = deployment / ".env"
+    original = (
+        "COMPOSE_PROJECT_NAME=mainstay-test\n"
+        "MAINSTAY_DATA_ROOT=\n"
+        "MAINSTAY_LOCAL_BIND_ADDRESS=0.0.0.0\n"
+        "MAINSTAY_LOCAL_PORT=9001\n"
+        "MAINSTAY_SAFEBOX_BIND_ADDRESS=0.0.0.0\n"
+        "MAINSTAY_SAFEBOX_PORT=9002\n"
+        "MAINSTAY_LIGHTNING_MINT_URL=https://mint.example.com\n"
+    )
+    env_file.write_text(original, encoding="utf-8")
+    environment["MOCK_LISTEN_PORT"] = "9001"
+    environment["MOCK_PORT_OWNER_NAME"] = "mainstay-other-mainstay-local-1"
+    environment["MOCK_PORT_OWNER_PROJECT"] = "mainstay-other"
+
+    result = subprocess.run(
+        [str(deployment / "install-mainstay.sh")],
+        cwd=deployment,
+        env=environment,
+        input="\n" * 9,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "Dashboard host port 9001 is already published by" in result.stderr
+    assert "mainstay-other-mainstay-local-1 (project mainstay-other)" in (
+        result.stderr
+    )
+    assert "Set MAINSTAY_LOCAL_PORT to an unused host port" in result.stderr
+    assert env_file.read_text(encoding="utf-8") == original
 
 
 def test_installer_rejects_an_existing_compose_project_before_writing(
@@ -199,6 +248,9 @@ def test_existing_env_values_are_displayed_as_defaults_without_mutation(
     tmp_path: Path,
 ) -> None:
     deployment, environment, _docker_log = _stage_installer(tmp_path)
+    environment["MOCK_LISTEN_PORT"] = "9876"
+    environment["MOCK_PORT_OWNER_NAME"] = "private-venue-mainstay-local-1"
+    environment["MOCK_PORT_OWNER_PROJECT"] = "private-venue"
     env_file = deployment / ".env"
     original = (
         "COMPOSE_PROJECT_NAME=private-venue\n"
