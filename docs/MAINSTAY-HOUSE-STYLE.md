@@ -182,6 +182,19 @@ documents may use **reachable** and **reachability** when the network path is
 the actual subject. Do not infer identity, authority, recognition, acceptance
 or trust from either condition.
 
+For Clear balances, use three derived availability states:
+
+- **Private** means usable by members within one Mainstay instance;
+- **Local** means usable between participating instances over shared local
+  infrastructure without requiring internet access; and
+- **Across networks** means eligible routes cross the local network boundary.
+
+All Clear bearer transfers remain cryptographically private. The **Private**
+availability label describes the instance membership boundary, not the
+confidentiality mechanism. These states do not imply acceptance, recognition,
+treasury authority, or universal access, and they are not permanent token
+properties.
+
 Where a security posture is summarized, use the full triad:
 
 - **confidentiality** protects appropriate limits on access and disclosure;

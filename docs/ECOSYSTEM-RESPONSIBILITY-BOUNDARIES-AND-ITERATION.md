@@ -41,9 +41,9 @@ These are ownership boundaries, not communication barriers. A component may
 report evidence used by another without becoming authoritative for the decision
 made at that other layer.
 
-## Worked Example: Clear Transfer Scope
+## Worked Example: Clear Availability
 
-The `Local only / Across networks` terminology shows the method clearly.
+The `Private / Local / Across networks` terminology shows the method clearly.
 
 The user asks a simple question:
 
@@ -71,8 +71,9 @@ wallets share one Mainstay context or whether a recipient wants the CMU.
 
 Mainstay knows which Clear and Spurline services belong to its installation and
 which internal routes are eligible for co-resident callers. It may also supply
-configured external route candidates. It does not decide that a CMU is trusted
-or accepted merely because its mint runs locally.
+local routes shared with other participating instances and configured
+cross-network route candidates. It does not decide that a CMU is trusted or
+accepted merely because its mint is available.
 
 ### Acorn resolves and guards
 
@@ -82,7 +83,7 @@ proof export when the recipient cannot use an internal-only mint.
 
 ### Safebox Web explains and confirms
 
-Safebox Web presents the derived transfer scope as `Local only` or `Across
+Safebox Web presents the derived availability as `Private`, `Local`, or `Across
 networks`, shows treasury and recognition information separately, and asks for
 the user's decision. It does not infer trust from reachability.
 
@@ -185,10 +186,10 @@ compatibility behavior should be labeled as such.
 
 ### 7. Test the matrix, not only the happy path
 
-Test meaningful combinations across boundaries. For Clear transfer scope these
-include local and external mint routes, same and different Mainstay contexts,
-available and unavailable relays, recognized and unknown treasurers, and
-pending versus confirmed proofs.
+Test meaningful combinations across boundaries. For Clear availability these
+include private, local, and cross-network mint routes, same and different
+Mainstay contexts, available and unavailable relays, recognized and unknown
+treasurers, and pending versus confirmed proofs.
 
 ### 8. Record the result where each audience needs it
 
@@ -235,5 +236,5 @@ For any new cross-product requirement, ask:
 - [Mainstay House Style and Family Audit](MAINSTAY-HOUSE-STYLE.md)
 - [Invariant Identity and Dynamic Resolution](INVARIANT-IDENTITY-AND-DYNAMIC-RESOLUTION.md)
 - [Identity, Resolution, and Event-Native Services](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
-- [Clear Transfer Scope, Acceptance, and Authority](CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md)
+- [Clear Availability, Acceptance, and Authority](CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md)
 - [Clear CMU Transferability, Acceptance, and Authority](https://github.com/trbouma/clear/blob/main/docs/CMU-TRANSFERABILITY-ACCEPTANCE-AND-AUTHORITY.md)

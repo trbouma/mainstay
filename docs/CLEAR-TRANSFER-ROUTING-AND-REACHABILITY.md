@@ -41,7 +41,7 @@ the issuing mint cannot be reached for proof verification and refresh.
 
 The user-facing transfer labels and their separation from acceptance and
 treasury authority are defined in
-[Clear Transfer Scope, Acceptance, and Authority](CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md).
+[Clear Availability, Acceptance, and Authority](CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md).
 
 ## Same-Instance Flow
 
@@ -133,7 +133,7 @@ of that later resolver.
 ## References
 
 - [Local Clear Transactions](LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md)
-- [Clear Transfer Scope, Acceptance, and Authority](CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md)
+- [Clear Availability, Acceptance, and Authority](CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md)
 - [Address Spaces, Endpoint Scopes, and FIPS](ADDRESS-SPACES-ENDPOINT-SCOPES-AND-FIPS.md)
 - [Identity, Resolution, and Event-Native Services](IDENTITY-RESOLUTION-AND-EVENT-NATIVE-SERVICES.md)
 - [Safebox Clear Receive Advertisement](https://github.com/trbouma/safebox-web/blob/main/docs/CLEAR-RECEIVE-ADVERTISEMENT.md)

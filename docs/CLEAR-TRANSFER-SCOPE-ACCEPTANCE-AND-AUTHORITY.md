@@ -1,4 +1,4 @@
-# Clear Transfer Scope, Acceptance, and Authority
+# Clear Availability, Acceptance, and Authority
 
 ## Status
 
@@ -10,13 +10,14 @@ future multi-route mint resolver.
 
 ## Summary
 
-Safebox Web should describe the practical transfer scope of a Clear balance
-with two user-facing values:
+Safebox Web should describe the practical availability of a Clear balance with
+three user-facing values:
 
-- **Local only**
+- **Private**
+- **Local**
 - **Across networks**
 
-Transfer scope answers where a token can be sent with a usable route back to
+Availability answers where a token can be sent with a usable route back to
 its mint. It does not answer whether the recipient recognizes the CMU, trusts
 its treasurer, values it at par, or is willing to accept it.
 
@@ -27,7 +28,7 @@ The governing rule is:
 Keeping them separate lets a wallet explain Clear balances plainly without
 turning network reachability into an endorsement.
 
-## Why Transfer Scope Is Useful
+## Why Availability Is Useful
 
 A bearer token can be delivered to a recipient even when that recipient cannot
 reach its mint. Delivery alone is therefore not a useful definition of a
@@ -35,32 +36,50 @@ successful Clear transfer. The recipient must also be able to verify and
 refresh the proofs through a route associated with the correct mint and
 keyset.
 
-Mainstay currently exposes two practical cases to a wallet user.
+Mainstay distinguishes three practical cases for a wallet user.
 
-### Local only
+### Private
 
-The token can be transferred safely among wallets that share the Mainstay
-context and its internal Clear and Spurline services.
+The token can be transferred among authorized members whose wallets share one
+Mainstay instance and its internal Clear and Spurline services.
 
 ```text
-Transfer scope: Local only
+Availability: Private
 ```
 
 Supporting copy:
 
-> Transferable between wallets using the same local services.
+> Usable by members of this Mainstay instance.
 
-This scope is logical rather than geographic. A user connected through a VPN
-may be physically distant while their Safebox and Acorn still operate inside
-the same Mainstay service context.
+All Clear bearer transfers are cryptographically private. This label adds a
+different fact: the usable service boundary is private to one instance and its
+members.
+
+### Local
+
+The token can be transferred between participating Mainstay instances using
+shared local infrastructure. The Clear mint and recipient delivery route are
+available on that infrastructure without requiring internet access.
+
+```text
+Availability: Local
+```
+
+Supporting copy:
+
+> Usable between participating instances on this local network.
+
+Local describes a deliberately shared operating boundary, not a single
+process or a claim of geographic closeness. Each instance retains its own
+governance, identities, data, and acceptance policy.
 
 ### Across networks
 
 The mint advertises a route intended to be reachable outside the sender's
-local Mainstay context, and the recipient has a suitable delivery path.
+local network boundary, and the recipient has a suitable delivery path.
 
 ```text
-Transfer scope: Across networks
+Availability: Across networks
 ```
 
 Supporting copy:
@@ -68,13 +87,16 @@ Supporting copy:
 > The mint can be reached outside this local system. The receiving wallet still
 > decides whether to accept the CMU.
 
-Today, an external HTTPS mint URL is the provisional signal for this scope.
-The future resolver may establish it through verified local, external, federated,
-or FIPS routes without making an FQDN part of the CMU's identity.
+Today, a LAN-address or local-DNS mint URL is the provisional signal for
+**Local**, and an eligible external HTTPS mint URL is the provisional signal
+for **Across networks**. The future resolver should derive either state from
+verified endpoint scope, federation, or FIPS routes without making an FQDN
+part of the CMU's identity.
 
 "Across networks" is intentionally different from "global." It does not promise
 universal Internet availability, unrestricted access, or acceptance everywhere.
-It says that transfer is not confined to one shared internal service context.
+It says that transfer is not confined to one shared local network. The route
+may still be private, authenticated, and limited to participating communities.
 
 ## Independent Dimensions
 
@@ -88,23 +110,22 @@ CMU identity answers:
 
 > Which exact issuance instrument is this?
 
-It does not identify the current mint URL, determine transfer scope, or imply
+It does not identify the current mint URL, determine availability, or imply
 recognition.
 
-### 2. Transfer scope
+### 2. Availability
 
-Transfer scope is a derived operational statement about the routes currently
+Availability is a derived operational statement about the routes currently
 available to a sender and intended recipient.
 
 It answers:
-
 > Can the recipient receive the token and reach the responsible mint from its
 > service context?
 
-The scope is not permanently embedded in the token. A mint may gain, lose, or
+The state is not permanently embedded in the token. A mint may gain, lose, or
 replace an external route while retaining the same service identity and
-keysets. Safebox should resolve scope as late as practical and may change the
-display when verified reachability changes.
+keysets. Safebox should resolve availability as late as practical and may
+change the display when verified reachability changes.
 
 ### 3. Acceptance and recognition
 
@@ -158,7 +179,7 @@ Service identity and endpoint verification answer:
 
 > Is this route serving the mint service expected for this keyset?
 
-Reachability is evidence used to derive transfer scope. It is not evidence that
+Reachability is evidence used to derive availability. It is not evidence that
 the CMU is valuable, well governed, solvent, or accepted.
 
 ### 6. Delivery path
@@ -179,7 +200,7 @@ reachability.
 
 An eligible route may be advertised while temporarily unavailable. Proofs may
 also be pending verification or refresh. Current health and proof state should
-therefore remain separate from the more durable transfer-scope classification.
+therefore remain separate from the more durable availability classification.
 
 Operational state answers:
 
@@ -188,15 +209,17 @@ Operational state answers:
 
 ## Decision Matrix
 
-| Transfer scope | Acceptance | Treasury recognition | User meaning |
+| Availability | Acceptance | Treasury recognition | User meaning |
 | --- | --- | --- | --- |
-| Local only | Accepted | Recognized | Usable among participating wallets in this local context |
-| Local only | Not established | Unknown or unrecognized | Reachable infrastructure exists, but no acceptance should be implied |
+| Private | Accepted | Recognized | Usable by participating members of this instance |
+| Private | Not established | Unknown or unrecognized | Instance services are usable, but no acceptance should be implied |
+| Local | Accepted | Recognized | Usable between participating instances on local infrastructure |
+| Local | Not established | Unknown or unrecognized | A local route exists, but no acceptance should be implied |
 | Across networks | Accepted | Recognized | Recipient accepts the CMU and can reach its mint outside the sender's context |
 | Across networks | Not established | Unknown or unrecognized | Technically portable, but not necessarily wanted or trusted |
 
-The matrix deliberately permits all four combinations. Transfer scope must not
-be used as a proxy for acceptance, and local co-location must not be used as a
+The matrix deliberately permits every combination. Availability must not be
+used as a proxy for acceptance, and local connectivity must not be used as a
 proxy for treasury recognition.
 
 ## Safebox Web Presentation
@@ -206,14 +229,21 @@ For example:
 
 ```text
 Clear Credits                         120 credits
-Transfer scope: Local only
+Availability: Private
 Treasurer: North Shore Cooperative
 Recognition: Recognized by this community
 ```
 
 ```text
+Market Credits                        75 credits
+Availability: Local
+Treasurer: Regional Cooperative
+Recognition: Recognized by this community
+```
+
+```text
 Community Credits                     40 credits
-Transfer scope: Across networks
+Availability: Across networks
 Treasurer: External issuer
 Recognition: Not yet established
 ```
@@ -222,36 +252,40 @@ The first implementation does not need to invent recognition data that does
 not exist. It may show only verified fields and use an honest unknown state:
 
 ```text
-Transfer scope: Across networks
+Availability: Across networks
 Treasurer: Not verified
 Recognition: Not established
 ```
 
 The send confirmation should explain the practical boundary:
 
-- for **Local only**, the recipient must share the required local services;
+- for **Private**, the recipient must be a member using the same instance;
+- for **Local**, the recipient's instance and mint must share eligible local
+  routes;
 - for **Across networks**, the mint advertises a route outside the local
   context, but the receiver still chooses whether to accept the CMU; and
-- when scope cannot be established, Safebox must stop before exporting proofs
-  or require a deliberate expert override with a precise warning.
+- when availability cannot be established, Safebox must stop before exporting
+  proofs or require a deliberate expert override with a precise warning.
 
 ## Terminology Decisions
 
-The labels are deliberately phrased around transfer rather than acceptance:
+The labels describe availability boundaries rather than acceptance:
 
 | Rejected wording | Reason |
 | --- | --- |
 | `Local / Global` | Global suggests universal reach and acceptance |
 | `Locally accepted / Widely accepted` | Acceptance cannot be inferred from network paths |
-| `Private / Public` | Suggests confidentiality, membership, or endorsement |
+| `Private / Public` | Public overstates exposure and acceptance; Private is retained only for the instance membership boundary |
 | `Trusted / Untrusted` | Reachability does not establish treasury trust |
 | `Venue only / Beyond venue` | Useful for some brands, but too specific as a universal product term |
 | `Non-local transferable` | Technically suggestive but awkward for users |
 
-`Local only / Across networks` is neutral across communities, Indigenous
-Nations, cooperatives, organizations, resorts, campuses, and independent
-deployments. Experience profiles may adapt explanatory nouns to language chosen
-by the operator or community, but they must not change the underlying meaning.
+`Private / Local / Across networks` distinguishes one house, cooperation among
+nearby houses, and cooperation across network boundaries. It remains neutral
+across communities, Indigenous Nations, cooperatives, organizations, resorts,
+campuses, and independent deployments. Experience profiles may adapt
+explanatory nouns to language chosen by the operator or community, but they
+must not change the underlying meaning.
 
 ## A Limited Historical Parallel
 
@@ -280,17 +314,18 @@ reach, authority, and acceptance collapse into one national currency boundary.
 
 ## Implementation Direction
 
-1. Add `Local only` and `Across networks` as derived Safebox display states,
-   not new CMU identifiers or token fields.
-2. Base the first version on the current same-context and external-route rules.
+1. Add `Private`, `Local`, and `Across networks` as derived Safebox display
+   states, not new CMU identifiers or token fields.
+2. Base the first version on internal, private-address or LAN, and external
+   HTTPS route rules.
 3. Keep treasury, recognition, service identity, and current health in separate
    fields and UI lines.
 4. Stop unsafe sends before proof export when the recipient cannot reach an
    internal-only mint.
 5. Replace the HTTPS heuristic with identity-based multi-route resolution when
    that resolver is available.
-6. Allow future FIPS and federation paths to produce `Across networks` without
-   changing the user terminology.
+6. Allow FIPS and federation paths to produce `Local` or `Across networks`
+   according to the boundary crossed, without changing the user terminology.
 7. Add acceptance policy only when Safebox has explicit wallet or
    community-authored evidence to support it.
 

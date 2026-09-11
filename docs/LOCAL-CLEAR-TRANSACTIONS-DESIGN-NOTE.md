@@ -6,7 +6,7 @@ This note defines the first Clear transaction profile for Mainstay. The core
 profile is implemented and was manually validated on September 6, 2026, with
 two wallets using the managed internal Clear mint and Spurline relay.
 
-The first profile is deliberately local-only:
+The first profile is deliberately private to one instance:
 
 > Transfer one Clear Mint Unit between two Safebox identities in the same
 > Mainstay environment, using only Mainstay's internal Clear and Spurline
@@ -332,7 +332,7 @@ Safebox into Mainstay. Its routing and guard rules are recorded in
 - Sender and recipient histories identify the exact CMU and keyset ID.
 - Mainstay never combines balances across keysets or CMUs.
 - Internal dependency failure does not trigger an external fallback.
-- Within the local-only profile, a token naming an unknown keyset or an
+- Within the private instance profile, a token naming an unknown keyset or an
   unapproved internal mint URL causes no outbound request. The separate public
   profile may evaluate a well-formed HTTPS mint after explicit acceptance.
 - Restart and uncertain-outcome handling do not duplicate or lose value.

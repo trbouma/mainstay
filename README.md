@@ -43,7 +43,7 @@ Design notes:
 - [Service Identity and Operator Attestation](docs/SERVICE-IDENTITY-AND-OPERATOR-ATTESTATION-DESIGN-NOTE.md)
 - [Local Clear Transactions](docs/LOCAL-CLEAR-TRANSACTIONS-DESIGN-NOTE.md)
 - [Clear Transfer Routing and Reachability](docs/CLEAR-TRANSFER-ROUTING-AND-REACHABILITY.md)
-- [Clear Transfer Scope, Acceptance, and Authority](docs/CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md)
+- [Clear Availability, Acceptance, and Authority](docs/CLEAR-TRANSFER-SCOPE-ACCEPTANCE-AND-AUTHORITY.md)
 - [Mainstay Clear Context Wrapper](docs/MAINSTAY-CLEAR-CONTEXT-WRAPPER.md)
 - [Mainstay Grove Context Integration](docs/MAINSTAY-GROVE-CONTEXT-INTEGRATION.md)
 - [Mainstay Continuity Coordinator](docs/MAINSTAY-CONTINUITY-COORDINATOR-DESIGN-NOTE.md)
@@ -358,8 +358,9 @@ Mainstay passes only `MAINSTAY_EXTERNAL_CLEAR_MINT_URL` through
 `SAFEBOX_CLEAR_EXTERNAL_MINTS` for public NIP-05 advertisement. It never
 advertises the Docker-only `http://clear:3339` route. A cross-instance Clear
 send may carry tokens from a public HTTPS mint even when the receiver has not
-seen that mint before. The managed Mainstay mint remains local-only until an
-external route to that same mint is deliberately implemented.
+seen that mint before. The managed Mainstay mint remains private to its
+instance until a local or cross-network route to that same mint is deliberately
+implemented.
 
 For cross-Mainstay token delivery, configure an externally reachable relay as
 the public NIP-05 discovery hint while retaining the private Spurline address as
