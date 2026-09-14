@@ -26,6 +26,7 @@ services:
       MAINSTAY_LOCAL_CONFIG: /app/data/mainstay-local.json
       MAINSTAY_INSTALLATION_NSEC: "${MAINSTAY_INSTALLATION_NSEC:?Run ./init-env.sh to generate MAINSTAY_INSTALLATION_NSEC}"
       CLEAR_OPERATOR_TOKEN: "${CLEAR_OPERATOR_TOKEN:?Set CLEAR_OPERATOR_TOKEN in .env}"
+      CLEAR_OPERATOR_API_URL: "${CLEAR_OPERATOR_API_URL:-http://clear-operator:3340}"
     ports:
       - "${MAINSTAY_LOCAL_BIND_ADDRESS:-0.0.0.0}:${MAINSTAY_LOCAL_PORT:-8788}:8788"
     read_only: true
@@ -239,12 +240,14 @@ services:
       - /app/data/clear.sqlite3
       - --mint-url
       - "${CLEAR_MINT_URL:-http://clear:3339}"
+      - --surface
+      - public
       - --log-level
       - "${CLEAR_LOG_LEVEL:-info}"
     environment:
       CLEAR_MASTER_SECRET: "${CLEAR_MASTER_SECRET:?Set CLEAR_MASTER_SECRET in .env}"
       CLEAR_OPERATOR_TOKEN: "${CLEAR_OPERATOR_TOKEN:?Set CLEAR_OPERATOR_TOKEN in .env}"
-      CLEAR_ROOT_API_LOOPBACK_ONLY: "${CLEAR_ROOT_API_LOOPBACK_ONLY:-false}"
+      CLEAR_ROOT_API_LOOPBACK_ONLY: "${CLEAR_ROOT_API_LOOPBACK_ONLY:-true}"
       CLEAR_MINT_SERVICE_NSEC: "${CLEAR_MINT_SERVICE_NSEC:?Run ./init-env.sh to generate CLEAR_MINT_SERVICE_NSEC}"
       CLEAR_MINT_SERVICE_MANAGEMENT: "mainstay-managed"
       CLEAR_DATABASE: /app/data/clear.sqlite3
@@ -258,6 +261,67 @@ services:
       CLEAR_ROOT_API_URL: http://127.0.0.1:3339
     expose:
       - "3339"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - "${MAINSTAY_CLEAR_DATA_SOURCE:-clear-data}:/app/data"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+
+  clear-operator:
+    image: ${MAINSTAY_CLEAR_IMAGE:-${COMPOSE_PROJECT_NAME:-mainstay-local}-clear:local}
+    build:
+      context: "${MAINSTAY_CLEAR_BUILD_CONTEXT:-https://github.com/trbouma/clear.git#main}"
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    user: "${MAINSTAY_DATA_RUNTIME_USER:-clear}"
+    command:
+      - clear
+      - --host
+      - 0.0.0.0
+      - --port
+      - "3340"
+      - --database
+      - /app/data/clear.sqlite3
+      - --mint-url
+      - "${CLEAR_MINT_URL:-http://clear:3339}"
+      - --surface
+      - all
+      - --log-level
+      - "${CLEAR_LOG_LEVEL:-info}"
+    environment:
+      CLEAR_MASTER_SECRET: "${CLEAR_MASTER_SECRET:?Set CLEAR_MASTER_SECRET in .env}"
+      CLEAR_OPERATOR_TOKEN: "${CLEAR_OPERATOR_TOKEN:?Set CLEAR_OPERATOR_TOKEN in .env}"
+      CLEAR_ROOT_API_LOOPBACK_ONLY: "${CLEAR_ROOT_API_LOOPBACK_ONLY:-false}"
+      CLEAR_ROOT_API_ALLOWED_NETWORKS: "${CLEAR_ROOT_API_ALLOWED_NETWORKS:-127.0.0.0/8,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7}"
+      CLEAR_MINT_SERVICE_NSEC: "${CLEAR_MINT_SERVICE_NSEC:?Run ./init-env.sh to generate CLEAR_MINT_SERVICE_NSEC}"
+      CLEAR_MINT_SERVICE_MANAGEMENT: "mainstay-managed"
+      CLEAR_DATABASE: /app/data/clear.sqlite3
+      CLEAR_MINT_URL: "${CLEAR_MINT_URL:-http://clear:3339}"
+      CLEAR_CURRENCY_NAME: "${CLEAR_CURRENCY_NAME:-Mainstay Local Credits}"
+      CLEAR_CURRENCY_ALIAS: "${CLEAR_CURRENCY_ALIAS:-Local Credits}"
+      CLEAR_CURRENCY_UNIT_ALIAS: "${CLEAR_CURRENCY_UNIT_ALIAS:-credits}"
+      CLEAR_MAX_ORDER: "${CLEAR_MAX_ORDER:-20}"
+      CLEAR_ROOT_AUTHORITY_NPUB: "${CLEAR_ROOT_AUTHORITY_NPUB:-}"
+      CLEAR_ROOT_WALLET: /app/data/clear-root-wallet.json
+      CLEAR_ROOT_API_URL: http://127.0.0.1:3340
+    expose:
+      - "3340"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:3340/health', timeout=3).read()"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=64m

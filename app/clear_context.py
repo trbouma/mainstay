@@ -157,9 +157,12 @@ def send_local_clear(
 
     operator_token = os.getenv("CLEAR_OPERATOR_TOKEN")
     if operator_token:
+        operator_url = os.getenv("CLEAR_OPERATOR_API_URL") or clear.require_url(
+            "internal", purpose="mint"
+        )
         try:
             result = _send_via_clear_operator_api(
-                clear.require_url("internal", purpose="mint"),
+                operator_url,
                 operator_token=operator_token,
                 amount=amount,
                 recipient_pubkey=recipient.pubkey,

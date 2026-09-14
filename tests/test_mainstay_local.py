@@ -34,7 +34,10 @@ class MainstayLocalTests(unittest.TestCase):
             compose,
         )
         self.assertIn(
-            'SAFEBOX_MAINSTAY_INSTANCE_NAME: "${MAINSTAY_INSTANCE_NAME:-Mainstay Local}"',
+            (
+                'SAFEBOX_MAINSTAY_INSTANCE_NAME: '
+                '"${MAINSTAY_INSTANCE_NAME:-Mainstay Local}"'
+            ),
             compose,
         )
         env_example = (Path(__file__).parents[1] / ".env.example").read_text(
@@ -46,6 +49,13 @@ class MainstayLocalTests(unittest.TestCase):
         )
         self.assertIn(
             'SAFEBOX_CLEAR_EXTERNAL_MINTS: "${MAINSTAY_EXTERNAL_CLEAR_MINT_URL:-https://clear.safebox.dev}"',
+            compose,
+        )
+        self.assertIn("clear-operator:", compose)
+        self.assertIn("--surface\n      - public", compose)
+        self.assertIn("--surface\n      - all", compose)
+        self.assertIn(
+            'CLEAR_OPERATOR_API_URL: "${CLEAR_OPERATOR_API_URL:-http://clear-operator:3340}"',
             compose,
         )
         self.assertIn("service-acorn.json", compose)

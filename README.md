@@ -404,12 +404,24 @@ value, choose the canonical `CLEAR_MINT_URL` and optional root authority, then
 preserve the database, `CLEAR_MASTER_SECRET`, and root-authority relationship
 together. Do not change those values to reconnect an existing database.
 
-The image includes the privileged root CLI, which talks only to Clear's
-container loopback interface:
+Mainstay runs Clear's public mint surface and privileged operator surface on
+separate internal services. The public `clear` service does not register
+`/v1/operator/*`; use `clear-operator` for privileged root CLI commands:
 
 ```bash
-docker compose exec clear clear-root info
-docker compose exec clear clear-root wallet balance
+docker compose exec clear-operator clear-root info
+docker compose exec clear-operator clear-root wallet balance
+```
+
+`CLEAR_CURRENCY_ALIAS` and `CLEAR_CURRENCY_UNIT_ALIAS` in `.env` are startup
+defaults for the root CMU's wallet-facing label. Once the CMU/keyset exists in
+Clear's database, changing those `.env` values does not rename the live CMU.
+Use `clear-root cmu label` for an existing Mainstay mint:
+
+```bash
+docker compose exec clear-operator clear-root cmu label cmu-<keyset-id-or-unit> \
+  --name "Local Program Credits" \
+  --unit-alias "credits"
 ```
 
 For an operator distribution to a Safebox registered in this same Mainstay,

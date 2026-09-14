@@ -66,19 +66,25 @@ this command's contract.
 ## Command Translation
 
 After eligibility succeeds, Mainstay resolves the recipient to its hex public
-key and executes the equivalent of:
+key and calls Clear's internal operator API, normally at
+`http://clear-operator:3340/v1/operator/root/send`, with the equivalent of:
 
 ```bash
-docker compose exec -T clear clear-root send 20 <recipient-pubkey> \
-  --allow-internal-mint-delivery \
-  --relay ws://spurline:8080 \
-  --memo "hello"
+{
+  "amount": 20,
+  "address": "<recipient-pubkey>",
+  "memo": "hello",
+  "relays": ["ws://spurline:8080"],
+  "allow_internal_mint_delivery": true
+}
 ```
 
-Using the public key prevents `clear-root` from performing external NIP-05
-resolution. The internal relay comes from the Mainstay registry rather than
-user input. Operators can select a Compose or environment file, but cannot use
-this wrapper to substitute a different relay or bypass local recipient checks.
+Using the public key prevents external NIP-05 resolution during delivery. The
+internal relay comes from the Mainstay registry rather than user input.
+Operators can select a Compose or environment file, but cannot use this wrapper
+to substitute a different relay or bypass local recipient checks. If an older
+Clear image lacks the operator send endpoint, the wrapper can still fall back
+to invoking `clear-root` in the managed Clear container.
 
 ## Output and Failure Handling
 

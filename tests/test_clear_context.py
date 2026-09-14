@@ -182,7 +182,13 @@ class LocalClearContextTests(unittest.TestCase):
             },
         }
         with (
-            patch.dict("os.environ", {"CLEAR_OPERATOR_TOKEN": "operator-token"}),
+            patch.dict(
+                "os.environ",
+                {
+                    "CLEAR_OPERATOR_TOKEN": "operator-token",
+                    "CLEAR_OPERATOR_API_URL": "http://clear-operator:3340",
+                },
+            ),
             patch(
                 "app.clear_context.resolve_local_clear_recipient",
                 return_value=LocalClearRecipient("alice", PUBKEY),
@@ -206,7 +212,7 @@ class LocalClearContextTests(unittest.TestCase):
         request = urlopen.call_args.args[0]
         self.assertEqual(
             request.full_url,
-            "http://clear:3339/v1/operator/root/send",
+            "http://clear-operator:3340/v1/operator/root/send",
         )
         self.assertEqual(request.headers["Authorization"], "Bearer operator-token")
         self.assertEqual(json.loads(request.data), {
