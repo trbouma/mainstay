@@ -30,8 +30,8 @@ class FakeResponse:
     def __exit__(self, *args: object) -> None:
         return None
 
-    def read(self, size: int) -> bytes:
-        return self.body[:size]
+    def read(self, size: int = -1) -> bytes:
+        return self.body if size < 0 else self.body[:size]
 
 
 def directory_payload() -> dict[str, object]:
@@ -162,6 +162,62 @@ class LocalClearContextTests(unittest.TestCase):
         )
         self.assertEqual(receipt["amount"], 20)
         self.assertEqual(receipt["recipient"]["handle"], "alice")
+        self.assertNotIn("cashu-secret", json.dumps(receipt))
+        self.assertNotIn("proof-secret", json.dumps(receipt))
+
+    def test_send_prefers_clear_operator_api_when_token_is_available(self) -> None:
+        root_result = {
+            "amount": 20,
+            "unit": "cmu-test",
+            "mint": "http://clear:3339",
+            "token": "cashu-secret",
+            "proofs": [{"secret": "proof-secret"}],
+            "delivery": {"recipient_npub": "npub1alice"},
+            "publish": {
+                "status": "OK",
+                "event_id": "event-id",
+                "relays": ["ws://spurline:8080"],
+                "verified_relays": ["ws://spurline:8080"],
+                "verified": True,
+            },
+        }
+        with (
+            patch.dict("os.environ", {"CLEAR_OPERATOR_TOKEN": "operator-token"}),
+            patch(
+                "app.clear_context.resolve_local_clear_recipient",
+                return_value=LocalClearRecipient("alice", PUBKEY),
+            ),
+            patch(
+                "app.clear_context.urlopen",
+                return_value=FakeResponse(root_result),
+            ) as urlopen,
+            patch("app.clear_context.subprocess.run") as run,
+        ):
+            receipt = send_local_clear(
+                BundleConfig.default(),
+                amount=20,
+                handle="alice",
+                memo="hello",
+                compose_path=Path("docker-compose.yaml"),
+                env_path=Path(".env"),
+                timeout=2,
+            )
+
+        request = urlopen.call_args.args[0]
+        self.assertEqual(
+            request.full_url,
+            "http://clear:3339/v1/operator/root/send",
+        )
+        self.assertEqual(request.headers["Authorization"], "Bearer operator-token")
+        self.assertEqual(json.loads(request.data), {
+            "amount": 20,
+            "address": PUBKEY,
+            "memo": "hello",
+            "relays": ["ws://spurline:8080"],
+            "allow_internal_mint_delivery": True,
+        })
+        run.assert_not_called()
+        self.assertEqual(receipt["amount"], 20)
         self.assertNotIn("cashu-secret", json.dumps(receipt))
         self.assertNotIn("proof-secret", json.dumps(receipt))
 

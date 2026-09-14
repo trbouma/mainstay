@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 from dataclasses import dataclass
@@ -43,38 +44,7 @@ def resolve_local_clear_recipient(
     safebox = bundle.require_service("safebox_web")
     if not safebox.enabled:
         raise LocalClearError("the Mainstay Safebox service is disabled")
-    base_url = safebox.require_url("local", purpose="web").rstrip("/")
-    target = (
-        f"{base_url}/.well-known/nostr.json?{urlencode({'name': normalized_handle})}"
-    )
-    request = Request(
-        target,
-        headers={
-            "Accept": "application/json",
-            "User-Agent": "mainstay-local",
-        },
-    )
-    try:
-        with urlopen(request, timeout=timeout) as response:
-            if not 200 <= response.status < 300:
-                raise LocalClearError(
-                    f"local Safebox directory returned HTTP {response.status}"
-                )
-            body = response.read(MAX_DIRECTORY_BYTES + 1)
-    except HTTPError as exc:
-        if exc.code == 404:
-            raise LocalClearError(
-                f"handle {normalized_handle!r} is not registered in this Mainstay"
-            ) from exc
-        raise LocalClearError(
-            f"local Safebox directory returned HTTP {exc.code}"
-        ) from exc
-    except URLError as exc:
-        raise LocalClearError(
-            f"local Safebox directory is unavailable: {exc.reason}"
-        ) from exc
-    except TimeoutError as exc:
-        raise LocalClearError("local Safebox directory timed out") from exc
+    body = _read_safebox_directory(safebox, normalized_handle, timeout=timeout)
 
     if len(body) > MAX_DIRECTORY_BYTES:
         raise LocalClearError("local Safebox directory response is too large")
@@ -99,6 +69,48 @@ def resolve_local_clear_recipient(
             f"local handle {normalized_handle!r} does not advertise Clear support"
         )
     return LocalClearRecipient(normalized_handle, pubkey.lower())
+
+
+def _read_safebox_directory(safebox, handle: str, *, timeout: float) -> bytes:
+    errors: list[str] = []
+    seen: set[str] = set()
+    for scope in ("local", "internal"):
+        try:
+            base_url = safebox.require_url(scope, purpose="web").rstrip("/")
+        except ValueError:
+            continue
+        if base_url in seen:
+            continue
+        seen.add(base_url)
+        target = f"{base_url}/.well-known/nostr.json?{urlencode({'name': handle})}"
+        request = Request(
+            target,
+            headers={
+                "Accept": "application/json",
+                "User-Agent": "mainstay-local",
+            },
+        )
+        try:
+            with urlopen(request, timeout=timeout) as response:
+                if not 200 <= response.status < 300:
+                    raise LocalClearError(
+                        f"local Safebox directory returned HTTP {response.status}"
+                    )
+                return response.read(MAX_DIRECTORY_BYTES + 1)
+        except HTTPError as exc:
+            if exc.code == 404:
+                raise LocalClearError(
+                    f"handle {handle!r} is not registered in this Mainstay"
+                ) from exc
+            raise LocalClearError(
+                f"local Safebox directory returned HTTP {exc.code}"
+            ) from exc
+        except URLError as exc:
+            errors.append(f"{base_url}: {exc.reason}")
+        except TimeoutError:
+            errors.append(f"{base_url}: timed out")
+    detail = "; ".join(errors) if errors else "no Safebox web endpoint configured"
+    raise LocalClearError(f"local Safebox directory is unavailable: {detail}")
 
 
 def _supports_clear_transfer(descriptor: Any) -> bool:
@@ -143,6 +155,99 @@ def send_local_clear(
     clear.require_url("internal", purpose="mint")
     relay = spurline.require_url("internal", purpose="relay")
 
+    operator_token = os.getenv("CLEAR_OPERATOR_TOKEN")
+    if operator_token:
+        try:
+            result = _send_via_clear_operator_api(
+                clear.require_url("internal", purpose="mint"),
+                operator_token=operator_token,
+                amount=amount,
+                recipient_pubkey=recipient.pubkey,
+                memo=memo,
+                relay=relay,
+                timeout=timeout,
+            )
+            return _redacted_receipt(result, recipient)
+        except LocalClearError as exc:
+            if "404" not in str(exc):
+                raise
+
+    result = _send_via_docker_compose(
+        amount=amount,
+        recipient_pubkey=recipient.pubkey,
+        memo=memo,
+        compose_path=compose_path,
+        env_path=env_path,
+        relay=relay,
+    )
+    return _redacted_receipt(result, recipient)
+
+
+def _send_via_clear_operator_api(
+    clear_url: str,
+    *,
+    operator_token: str,
+    amount: int,
+    recipient_pubkey: str,
+    memo: str | None,
+    relay: str,
+    timeout: float,
+) -> dict[str, Any]:
+    request = Request(
+        f"{clear_url.rstrip('/')}/v1/operator/root/send",
+        data=json.dumps(
+            {
+                "amount": amount,
+                "address": recipient_pubkey,
+                "memo": memo,
+                "relays": [relay],
+                "allow_internal_mint_delivery": True,
+            }
+        ).encode(),
+        headers={
+            "Accept": "application/json",
+            "Authorization": f"Bearer {operator_token}",
+            "Content-Type": "application/json",
+            "User-Agent": "mainstay-local",
+        },
+        method="POST",
+    )
+    try:
+        with urlopen(request, timeout=max(10, timeout)) as response:
+            body = response.read()
+    except HTTPError as exc:
+        detail = exc.read().decode(errors="replace")
+        raise LocalClearError(
+            f"Clear root send API returned HTTP {exc.code}: {detail}"
+        ) from exc
+    except URLError as exc:
+        raise LocalClearError(
+            f"Clear root send API is unavailable: {exc.reason}"
+        ) from exc
+    try:
+        result = json.loads(body)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise LocalClearError(
+            "Clear root send API reported success but returned unreadable JSON; "
+            "do not retry without reconciling the root wallet"
+        ) from exc
+    if not isinstance(result, dict):
+        raise LocalClearError(
+            "Clear root send API reported success without a structured receipt; "
+            "do not retry without reconciling the root wallet"
+        )
+    return result
+
+
+def _send_via_docker_compose(
+    *,
+    amount: int,
+    recipient_pubkey: str,
+    memo: str | None,
+    compose_path: Path,
+    env_path: Path | None,
+    relay: str,
+) -> dict[str, Any]:
     command = ["docker", "compose"]
     if env_path is not None:
         command.extend(["--env-file", str(env_path)])
@@ -156,7 +261,7 @@ def send_local_clear(
             "clear-root",
             "send",
             str(amount),
-            recipient.pubkey,
+            recipient_pubkey,
             "--allow-internal-mint-delivery",
             "--relay",
             relay,
@@ -190,7 +295,7 @@ def send_local_clear(
             "clear-root reported success without a structured receipt; "
             "do not retry without reconciling the root wallet"
         )
-    return _redacted_receipt(result, recipient)
+    return result
 
 
 def _redacted_receipt(
