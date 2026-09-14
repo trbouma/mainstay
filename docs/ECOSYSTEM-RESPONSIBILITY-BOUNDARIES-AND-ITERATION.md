@@ -66,6 +66,16 @@ Clear defines CMU identity, proof validity, treasury authority, and what it
 means for a Mint Note to be transferable by protocol. It can advertise its
 service identity and supported capabilities. It does not know whether two
 wallets share one Mainstay context or whether a recipient wants the CMU.
+Clear also must keep service operation separate from currency authority: a
+root operator or mint operator can provide infrastructure and enforce protocol
+rules, but the treasurer or issuer remains responsible for issuance policy,
+redemption terms, and any obligation represented by the CMU.
+That separation also preserves a future migration path. A treasurer may later
+want to move a CMU from one mint operator to another by exporting circulation
+and spent-state evidence from the source mint and importing it into a
+destination mint. Mainstay does not implement that ceremony in the first
+release, but it should avoid designs that make mint operation, treasurer
+authority, and CMU circulation state inseparable.
 
 ### Mainstay supplies local context
 

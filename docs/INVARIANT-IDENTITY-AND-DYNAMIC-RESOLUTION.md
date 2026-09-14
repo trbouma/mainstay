@@ -57,6 +57,27 @@ an issuance keyset, not its current mint URL. A Grove ciphertext digest
 identifies exact bytes, not the server currently retaining them. A service
 `npub` identifies a service role, not its host, operator, or transport.
 
+Clear follows the same pattern as service identity, but with a different stable
+identifier. For an addressable service, the service `npub` is stable while
+Docker names, public HTTPS endpoints, LAN addresses, VPN routes, and future
+FIPS paths may vary. For a CMU, the complete keyset ID is stable while the mint
+route used to verify, swap, refresh, or retire proofs may vary. In both cases,
+routes are selectable reachability facts; they are not the identity itself.
+
+```text
+service npub
+    -> eligible service route
+
+cmu-<keyset-id>
+    -> eligible mint route serving that keyset
+```
+
+The analogy is intentionally limited. A service `npub` identifies an
+addressable service role that can sign service evidence. A CMU keyset ID
+identifies issuance keys and the Mint Notes denominated by those keys. The
+shared design rule is that moving, adding, or replacing a route must not
+silently create a new identity or merge two identities.
+
 ## Resolution Model
 
 The practical model is:

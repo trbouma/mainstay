@@ -169,6 +169,12 @@ Mainstay operator commissioning a Clear service attests to the service's place
 in that installation; it does not silently endorse every CMU or assume every
 treasury liability.
 
+The root operator authority is therefore a service authority, not a currency
+authority. It may make a mint available and allow a treasurer to establish a
+CMU, but it does not decide the CMU's issuance policy, redemption promise,
+budget, eligibility rules, or trustworthiness. Those remain with the treasurer
+or issuer represented by the treasurer.
+
 ### 5. Service identity and reachability
 
 The Clear service `npub` identifies the mint service independently of its

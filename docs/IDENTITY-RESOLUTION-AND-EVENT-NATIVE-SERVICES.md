@@ -694,7 +694,7 @@ be supported by:
 1. a final event signed by the old service key naming the new key;
 2. an acceptance event signed by the new key;
 3. a current operator, installation, or domain-authority attestation; and
-4. service-specific authorization, such as a Clear currency-root service
+4. service-specific authorization, such as a Clear root-operator service
    record.
 
 Emergency replacement after key loss cannot rely on the old key. It requires
@@ -1007,13 +1007,13 @@ resolution, and the remaining service identities are still future work.
 
 1. **Clear identity cardinality:** settle the relationship among a Clear
    process, currency domain, mint-service identity, and multiple keysets.
-2. **Clear service record:** specify canonical serialization, root authority,
-   rotation, expiry, and endpoint disclosure without assigning a public event
-   kind yet.
+2. **Clear service record:** specify canonical serialization, root-operator
+   authority, rotation, expiry, and endpoint disclosure without assigning a
+   public event kind yet.
 3. **Managed Clear bootstrap:** generate and verify one uncommissioned local
    mint-service identity without changing current mint or keyset behavior.
 4. **Clear commissioning:** bind keysets and CMUs to the service identity with
-   currency-root-authorized evidence.
+   root-operator-authorized evidence.
 5. **Mainstay resolution:** consume the managed local service record and
    resolve its keyset IDs to the verified service identity.
 6. **Local Clear transfer:** prove send, relay delivery, pending receipt, and

@@ -113,7 +113,7 @@ The initial Mainstay deployment contains these distinct identities:
 | Grove | Storage service `npub` | Signs descriptors and service evidence |
 | Safebox Web | Application service `npub` | Distinct from every hosted Acorn |
 | Safebox service Acorn | Provider Acorn `npub` | Existing payment-provider identity |
-| Clear | Mint-service `npub` | Distinct from keyset IDs and currency authority |
+| Clear | Mint-service `npub` | Distinct from keyset IDs and root-operator authority |
 | Operator | Operator `npub` | Commissions services; private key remains separate |
 
 Mainstay uses one installation identity for both the installation authority
@@ -126,8 +126,8 @@ attest this installation identity without replacing it.
 
 The Safebox Web identity must not replace a user's Acorn identity or the
 service Acorn. The Clear identity must not replace the complete Cashu keyset
-ID, CMU, root authority, or treasurer identities. Those objects have separate
-authority and rotation rules.
+ID, CMU, root-operator authority, or treasurer identities. Those objects have
+separate authority and rotation rules.
 
 One process may host several logical services only if sharing one service key
 matches their custody, authorization, and rotation boundary. A future Clear

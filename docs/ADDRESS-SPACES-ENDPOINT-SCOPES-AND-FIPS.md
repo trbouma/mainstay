@@ -373,7 +373,7 @@ For Clear, endpoint verification should include:
 1. connect to a candidate route;
 2. request the expected keyset;
 3. confirm that its complete keyset ID matches the CMU being routed;
-4. verify any issuer or root-authority policy required by Clear;
+4. verify any issuer or root-operator authority policy required by Clear;
 5. use multiple routes for one keyset only when they share authoritative
    issuance and spent-note state or form an explicitly coordinated cluster.
 

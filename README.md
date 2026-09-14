@@ -400,9 +400,17 @@ docker compose logs service-acorn-worker
 Mainstay starts Clear in root-bootstrap mode but does not commission it, issue
 Mint Notes, or enable treasury activity. The formal Clear commissioning state
 machine is not implemented yet. Before issuing anything beyond disposable test
-value, choose the canonical `CLEAR_MINT_URL` and optional root authority, then
-preserve the database, `CLEAR_MASTER_SECRET`, and root-authority relationship
-together. Do not change those values to reconnect an existing database.
+value, choose the canonical `CLEAR_MINT_URL` and optional root operator
+authority, then preserve the database, `CLEAR_MASTER_SECRET`, and that
+root-operator authority relationship together. Do not change those values to
+reconnect an existing database.
+
+The root CMU is available so the operator can test this Mainstay-managed mint
+before formal treasurer workflows are comfortable. It can circulate like any
+other CMU, but its main purpose is to prove that issuance, local delivery,
+wallet display, proof refresh, retirement, labels, backups, and recovery are
+working. Treasurer-managed CMUs remain the preferred place for ordinary program
+or community issuance policy.
 
 Mainstay runs Clear's public mint surface and privileged operator surface on
 separate internal services. The public `clear` service does not register
