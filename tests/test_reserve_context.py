@@ -239,3 +239,35 @@ def test_mainstay_cli_reports_reserve_balance(capsys) -> None:
         compose_path=Path("venue.yaml"),
         env_path=Path("venue.env"),
     )
+
+
+def test_mainstay_cli_funds_reserve(capsys) -> None:
+    with patch(
+        "app.cli.fund_service_acorn_reserve",
+        return_value={"status": "CONFIRMED", "amount": 21, "balance": 33},
+    ) as fund:
+        result = main(
+            [
+                "reserve",
+                "fund",
+                "21",
+                "--mint",
+                "https://mint.example.com",
+                "--compose-file",
+                "venue.yaml",
+                "--env-file",
+                "venue.env",
+            ]
+        )
+
+    assert result == 0
+    assert capsys.readouterr().out == (
+        "Service Acorn reserve funding confirmed: "
+        "21 sats deposited; balance=33 sats\n"
+    )
+    fund.assert_called_once_with(
+        amount=21,
+        mint="https://mint.example.com",
+        compose_path=Path("venue.yaml"),
+        env_path=Path("venue.env"),
+    )
