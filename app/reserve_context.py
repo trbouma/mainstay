@@ -9,6 +9,8 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+import qrcode
+
 
 class ReserveContextError(RuntimeError):
     """Raised when Mainstay cannot inspect its service Acorn reserve."""
@@ -218,6 +220,7 @@ def _poll_service_acorn_reserve_funding_api(
             print(f"Service Acorn funding amount: {result.get('amount')} sats")
             print(f"Mint: {result.get('mint')}")
             print(f"Invoice:\n{invoice}\n")
+            _print_invoice_qr(invoice)
             print("Waiting for payment confirmation. Keep this command running...")
             invoice_shown = True
         if status == "CONFIRMED":
@@ -230,6 +233,14 @@ def _poll_service_acorn_reserve_funding_api(
                 "timed out waiting for service Acorn funding confirmation"
             )
         time.sleep(max(0.2, poll_interval_seconds))
+
+
+def _print_invoice_qr(invoice: str) -> None:
+    qr = qrcode.QRCode()
+    qr.add_data(invoice)
+    qr.make(fit=True)
+    print("QR code:")
+    qr.print_ascii()
 
 
 def _read_service_acorn_reserve_api(

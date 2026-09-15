@@ -16,6 +16,7 @@ mainstay-local = "app.cli:main"
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
 stroma-nostr = { git = "https://github.com/trbouma/stroma.git" }
+qrcode = "^8.2"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = ">=1.6.0,<2.0.0"

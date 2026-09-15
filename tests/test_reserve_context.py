@@ -10,7 +10,11 @@ from urllib.error import HTTPError
 import pytest
 
 from app.cli import main
-from app.reserve_context import ReserveContextError, read_service_acorn_reserve
+from app.reserve_context import (
+    ReserveContextError,
+    fund_service_acorn_reserve,
+    read_service_acorn_reserve,
+)
 
 
 class FakeResponse:
@@ -121,6 +125,66 @@ def test_balance_prefers_safebox_management_endpoint() -> None:
     )
     assert request.headers["Authorization"] == "Bearer management-token"
     run.assert_not_called()
+
+
+def test_fund_reserve_prints_invoice_qr(capsys) -> None:
+    calls: list[tuple] = []
+
+    class FakeQr:
+        def add_data(self, invoice):
+            calls.append(("qr-data", invoice))
+
+        def make(self, *, fit):
+            calls.append(("qr-make", fit))
+
+        def print_ascii(self):
+            print("ASCII QR")
+
+    responses = [
+        FakeResponse({"id": "funding-1", "status": "REQUESTED", "amount": 21}),
+        FakeResponse(
+            {
+                "id": "funding-1",
+                "status": "PENDING",
+                "amount": 21,
+                "mint": "https://mint.example.com",
+                "invoice": "lnbc123",
+            }
+        ),
+        FakeResponse(
+            {
+                "id": "funding-1",
+                "status": "CONFIRMED",
+                "amount": 21,
+                "balance": 33,
+            }
+        ),
+    ]
+    with (
+        patch.dict(
+            "os.environ",
+            {
+                "MAINSTAY_SAFEBOX_MANAGEMENT_URL": "http://safebox-web:8000",
+                "SAFEBOX_MANAGEMENT_TOKEN": "management-token",
+            },
+        ),
+        patch("app.reserve_context.urlopen", side_effect=responses),
+        patch("app.reserve_context.qrcode.QRCode", FakeQr),
+        patch("app.reserve_context.time.sleep"),
+    ):
+        result = fund_service_acorn_reserve(
+            amount=21,
+            mint=None,
+            compose_path=Path("docker-compose.yaml"),
+            env_path=Path(".env"),
+        )
+
+    assert result["status"] == "CONFIRMED"
+    assert ("qr-data", "lnbc123") in calls
+    assert ("qr-make", True) in calls
+    output = capsys.readouterr().out
+    assert "Invoice:\nlnbc123" in output
+    assert "QR code:\nASCII QR" in output
 
 
 def test_balance_does_not_start_a_worker_that_was_stopped() -> None:
