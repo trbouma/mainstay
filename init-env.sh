@@ -209,7 +209,8 @@ if [ -n "$master_secret" ] && [ -n "$operator_token" ] && \
     [ -n "$grove_service_nsec" ] && \
     [ -n "$safebox_web_service_nsec" ] && \
     [ -n "$installation_nsec" ] && \
-    [ -n "$cookie_key" ] && [ -n "$invite_code" ] && \
+    [ -n "$cookie_key" ] && [ -n "$management_token" ] && \
+    [ -n "$invite_code" ] && \
     [ "$storage_complete" = true ] && [ "$images_complete" = true ]; then
     ensure_data_directories
     chmod 600 "$env_file"
