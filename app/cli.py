@@ -335,8 +335,16 @@ def _config(config_path: Path, output_path: Path) -> int:
     return 0
 
 
+def _load_bundle_or_default(config_path: Path) -> BundleConfig:
+    if config_path.exists():
+        return BundleConfig.from_json(config_path)
+    return BundleConfig.default(
+        safebox_port=_env_int("MAINSTAY_SAFEBOX_PORT") or 8888
+    )
+
+
 def _status(config_path: Path, *, timeout: float) -> int:
-    bundle = BundleConfig.from_json(config_path)
+    bundle = _load_bundle_or_default(config_path)
     results = check_bundle(bundle, timeout=timeout)
     width = max(len(result.name) for result in results) if results else 0
     failed = False

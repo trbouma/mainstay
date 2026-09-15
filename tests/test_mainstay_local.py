@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from stroma import Keys, fips_ipv6_address
 
-from app.cli import DEFAULT_COMPOSE_PATH, _serve, _up
+from app.cli import DEFAULT_COMPOSE_PATH, _serve, _status, _up
 from app.env import render_safebox_env
 from app.registry import BundleConfig, EndpointAddress, ServiceEndpoint
 from app.server import (
@@ -437,6 +437,16 @@ class MainstayLocalTests(unittest.TestCase):
         self.assertEqual(result, 0)
         command = call.call_args.args[0]
         self.assertNotIn("--profile", command)
+
+    def test_status_uses_default_registry_when_config_file_is_absent(self) -> None:
+        missing_config = Path("missing-mainstay-local.json")
+        with patch("app.cli.check_bundle", return_value=[]) as check:
+            result = _status(missing_config, timeout=2)
+
+        self.assertEqual(result, 0)
+        bundle = check.call_args.args[0]
+        self.assertIsInstance(bundle, BundleConfig)
+        self.assertEqual(check.call_args.kwargs["timeout"], 2)
 
     def test_legacy_registry_urls_migrate_to_scoped_endpoints(self) -> None:
         service = ServiceEndpoint.from_dict(
