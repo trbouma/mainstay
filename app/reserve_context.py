@@ -29,7 +29,14 @@ def read_service_acorn_reserve(
                 management_token=management_token,
             )
         except ReserveContextError as exc:
-            if "HTTP 404" not in str(exc):
+            if "HTTP 404" in str(exc):
+                if _running_in_container():
+                    raise ReserveContextError(
+                        "Safebox reserve endpoint is not available. Rebuild "
+                        "safebox-web with the internal service-Acorn reserve "
+                        "endpoint before using container-native reserve checks."
+                    ) from exc
+            else:
                 raise
     elif _running_in_container():
         missing = []

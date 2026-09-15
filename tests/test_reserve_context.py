@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import io
 import json
 import subprocess
 from pathlib import Path
 from unittest.mock import patch
+from urllib.error import HTTPError
 
 import pytest
 
@@ -182,6 +184,32 @@ def test_balance_requires_management_env_inside_container() -> None:
         patch.dict("os.environ", {}, clear=True),
         patch("app.reserve_context._running_in_container", return_value=True),
         pytest.raises(ReserveContextError, match="MAINSTAY_SAFEBOX_MANAGEMENT_URL"),
+    ):
+        read_service_acorn_reserve(
+            compose_path=Path("compose.yaml"),
+            env_path=Path(".env"),
+        )
+
+
+def test_balance_reports_missing_safebox_endpoint_inside_container() -> None:
+    error = HTTPError(
+        "http://safebox-web:8000/internal/service-acorn/reserve",
+        404,
+        "Not Found",
+        {},
+        io.BytesIO(b'{"detail":"Not found"}'),
+    )
+    with (
+        patch.dict(
+            "os.environ",
+            {
+                "MAINSTAY_SAFEBOX_MANAGEMENT_URL": "http://safebox-web:8000",
+                "SAFEBOX_MANAGEMENT_TOKEN": "management-token",
+            },
+        ),
+        patch("app.reserve_context._running_in_container", return_value=True),
+        patch("app.reserve_context.urlopen", side_effect=error),
+        pytest.raises(ReserveContextError, match="Safebox reserve endpoint"),
     ):
         read_service_acorn_reserve(
             compose_path=Path("compose.yaml"),
