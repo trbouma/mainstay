@@ -31,6 +31,17 @@ def read_service_acorn_reserve(
         except ReserveContextError as exc:
             if "HTTP 404" not in str(exc):
                 raise
+    elif _running_in_container():
+        missing = []
+        if not management_url:
+            missing.append("MAINSTAY_SAFEBOX_MANAGEMENT_URL")
+        if not management_token:
+            missing.append("SAFEBOX_MANAGEMENT_TOKEN")
+        raise ReserveContextError(
+            "container-native reserve check is not configured; missing "
+            f"{', '.join(missing)}. Recreate the mainstay-local container from "
+            "the updated Compose file after running ./init-env.sh."
+        )
 
     prefix = ["docker", "compose"]
     if env_path is not None:
@@ -159,6 +170,10 @@ def _run(command: list[str]) -> subprocess.CompletedProcess[str]:
                 "`poetry run mainstayctl reserve balance`."
             ) from exc
         raise ReserveContextError(f"could not run Docker Compose: {exc}") from exc
+
+
+def _running_in_container() -> bool:
+    return Path("/.dockerenv").exists() or Path("/run/.containerenv").exists()
 
 
 def _failure_detail(

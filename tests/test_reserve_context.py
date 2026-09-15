@@ -164,11 +164,24 @@ def test_balance_failure_still_restarts_running_worker() -> None:
 
 def test_balance_reports_host_side_command_when_docker_is_unavailable() -> None:
     with (
+        patch("app.reserve_context._running_in_container", return_value=False),
         patch(
             "app.reserve_context.subprocess.run",
             side_effect=FileNotFoundError(2, "No such file or directory", "docker"),
         ),
         pytest.raises(ReserveContextError, match="./reserve-balance.sh"),
+    ):
+        read_service_acorn_reserve(
+            compose_path=Path("compose.yaml"),
+            env_path=Path(".env"),
+        )
+
+
+def test_balance_requires_management_env_inside_container() -> None:
+    with (
+        patch.dict("os.environ", {}, clear=True),
+        patch("app.reserve_context._running_in_container", return_value=True),
+        pytest.raises(ReserveContextError, match="MAINSTAY_SAFEBOX_MANAGEMENT_URL"),
     ):
         read_service_acorn_reserve(
             compose_path=Path("compose.yaml"),
