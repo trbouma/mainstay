@@ -11,7 +11,13 @@ from pathlib import Path
 from stroma import KeyError as StromaKeyError
 from stroma import Keys
 
-from .clear_context import LocalClearError, list_registered_handles, send_local_clear
+from .clear_context import (
+    LocalClearError,
+    clear_info,
+    list_clear_cmus,
+    list_registered_handles,
+    send_local_clear,
+)
 from .env import render_safebox_env
 from .registry import BundleConfig
 from .reserve_context import (
@@ -136,6 +142,46 @@ def main(argv: list[str] | None = None) -> int:
     clear_subparsers = clear_parser.add_subparsers(
         dest="clear_command",
         required=True,
+    )
+    clear_info_parser = clear_subparsers.add_parser(
+        "info",
+        help="Show managed Clear mint information.",
+    )
+    clear_info_parser.add_argument(
+        "--config",
+        type=Path,
+        default=None,
+        help="Optional registry JSON for a customized deployment.",
+    )
+    clear_info_parser.add_argument(
+        "--timeout",
+        type=float,
+        default=2.0,
+        help="Internal Clear API timeout in seconds.",
+    )
+    clear_cmu_parser = clear_subparsers.add_parser(
+        "cmu",
+        help="Inspect Clear Mint Units.",
+    )
+    clear_cmu_subparsers = clear_cmu_parser.add_subparsers(
+        dest="clear_cmu_command",
+        required=True,
+    )
+    clear_cmu_list_parser = clear_cmu_subparsers.add_parser(
+        "list",
+        help="List CMUs known to the managed Clear mint.",
+    )
+    clear_cmu_list_parser.add_argument(
+        "--config",
+        type=Path,
+        default=None,
+        help="Optional registry JSON for a customized deployment.",
+    )
+    clear_cmu_list_parser.add_argument(
+        "--timeout",
+        type=float,
+        default=2.0,
+        help="Internal Clear API timeout in seconds.",
     )
     clear_send_parser = clear_subparsers.add_parser(
         "send",
@@ -270,6 +316,20 @@ def main(argv: list[str] | None = None) -> int:
         return _up(args.config, args.compose_file, args.env_file, args.detach)
     if args.command == "serve":
         return _serve(args.config, host=args.host, port=args.port)
+    if args.command == "clear" and args.clear_command == "info":
+        return _clear_info(
+            args.config,
+            timeout=args.timeout,
+        )
+    if (
+        args.command == "clear"
+        and args.clear_command == "cmu"
+        and args.clear_cmu_command == "list"
+    ):
+        return _clear_cmu_list(
+            args.config,
+            timeout=args.timeout,
+        )
     if args.command == "clear" and args.clear_command == "send":
         return _clear_send(
             args.config,
@@ -359,7 +419,7 @@ def _print_reserve_advisory(amount_sats: int) -> None:
 
 
 def _config(config_path: Path, output_path: Path) -> int:
-    bundle = BundleConfig.from_json(config_path)
+    bundle = _load_bundle_or_default(config_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(render_safebox_env(bundle), encoding="utf-8")
     print(f"Wrote {output_path}")
@@ -523,6 +583,44 @@ def _clear_send(
         print(f"mainstayctl clear send failed: {exc}", file=sys.stderr)
         return 1
     print(json.dumps(receipt, indent=2))
+    return 0
+
+
+def _clear_info(
+    config_path: Path | None,
+    *,
+    timeout: float,
+) -> int:
+    try:
+        bundle = (
+            BundleConfig.from_json(config_path)
+            if config_path is not None
+            else BundleConfig.default()
+        )
+        result = clear_info(bundle, timeout=timeout)
+    except (LocalClearError, ValueError) as exc:
+        print(f"mainstayctl clear info failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+def _clear_cmu_list(
+    config_path: Path | None,
+    *,
+    timeout: float,
+) -> int:
+    try:
+        bundle = (
+            BundleConfig.from_json(config_path)
+            if config_path is not None
+            else BundleConfig.default()
+        )
+        result = list_clear_cmus(bundle, timeout=timeout)
+    except (LocalClearError, ValueError) as exc:
+        print(f"mainstayctl clear cmu list failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, indent=2))
     return 0
 
 

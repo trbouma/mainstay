@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from stroma import Keys, fips_ipv6_address
 
-from app.cli import DEFAULT_COMPOSE_PATH, _serve, _status, _up
+from app.cli import DEFAULT_COMPOSE_PATH, _config, _serve, _status, _up
 from app.env import render_safebox_env
 from app.registry import BundleConfig, EndpointAddress, ServiceEndpoint
 from app.server import (
@@ -447,6 +448,19 @@ class MainstayLocalTests(unittest.TestCase):
         bundle = check.call_args.args[0]
         self.assertIsInstance(bundle, BundleConfig)
         self.assertEqual(check.call_args.kwargs["timeout"], 2)
+
+    def test_config_uses_default_registry_when_config_file_is_absent(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = Path(tmpdir) / "safebox-web.env"
+
+            result = _config(Path("missing-mainstay-local.json"), output)
+
+            self.assertEqual(result, 0)
+            text = output.read_text(encoding="utf-8")
+            self.assertIn(
+                'SAFEBOX_DEFAULT_BOOTSTRAP_RELAY="ws://spurline:8080"',
+                text,
+            )
 
     def test_legacy_registry_urls_migrate_to_scoped_endpoints(self) -> None:
         service = ServiceEndpoint.from_dict(

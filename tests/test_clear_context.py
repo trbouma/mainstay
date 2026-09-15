@@ -11,6 +11,8 @@ from app.clear_context import (
     LocalClearError,
     LocalClearRecipient,
     RegisteredHandle,
+    clear_info,
+    list_clear_cmus,
     list_registered_handles,
     resolve_local_clear_recipient,
     send_local_clear,
@@ -269,6 +271,78 @@ class LocalClearContextTests(unittest.TestCase):
         self.assertNotIn("cashu-secret", json.dumps(receipt))
         self.assertNotIn("proof-secret", json.dumps(receipt))
 
+    def test_clear_info_reads_public_info_and_operator_summary(self) -> None:
+        calls = []
+
+        def open_response(request, *, timeout):
+            calls.append((request.full_url, request.headers.get("Authorization")))
+            if request.full_url.endswith("/v1/info"):
+                return FakeResponse(
+                    {
+                        "currency": {"unit": "cmu-root"},
+                        "service_identity": {"npub": "npub1clear"},
+                    }
+                )
+            return FakeResponse(
+                {"unit": "cmu-root", "issued": 120, "outstanding": 80}
+            )
+
+        with (
+            patch.dict("os.environ", {"CLEAR_OPERATOR_TOKEN": "operator-token"}),
+            patch("app.clear_context.urlopen", side_effect=open_response),
+        ):
+            result = clear_info(BundleConfig.default(), timeout=2)
+
+        self.assertEqual(result["status"], "OK")
+        self.assertEqual(result["info"]["currency"]["unit"], "cmu-root")
+        self.assertEqual(result["root_summary"]["outstanding"], 80)
+        self.assertEqual(
+            calls,
+            [
+                ("http://clear:3339/v1/info", None),
+                (
+                    "http://clear:3339/v1/operator/summary",
+                    "Bearer operator-token",
+                ),
+            ],
+        )
+
+    def test_clear_cmu_list_marks_instance_owned_cmu(self) -> None:
+        calls = []
+
+        def open_response(request, *, timeout):
+            calls.append((request.full_url, request.headers.get("Authorization")))
+            if request.full_url.endswith("/v1/info"):
+                return FakeResponse({"currency": {"unit": "cmu-root"}})
+            return FakeResponse(
+                {
+                    "cmus": [
+                        {"unit": "cmu-root", "status": "active"},
+                        {"unit": "cmu-treasurer", "status": "active"},
+                    ]
+                }
+            )
+
+        with (
+            patch.dict("os.environ", {"CLEAR_OPERATOR_TOKEN": "operator-token"}),
+            patch("app.clear_context.urlopen", side_effect=open_response),
+        ):
+            result = list_clear_cmus(BundleConfig.default(), timeout=2)
+
+        self.assertEqual(result["instance_cmu"], "cmu-root")
+        self.assertTrue(result["cmus"][0]["instance_owned"])
+        self.assertFalse(result["cmus"][1]["instance_owned"])
+        self.assertEqual(
+            calls,
+            [
+                ("http://clear:3339/v1/info", None),
+                (
+                    "http://clear:3339/v1/operator/cmus",
+                    "Bearer operator-token",
+                ),
+            ],
+        )
+
     def test_unreadable_success_requires_reconciliation(self) -> None:
         with (
             patch(
@@ -321,6 +395,34 @@ class LocalClearContextTests(unittest.TestCase):
         self.assertEqual(send.call_args.kwargs["memo"], "hello")
         self.assertEqual(send.call_args.kwargs["env_path"], Path(".env"))
         output.assert_called_once_with(json.dumps(receipt, indent=2))
+
+    def test_cli_exposes_clear_info(self) -> None:
+        payload = {"status": "OK", "info": {"currency": {"unit": "cmu-root"}}}
+        with (
+            patch("app.cli.clear_info", return_value=payload) as info,
+            patch("builtins.print") as output,
+        ):
+            result = main(["clear", "info", "--timeout", "5"])
+
+        self.assertEqual(result, 0)
+        self.assertEqual(info.call_args.kwargs["timeout"], 5)
+        output.assert_called_once_with(json.dumps(payload, indent=2))
+
+    def test_cli_exposes_clear_cmu_list(self) -> None:
+        payload = {
+            "status": "OK",
+            "instance_cmu": "cmu-root",
+            "cmus": [{"unit": "cmu-root", "instance_owned": True}],
+        }
+        with (
+            patch("app.cli.list_clear_cmus", return_value=payload) as cmus,
+            patch("builtins.print") as output,
+        ):
+            result = main(["clear", "cmu", "list", "--timeout", "5"])
+
+        self.assertEqual(result, 0)
+        self.assertEqual(cmus.call_args.kwargs["timeout"], 5)
+        output.assert_called_once_with(json.dumps(payload, indent=2))
 
     def test_cli_can_load_a_custom_deployment_registry(self) -> None:
         bundle = BundleConfig.default()

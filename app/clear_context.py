@@ -263,6 +263,99 @@ def send_local_clear(
     return _redacted_receipt(result, recipient)
 
 
+def clear_info(
+    bundle: BundleConfig,
+    *,
+    timeout: float,
+) -> dict[str, Any]:
+    if timeout <= 0:
+        raise LocalClearError("timeout must be greater than zero")
+    clear = bundle.require_service("clear")
+    if not clear.enabled:
+        raise LocalClearError("the Mainstay Clear service is disabled")
+    clear_url = clear.require_url("internal", purpose="mint")
+    info = _clear_request_json(
+        clear_url,
+        "GET",
+        "/v1/info",
+        timeout=timeout,
+    )
+    result: dict[str, Any] = {
+        "status": "OK",
+        "mint": clear_url,
+        "info": info,
+    }
+    operator_token = os.getenv("CLEAR_OPERATOR_TOKEN")
+    if operator_token:
+        operator_url = os.getenv("CLEAR_OPERATOR_API_URL") or clear_url
+        try:
+            summary = _clear_request_json(
+                operator_url,
+                "GET",
+                "/v1/operator/summary",
+                token=operator_token,
+                timeout=timeout,
+            )
+            result["root_summary"] = summary
+        except LocalClearError as exc:
+            result["root_summary_error"] = str(exc)
+    return result
+
+
+def list_clear_cmus(
+    bundle: BundleConfig,
+    *,
+    timeout: float,
+) -> dict[str, Any]:
+    if timeout <= 0:
+        raise LocalClearError("timeout must be greater than zero")
+    clear = bundle.require_service("clear")
+    if not clear.enabled:
+        raise LocalClearError("the Mainstay Clear service is disabled")
+    operator_token = os.getenv("CLEAR_OPERATOR_TOKEN")
+    if not operator_token:
+        raise LocalClearError("CLEAR_OPERATOR_TOKEN must be set to list Clear CMUs")
+    clear_url = clear.require_url("internal", purpose="mint")
+    operator_url = os.getenv("CLEAR_OPERATOR_API_URL") or clear_url
+    info = _clear_request_json(clear_url, "GET", "/v1/info", timeout=timeout)
+    root_unit = _root_cmu_unit(info)
+    cmus = _clear_request_json(
+        operator_url,
+        "GET",
+        "/v1/operator/cmus",
+        token=operator_token,
+        timeout=timeout,
+    )
+    items = cmus.get("cmus") if isinstance(cmus, dict) else None
+    if not isinstance(items, list):
+        raise LocalClearError("Clear CMU list endpoint returned an invalid response")
+    annotated = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        unit = str(item.get("unit") or "")
+        annotated.append(
+            {
+                **item,
+                "instance_owned": bool(root_unit and unit == root_unit),
+            }
+        )
+    return {
+        "status": "OK",
+        "mint": clear_url,
+        "instance_cmu": root_unit,
+        "cmus": annotated,
+    }
+
+
+def _root_cmu_unit(info: dict[str, Any]) -> str | None:
+    currency = info.get("currency")
+    if not isinstance(currency, dict):
+        return None
+    unit = currency.get("unit")
+    return unit if isinstance(unit, str) and unit.startswith("cmu-") else None
+
+
 def _send_via_clear_operator_api(
     clear_url: str,
     *,
@@ -273,49 +366,64 @@ def _send_via_clear_operator_api(
     relay: str,
     timeout: float,
 ) -> dict[str, Any]:
+    payload = {
+        "amount": amount,
+        "address": recipient_pubkey,
+        "memo": memo,
+        "relays": [relay],
+        "allow_internal_mint_delivery": True,
+    }
+    return _clear_request_json(
+        clear_url,
+        "POST",
+        "/v1/operator/root/send",
+        payload=payload,
+        token=operator_token,
+        timeout=max(10, timeout),
+        label="Clear root send API",
+    )
+
+
+def _clear_request_json(
+    base_url: str,
+    method: str,
+    path: str,
+    *,
+    payload: dict[str, Any] | None = None,
+    token: str | None = None,
+    timeout: float,
+    label: str = "Clear API",
+) -> dict[str, Any]:
+    headers = {
+        "Accept": "application/json",
+        "User-Agent": "mainstay-local",
+    }
+    data = None
+    if payload is not None:
+        data = json.dumps(payload).encode()
+        headers["Content-Type"] = "application/json"
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     request = Request(
-        f"{clear_url.rstrip('/')}/v1/operator/root/send",
-        data=json.dumps(
-            {
-                "amount": amount,
-                "address": recipient_pubkey,
-                "memo": memo,
-                "relays": [relay],
-                "allow_internal_mint_delivery": True,
-            }
-        ).encode(),
-        headers={
-            "Accept": "application/json",
-            "Authorization": f"Bearer {operator_token}",
-            "Content-Type": "application/json",
-            "User-Agent": "mainstay-local",
-        },
-        method="POST",
+        f"{base_url.rstrip('/')}{path}",
+        data=data,
+        headers=headers,
+        method=method,
     )
     try:
-        with urlopen(request, timeout=max(10, timeout)) as response:
+        with urlopen(request, timeout=timeout) as response:
             body = response.read()
     except HTTPError as exc:
         detail = exc.read().decode(errors="replace")
-        raise LocalClearError(
-            f"Clear root send API returned HTTP {exc.code}: {detail}"
-        ) from exc
+        raise LocalClearError(f"{label} returned HTTP {exc.code}: {detail}") from exc
     except URLError as exc:
-        raise LocalClearError(
-            f"Clear root send API is unavailable: {exc.reason}"
-        ) from exc
+        raise LocalClearError(f"{label} is unavailable: {exc.reason}") from exc
     try:
         result = json.loads(body)
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise LocalClearError(
-            "Clear root send API reported success but returned unreadable JSON; "
-            "do not retry without reconciling the root wallet"
-        ) from exc
+        raise LocalClearError(f"{label} returned unreadable JSON") from exc
     if not isinstance(result, dict):
-        raise LocalClearError(
-            "Clear root send API reported success without a structured receipt; "
-            "do not retry without reconciling the root wallet"
-        )
+        raise LocalClearError(f"{label} returned an invalid response")
     return result
 
 
