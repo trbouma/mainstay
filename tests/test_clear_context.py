@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import subprocess
 import unittest
 from pathlib import Path
@@ -9,6 +10,8 @@ from unittest.mock import patch
 from app.clear_context import (
     LocalClearError,
     LocalClearRecipient,
+    RegisteredHandle,
+    list_registered_handles,
     resolve_local_clear_recipient,
     send_local_clear,
 )
@@ -66,6 +69,45 @@ class LocalClearContextTests(unittest.TestCase):
             "http://127.0.0.1:8888/.well-known/nostr.json?name=alice",
         )
         self.assertEqual(urlopen.call_args.kwargs["timeout"], 3)
+
+    def test_lists_registered_handles_from_safebox_database(self) -> None:
+        path = Path(self._testMethodName).with_suffix(".db")
+        self.addCleanup(lambda: path.unlink(missing_ok=True))
+        with sqlite3.connect(path) as connection:
+            connection.execute(
+                """
+                CREATE TABLE claimed_handle (
+                    id INTEGER PRIMARY KEY,
+                    claimed_handle TEXT NOT NULL,
+                    npub TEXT NOT NULL,
+                    home_relay TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                """
+                INSERT INTO claimed_handle
+                (claimed_handle, npub, home_relay)
+                VALUES (?, ?, ?)
+                """,
+                (
+                    "alice",
+                    "npub14w46h2at4w46h2at4w46h2at4w46h2at4w46h2at4w46h2at4w4scf6zts",
+                    "ws://spurline:8080",
+                ),
+            )
+
+        self.assertEqual(
+            list_registered_handles(database_path=path),
+            [
+                RegisteredHandle(
+                    handle="alice",
+                    pubkey=PUBKEY,
+                    npub="npub14w46h2at4w46h2at4w46h2at4w46h2at4w46h2at4w46h2at4w4scf6zts",
+                    relays=("ws://spurline:8080",),
+                )
+            ],
+        )
 
     def test_rejects_full_nip05_address_without_network_lookup(self) -> None:
         with (
@@ -300,6 +342,42 @@ class LocalClearContextTests(unittest.TestCase):
 
         self.assertEqual(result, 0)
         load.assert_called_once_with(Path("venue.json"))
+
+    def test_cli_lists_registered_handles(self) -> None:
+        handles = [
+            RegisteredHandle(
+                handle="alice",
+                pubkey=PUBKEY,
+                npub="npub1alice",
+                relays=("ws://spurline:8080",),
+            )
+        ]
+        with (
+            patch(
+                "app.cli.list_registered_handles",
+                return_value=handles,
+            ) as list_handles,
+            patch("builtins.print") as output,
+        ):
+            result = main(["handles", "--database", "/tmp/safebox.db", "--json"])
+
+        self.assertEqual(result, 0)
+        list_handles.assert_called_once_with(database_path=Path("/tmp/safebox.db"))
+        output.assert_called_once_with(
+            json.dumps(
+                {
+                    "handles": [
+                        {
+                            "handle": "alice",
+                            "npub": "npub1alice",
+                            "pubkey": PUBKEY,
+                            "home_relays": ["ws://spurline:8080"],
+                        }
+                    ]
+                },
+                indent=2,
+            )
+        )
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ services:
     init: true
     user: "${MAINSTAY_DATA_RUNTIME_USER:-mainstay}"
     command:
-      - mainstay-local
+      - mainstayctl
       - serve
       - --config
       - /app/data/mainstay-local.json
@@ -27,6 +27,7 @@ services:
       MAINSTAY_INSTALLATION_NSEC: "${MAINSTAY_INSTALLATION_NSEC:?Run ./init-env.sh to generate MAINSTAY_INSTALLATION_NSEC}"
       CLEAR_OPERATOR_TOKEN: "${CLEAR_OPERATOR_TOKEN:?Set CLEAR_OPERATOR_TOKEN in .env}"
       CLEAR_OPERATOR_API_URL: "${CLEAR_OPERATOR_API_URL:-http://clear-operator:3340}"
+      MAINSTAY_SAFEBOX_DATABASE_PATH: /app/safebox-data/database.db
     ports:
       - "${MAINSTAY_LOCAL_BIND_ADDRESS:-0.0.0.0}:${MAINSTAY_LOCAL_PORT:-8788}:8788"
     read_only: true
@@ -34,6 +35,7 @@ services:
       - /tmp:rw,noexec,nosuid,size=16m
     volumes:
       - "${MAINSTAY_LOCAL_DATA_SOURCE:-mainstay-local-data}:/app/data"
+      - "${MAINSTAY_SAFEBOX_DATA_SOURCE:-safebox-web-data}:/app/safebox-data:ro"
     security_opt:
       - no-new-privileges:true
     stop_grace_period: 30s

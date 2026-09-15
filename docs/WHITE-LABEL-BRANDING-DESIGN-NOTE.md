@@ -117,14 +117,14 @@ choices.
 Mainstay should provide one administrative surface for both levels:
 
 ```text
-mainstay-local brand list
-mainstay-local brand validate <profile-directory>
-mainstay-local brand assign <profile-id> --instance <instance>
-mainstay-local brand override <override-directory> --instance <instance>
-mainstay-local brand preview --instance <instance>
-mainstay-local brand diff --instance <instance>
-mainstay-local brand activate --instance <instance>
-mainstay-local brand rollback --instance <instance>
+mainstayctl brand list
+mainstayctl brand validate <profile-directory>
+mainstayctl brand assign <profile-id> --instance <instance>
+mainstayctl brand override <override-directory> --instance <instance>
+mainstayctl brand preview --instance <instance>
+mainstayctl brand diff --instance <instance>
+mainstayctl brand activate --instance <instance>
+mainstayctl brand rollback --instance <instance>
 ```
 
 The same operations can later be exposed through the authenticated Mainstay
@@ -571,7 +571,7 @@ avoiding a premature dependency on DNS, HTTPS or a central theme registry.
 
 - Define a typed schema and JSON Schema fixture in Mainstay.
 - Define the base-profile, instance-override and effective-profile contracts.
-- Add `mainstay-local brand validate`, `preview` and `diff` commands.
+- Add `mainstayctl brand validate`, `preview` and `diff` commands.
 - Add native and generic venue example profiles with test assets.
 - Define field-level override policy and deterministic profile resolution.
 - Define atomic installation, digesting, rollback and recovery behavior.

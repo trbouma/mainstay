@@ -20,6 +20,13 @@ therefore one contributor to availability, not proof of availability by itself.
 Internal, local, and external are scopes. HTTP, WebSocket, IPv4, IPv6, DNS, and
 FIPS are transports or locator forms. These dimensions must remain separate.
 
+This is different from the classic web habit of letting a DNS-backed URL carry
+identity, authority, and reachability at once. Mainstay treats `npub`s, Clear
+keyset IDs, and content hashes as context-free identifiers. URLs, DNS names,
+container names, LAN addresses, and FIPS locators are context supplied around
+those identifiers so a caller can reach the right service from its current
+environment.
+
 Clear translates those technical endpoint scopes into three wallet-facing
 availability states: `internal` becomes **Instance**, `local` becomes **Local**,
 and an eligible `external` route becomes **Across networks**. Wallets show
@@ -42,6 +49,12 @@ may all change over its lifetime.
 For Clear, the complete keyset ID is the stable identity of a CMU. A mint URL
 carried in a token is a routing hint. Mainstay may associate several verified
 routes with a keyset without treating any one route as the keyset's identity.
+
+This separation is what lets new address spaces be added without changing the
+meaning of existing identities. A CMU does not become a different CMU when it
+is reachable through FIPS instead of HTTPS. A service `npub` does not become a
+different service when it moves from Docker DNS to a jail address, LAN route,
+or FIPS-native locator. Only the context and route selection change.
 
 The same separation applies elsewhere:
 

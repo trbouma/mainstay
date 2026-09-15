@@ -10,6 +10,7 @@ repository = "https://github.com/trbouma/mainstay"
 packages = [{ include = "app" }]
 
 [tool.poetry.scripts]
+mainstayctl = "app.cli:main"
 mainstay-local = "app.cli:main"
 
 [tool.poetry.dependencies]

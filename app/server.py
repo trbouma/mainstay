@@ -691,7 +691,7 @@ def serve(
 ) -> None:
     handler = _handler_for(bundle, installation_npub=installation_npub)
     server = ThreadingHTTPServer((host, port), handler)
-    print(f"mainstay-local listening on http://{host}:{port}")
+    print(f"mainstayctl listening on http://{host}:{port}")
     server.serve_forever()
 
 

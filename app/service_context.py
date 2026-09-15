@@ -119,7 +119,7 @@ def commission_service(
     ):
         raise ServiceCommissioningError(
             "Clear did not confirm a commissioned service identity; "
-            "do not retry without checking `mainstay-local service show clear`"
+            "do not retry without checking `mainstayctl service show clear`"
         )
     try:
         reported_service_hex = Keys(

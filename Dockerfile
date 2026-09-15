@@ -44,4 +44,4 @@ VOLUME ["/app/data"]
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD ["python", "-c", "import json, urllib.request; response = json.load(urllib.request.urlopen('http://127.0.0.1:8788/health', timeout=3)); assert response.get('status') == 'ok'"]
 
-CMD ["mainstay-local", "serve", "--config", "/app/data/mainstay-local.json", "--host", "0.0.0.0", "--port", "8788"]
+CMD ["mainstayctl", "serve", "--config", "/app/data/mainstay-local.json", "--host", "0.0.0.0", "--port", "8788"]

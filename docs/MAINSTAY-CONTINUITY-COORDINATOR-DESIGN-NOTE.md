@@ -283,10 +283,10 @@ resource details:
 Likely CLI operations include:
 
 ```text
-mainstay-local continuity status
-mainstay-local continuity sync
-mainstay-local continuity verify
-mainstay-local continuity restore --from <service-npub>
+mainstayctl continuity status
+mainstayctl continuity sync
+mainstayctl continuity verify
+mainstayctl continuity restore --from <service-npub>
 ```
 
 The exact commands should follow implementation experiments rather than being

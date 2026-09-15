@@ -2,7 +2,7 @@
 
 ## Status
 
-The first host-side wrapper is implemented by `mainstay-local clear send`. It
+The first host-side wrapper is implemented by `mainstayctl clear send`. It
 automates a privileged local distribution from the managed Clear root wallet
 only after resolving the recipient through the co-resident Safebox directory.
 
@@ -23,7 +23,7 @@ uses that context to make a common local operation concise without weakening
 the standalone Clear safety policy.
 
 ```bash
-poetry run mainstay-local clear send 20 awaycastle559 --memo "hello"
+poetry run mainstayctl clear send 20 awaycastle559 --memo "hello"
 ```
 
 Only a bare local handle is accepted. A value containing `@` is rejected so an

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sqlite3
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -25,6 +26,57 @@ class LocalClearError(RuntimeError):
 class LocalClearRecipient:
     handle: str
     pubkey: str
+
+
+@dataclass(frozen=True)
+class RegisteredHandle:
+    handle: str
+    pubkey: str
+    npub: str
+    relays: tuple[str, ...]
+
+
+def list_registered_handles(
+    *,
+    database_path: Path,
+) -> list[RegisteredHandle]:
+    if not database_path.exists():
+        raise LocalClearError(f"Safebox database is unavailable: {database_path}")
+    try:
+        with sqlite3.connect(
+            f"file:{database_path}?mode=ro",
+            uri=True,
+        ) as connection:
+            rows = connection.execute(
+                """
+                SELECT claimed_handle, npub, home_relay
+                FROM claimed_handle
+                ORDER BY claimed_handle
+                """
+            ).fetchall()
+    except sqlite3.Error as exc:
+        raise LocalClearError(f"could not read Safebox handle database: {exc}") from exc
+
+    registered: list[RegisteredHandle] = []
+    for raw_handle, raw_npub, raw_home_relay in rows:
+        handle = str(raw_handle).strip().lower()
+        if not LOCAL_HANDLE_PATTERN.fullmatch(handle):
+            continue
+        npub = str(raw_npub or "").strip()
+        pubkey = _pubkey_from_npub(npub)
+        if not pubkey:
+            continue
+        home_relay = str(raw_home_relay or "").strip()
+        relays = (home_relay,) if home_relay else ()
+        registered.append(
+            RegisteredHandle(
+                handle=handle,
+                pubkey=pubkey,
+                npub=npub,
+                relays=relays,
+            )
+        )
+    return registered
 
 
 def resolve_local_clear_recipient(
@@ -71,7 +123,12 @@ def resolve_local_clear_recipient(
     return LocalClearRecipient(normalized_handle, pubkey.lower())
 
 
-def _read_safebox_directory(safebox, handle: str, *, timeout: float) -> bytes:
+def _read_safebox_directory(
+    safebox,
+    handle: str | None,
+    *,
+    timeout: float,
+) -> bytes:
     errors: list[str] = []
     seen: set[str] = set()
     for scope in ("local", "internal"):
@@ -82,7 +139,9 @@ def _read_safebox_directory(safebox, handle: str, *, timeout: float) -> bytes:
         if base_url in seen:
             continue
         seen.add(base_url)
-        target = f"{base_url}/.well-known/nostr.json?{urlencode({'name': handle})}"
+        target = f"{base_url}/.well-known/nostr.json"
+        if handle is not None:
+            target = f"{target}?{urlencode({'name': handle})}"
         request = Request(
             target,
             headers={
@@ -98,7 +157,7 @@ def _read_safebox_directory(safebox, handle: str, *, timeout: float) -> bytes:
                     )
                 return response.read(MAX_DIRECTORY_BYTES + 1)
         except HTTPError as exc:
-            if exc.code == 404:
+            if exc.code == 404 and handle is not None:
                 raise LocalClearError(
                     f"handle {handle!r} is not registered in this Mainstay"
                 ) from exc
@@ -111,6 +170,24 @@ def _read_safebox_directory(safebox, handle: str, *, timeout: float) -> bytes:
             errors.append(f"{base_url}: timed out")
     detail = "; ".join(errors) if errors else "no Safebox web endpoint configured"
     raise LocalClearError(f"local Safebox directory is unavailable: {detail}")
+
+
+def _npub_from_pubkey(pubkey: str) -> str:
+    try:
+        from stroma import Keys
+
+        return Keys(pub_k=pubkey).public_key_bech32()
+    except Exception:
+        return ""
+
+
+def _pubkey_from_npub(npub: str) -> str:
+    try:
+        from stroma import Keys
+
+        return Keys(pub_k=npub).public_key_hex()
+    except Exception:
+        return ""
 
 
 def _supports_clear_transfer(descriptor: Any) -> bool:

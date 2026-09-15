@@ -45,7 +45,7 @@ The initial `mainstay-local` app can treat Docker Compose as the execution
 engine:
 
 ```text
-mainstay-local up
+mainstayctl up
     -> create Docker network
     -> start clear
     -> start grove
@@ -401,9 +401,9 @@ authorization boundaries.
    both an internal endpoint and a local or external routing hint.
 4. Add missing Safebox Web configuration seams before introducing Mainstay
    runtime code.
-5. Build a minimal `mainstay-local config` command that emits a Safebox Web env
+5. Build a minimal `mainstayctl config` command that emits a Safebox Web env
    file from the endpoint registry.
-6. Build `mainstay-local status` against existing `/health` endpoints.
+6. Build `mainstayctl status` against existing `/health` endpoints.
 7. After Docker smoke tests pass, sketch the FreeBSD jail process graph using
    the same endpoint registry.
 8. Add FIPS endpoint fields to the registry and test the HTTP/WebSocket services

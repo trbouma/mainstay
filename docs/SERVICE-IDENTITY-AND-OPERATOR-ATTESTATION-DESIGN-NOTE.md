@@ -468,9 +468,9 @@ The implemented Clear-first workflow is:
 
 ```bash
 ./init-env.sh
-poetry run mainstay-local service commission clear
-poetry run mainstay-local service show clear
-poetry run mainstay-local service verify clear
+poetry run mainstayctl service commission clear
+poetry run mainstayctl service show clear
+poetry run mainstayctl service verify clear
 ```
 
 `service commission clear` asks Clear to sign a request, verifies it, signs the

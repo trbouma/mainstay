@@ -32,9 +32,9 @@ FreeBSD jails without changing the logical ownership of the data.
 | `.env` | Active deployment configuration and secret material in the deployment directory |
 | `.env.recovery` | Mode-`0600` recovery copy stored at the instance root outside all service mounts |
 
-The current CLI and Compose service remain named `mainstay-local` for
-compatibility. A future `mainstayctl` command may become a clearer operator
-interface, but that rename is not part of the storage model.
+The operator CLI is named `mainstayctl`. The Compose service and several
+storage paths still use `mainstay-local` for compatibility; those names are
+deployment identity, not the administrative command name.
 
 ## Instance Boundary
 

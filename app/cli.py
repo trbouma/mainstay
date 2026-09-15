@@ -11,7 +11,7 @@ from pathlib import Path
 from stroma import KeyError as StromaKeyError
 from stroma import Keys
 
-from .clear_context import LocalClearError, send_local_clear
+from .clear_context import LocalClearError, list_registered_handles, send_local_clear
 from .env import render_safebox_env
 from .registry import BundleConfig
 from .reserve_context import ReserveContextError, read_service_acorn_reserve
@@ -30,11 +30,14 @@ DEFAULT_CONFIG_PATH = Path(
 )
 DEFAULT_ENV_PATH = Path("build/mainstay-local/safebox-web.env")
 DEFAULT_COMPOSE_PATH = Path("docker-compose.yaml")
+DEFAULT_SAFEBOX_DATABASE_PATH = Path(
+    os.getenv("MAINSTAY_SAFEBOX_DATABASE_PATH", "/app/safebox-data/database.db")
+)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="mainstay-local",
+        prog="mainstayctl",
         description="Local-first Mainstay control-plane prototype.",
     )
 
@@ -67,6 +70,22 @@ def main(argv: list[str] | None = None) -> int:
         type=float,
         default=2.0,
         help="HTTP timeout in seconds for each health check.",
+    )
+
+    handles_parser = subparsers.add_parser(
+        "handles",
+        help="List Safebox handles registered in this Mainstay instance.",
+    )
+    handles_parser.add_argument(
+        "--database",
+        type=Path,
+        default=DEFAULT_SAFEBOX_DATABASE_PATH,
+        help="Path to the Safebox SQLite database.",
+    )
+    handles_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit structured JSON instead of a table.",
     )
 
     up_parser = subparsers.add_parser("up", help="Start the local Docker bundle.")
@@ -221,6 +240,8 @@ def main(argv: list[str] | None = None) -> int:
         return _config(args.config, args.output)
     if args.command == "status":
         return _status(args.config, timeout=args.timeout)
+    if args.command == "handles":
+        return _handles(args.database, json_output=args.json)
     if args.command == "up":
         return _up(args.config, args.compose_file, args.env_file, args.detach)
     if args.command == "serve":
@@ -328,6 +349,61 @@ def _status(config_path: Path, *, timeout: float) -> int:
     return 1 if failed else 0
 
 
+def _handles(database_path: Path, *, json_output: bool) -> int:
+    try:
+        handles = list_registered_handles(database_path=database_path)
+    except (LocalClearError, ValueError) as exc:
+        print(f"mainstayctl handles failed: {exc}", file=sys.stderr)
+        return 1
+
+    rows = [
+        {
+            "handle": handle.handle,
+            "npub": handle.npub,
+            "pubkey": handle.pubkey,
+            "home_relays": list(handle.relays),
+        }
+        for handle in handles
+    ]
+    if json_output:
+        print(json.dumps({"handles": rows}, indent=2))
+        return 0
+
+    if not rows:
+        print("No registered handles found.")
+        return 0
+
+    columns = ("handle", "npub", "home_relays")
+    widths = {
+        column: max(
+            len(column),
+            *(len(_display_cell(row[column])) for row in rows),
+        )
+        for column in columns
+    }
+    print(
+        "  ".join(
+            column.replace("_", " ").ljust(widths[column])
+            for column in columns
+        )
+    )
+    print("  ".join("-" * widths[column] for column in columns))
+    for row in rows:
+        print(
+            "  ".join(
+                _display_cell(row[column]).ljust(widths[column])
+                for column in columns
+            )
+        )
+    return 0
+
+
+def _display_cell(value: object) -> str:
+    if isinstance(value, list):
+        return ", ".join(str(item) for item in value)
+    return str(value)
+
+
 def _up(
     config_path: Path,
     compose_path: Path,
@@ -405,7 +481,7 @@ def _clear_send(
             timeout=timeout,
         )
     except (LocalClearError, ValueError) as exc:
-        print(f"mainstay-local clear send failed: {exc}", file=sys.stderr)
+        print(f"mainstayctl clear send failed: {exc}", file=sys.stderr)
         return 1
     print(json.dumps(receipt, indent=2))
     return 0
@@ -418,7 +494,7 @@ def _reserve_balance(*, compose_path: Path, env_path: Path | None) -> int:
             env_path=env_path,
         )
     except ReserveContextError as exc:
-        print(f"mainstay-local reserve balance failed: {exc}", file=sys.stderr)
+        print(f"mainstayctl reserve balance failed: {exc}", file=sys.stderr)
         return 1
     print(f"Service Acorn reserve: {result['balance']} sats")
     return 0
@@ -462,7 +538,7 @@ def _service_command(args: argparse.Namespace) -> int:
             )
     except (ServiceCommissioningError, ValueError) as exc:
         print(
-            f"mainstay-local service {args.service_command} failed: {exc}",
+            f"mainstayctl service {args.service_command} failed: {exc}",
             file=sys.stderr,
         )
         return 1

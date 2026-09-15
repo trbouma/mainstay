@@ -50,7 +50,7 @@ Design notes:
 
 ## Prototype App
 
-The first `mainstay-local` prototype lives in `app/`. Install the local
+The first `mainstayctl` prototype lives in `app/`. Install the local
 development environment with Poetry:
 
 ```bash
@@ -60,9 +60,9 @@ poetry install --with dev,docs
 Then run the CLI from this checkout:
 
 ```bash
-poetry run mainstay-local init
-poetry run mainstay-local config
-poetry run mainstay-local status
+poetry run mainstayctl init
+poetry run mainstayctl config
+poetry run mainstayctl status
 ```
 
 It starts as a thin endpoint registry and lifecycle wrapper. The Mainstay
@@ -82,9 +82,9 @@ the updated Clear image is running:
 
 ```bash
 ./init-env.sh
-poetry run mainstay-local service commission clear
-poetry run mainstay-local service show clear
-poetry run mainstay-local service verify clear
+poetry run mainstayctl service commission clear
+poetry run mainstayctl service show clear
+poetry run mainstayctl service verify clear
 ```
 
 The host-side command signs with `MAINSTAY_INSTALLATION_NSEC`; that key is not
@@ -95,7 +95,7 @@ Spurline. Use `--no-publish` only for an intentionally offline commissioning.
 Run the local control-plane HTTP surface directly:
 
 ```bash
-poetry run mainstay-local serve --host 127.0.0.1 --port 8788
+poetry run mainstayctl serve --host 127.0.0.1 --port 8788
 ```
 
 Then open:
@@ -274,7 +274,7 @@ requiring Poetry on the host:
 The script uses the configured Docker Compose project, briefly stops the
 singleton worker, runs its balance command in a one-off container, and restores
 the worker only when it was running beforehand. From a development checkout
-with Poetry installed, `poetry run mainstay-local reserve balance` remains an
+with Poetry installed, `poetry run mainstayctl reserve balance` remains an
 equivalent convenience command.
 
 Mainstay briefly pauses the singleton service Acorn worker while it loads the
@@ -436,7 +436,7 @@ For an operator distribution to a Safebox registered in this same Mainstay,
 run the context-aware wrapper from the Mainstay checkout on the Docker host:
 
 ```bash
-poetry run mainstay-local clear send 20 awaycastle559 --memo "hello"
+poetry run mainstayctl clear send 20 awaycastle559 --memo "hello"
 ```
 
 The command accepts only a bare local handle. It verifies the handle and Clear
@@ -451,7 +451,7 @@ the trust boundary and failure behavior.
 mint-service `npub`, records that public identity with its database, and shows
 it in `clear-root info` and the Mainstay service report. The identity starts as
 `bootstrapped`; it can operate technically but has no recognized operator
-attestation until `mainstay-local service commission clear` succeeds. The
+attestation until `mainstayctl service commission clear` succeeds. The
 service identity is not the currency root and does not itself authorize a
 keyset-to-service binding. Preserve `.env` with the Clear data source.
 

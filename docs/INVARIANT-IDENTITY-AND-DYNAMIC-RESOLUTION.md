@@ -57,6 +57,12 @@ an issuance keyset, not its current mint URL. A Grove ciphertext digest
 identifies exact bytes, not the server currently retaining them. A service
 `npub` identifies a service role, not its host, operator, or transport.
 
+This makes Mainstay's identity model deliberately different from the common
+URL-centered web model where a DNS name often becomes identity, authority,
+brand, and routing root at the same time. Mainstay keeps `npub`s, keyset IDs,
+and content hashes context-free, then resolves them through the caller's
+current context into usable routes.
+
 Clear follows the same pattern as service identity, but with a different stable
 identifier. For an addressable service, the service `npub` is stable while
 Docker names, public HTTPS endpoints, LAN addresses, VPN routes, and future
@@ -77,6 +83,11 @@ addressable service role that can sign service evidence. A CMU keyset ID
 identifies issuance keys and the Mint Notes denominated by those keys. The
 shared design rule is that moving, adding, or replacing a route must not
 silently create a new identity or merge two identities.
+
+That rule is the foundation for future transports and address spaces. FIPS,
+VPN routes, jail-local addresses, relay-backed descriptors, or other locator
+forms can become additional reachability contexts without redefining what the
+service `npub` or CMU keyset ID means.
 
 ## Resolution Model
 
