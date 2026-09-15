@@ -11,6 +11,22 @@ from app.cli import main
 from app.reserve_context import ReserveContextError, read_service_acorn_reserve
 
 
+class FakeResponse:
+    status = 200
+
+    def __init__(self, payload: dict[str, object]) -> None:
+        self.body = json.dumps(payload).encode()
+
+    def __enter__(self) -> FakeResponse:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        return None
+
+    def read(self) -> bytes:
+        return self.body
+
+
 def completed(
     *,
     returncode: int = 0,
@@ -67,6 +83,44 @@ def test_balance_pauses_and_restarts_a_running_worker() -> None:
     ]
 
 
+def test_balance_prefers_safebox_management_endpoint() -> None:
+    payload = {
+        "status": "OK",
+        "balance": 457,
+        "unit": "sat",
+        "mint": "https://mint.example.com",
+        "npub": "npub1service",
+        "updated_at": 123456,
+    }
+    with (
+        patch.dict(
+            "os.environ",
+            {
+                "MAINSTAY_SAFEBOX_MANAGEMENT_URL": "http://safebox-web:8000",
+                "SAFEBOX_MANAGEMENT_TOKEN": "management-token",
+            },
+        ),
+        patch(
+            "app.reserve_context.urlopen",
+            return_value=FakeResponse(payload),
+        ) as open_url,
+        patch("app.reserve_context.subprocess.run") as run,
+    ):
+        result = read_service_acorn_reserve(
+            compose_path=Path("docker-compose.yaml"),
+            env_path=Path(".env"),
+        )
+
+    assert result["balance"] == 457
+    assert result["worker_restarted"] is False
+    request = open_url.call_args.args[0]
+    assert request.full_url == (
+        "http://safebox-web:8000/internal/service-acorn/reserve"
+    )
+    assert request.headers["Authorization"] == "Bearer management-token"
+    run.assert_not_called()
+
+
 def test_balance_does_not_start_a_worker_that_was_stopped() -> None:
     responses = [
         completed(stdout=""),
@@ -106,6 +160,20 @@ def test_balance_failure_still_restarts_running_worker() -> None:
         "--no-deps",
         "service-acorn-worker",
     ]
+
+
+def test_balance_reports_host_side_command_when_docker_is_unavailable() -> None:
+    with (
+        patch(
+            "app.reserve_context.subprocess.run",
+            side_effect=FileNotFoundError(2, "No such file or directory", "docker"),
+        ),
+        pytest.raises(ReserveContextError, match="./reserve-balance.sh"),
+    ):
+        read_service_acorn_reserve(
+            compose_path=Path("compose.yaml"),
+            env_path=Path(".env"),
+        )
 
 
 def test_mainstay_cli_reports_reserve_balance(capsys) -> None:

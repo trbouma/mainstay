@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 
 class ReserveContextError(RuntimeError):
@@ -16,6 +19,18 @@ def read_service_acorn_reserve(
     env_path: Path | None,
 ) -> dict[str, Any]:
     """Read the reserve while preserving the worker's prior run state."""
+
+    management_url = os.getenv("MAINSTAY_SAFEBOX_MANAGEMENT_URL", "").strip()
+    management_token = os.getenv("SAFEBOX_MANAGEMENT_TOKEN", "").strip()
+    if management_url and management_token:
+        try:
+            return _read_service_acorn_reserve_api(
+                management_url,
+                management_token=management_token,
+            )
+        except ReserveContextError as exc:
+            if "HTTP 404" not in str(exc):
+                raise
 
     prefix = ["docker", "compose"]
     if env_path is not None:
@@ -89,6 +104,45 @@ def read_service_acorn_reserve(
     return result
 
 
+def _read_service_acorn_reserve_api(
+    base_url: str,
+    *,
+    management_token: str,
+) -> dict[str, Any]:
+    request = Request(
+        f"{base_url.rstrip('/')}/internal/service-acorn/reserve",
+        headers={
+            "Accept": "application/json",
+            "Authorization": f"Bearer {management_token}",
+            "User-Agent": "mainstayctl",
+        },
+    )
+    try:
+        with urlopen(request, timeout=5) as response:
+            body = response.read()
+    except HTTPError as exc:
+        detail = exc.read().decode(errors="replace")
+        raise ReserveContextError(
+            f"Safebox reserve endpoint returned HTTP {exc.code}: {detail}"
+        ) from exc
+    except URLError as exc:
+        raise ReserveContextError(
+            f"Safebox reserve endpoint is unavailable: {exc.reason}"
+        ) from exc
+    try:
+        result = json.loads(body)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ReserveContextError(
+            "Safebox reserve endpoint returned unreadable JSON"
+        ) from exc
+    if not isinstance(result, dict) or not isinstance(result.get("balance"), int):
+        raise ReserveContextError(
+            "Safebox reserve endpoint returned an incomplete reserve balance"
+        )
+    result["worker_restarted"] = False
+    return result
+
+
 def _run(command: list[str]) -> subprocess.CompletedProcess[str]:
     try:
         return subprocess.run(
@@ -98,6 +152,12 @@ def _run(command: list[str]) -> subprocess.CompletedProcess[str]:
             check=False,
         )
     except OSError as exc:
+        if exc.filename == "docker":
+            raise ReserveContextError(
+                "Docker is not available in this container. Run the reserve "
+                "check from the deployment host with `./reserve-balance.sh` or "
+                "`poetry run mainstayctl reserve balance`."
+            ) from exc
         raise ReserveContextError(f"could not run Docker Compose: {exc}") from exc
 
 

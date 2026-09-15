@@ -184,6 +184,7 @@ grove_service_nsec=$(read_value GROVE_SERVICE_NSEC)
 safebox_web_service_nsec=$(read_value SAFEBOX_WEB_SERVICE_NSEC)
 installation_nsec=$(read_value MAINSTAY_INSTALLATION_NSEC)
 cookie_key=$(read_value SAFEBOX_COOKIE_KEY)
+management_token=$(read_value SAFEBOX_MANAGEMENT_TOKEN)
 invite_code=$(read_value SAFEBOX_ONBOARD_INVITE_CODE)
 
 storage_complete=true
@@ -293,6 +294,10 @@ if [ -z "$cookie_key" ]; then
     cookie_key=$(openssl rand -base64 32 | tr '+/' '-_')
 fi
 
+if [ -z "$management_token" ]; then
+    management_token=$(openssl rand -hex 32)
+fi
+
 if [ -z "$invite_code" ]; then
     invite_code=$(openssl rand -hex 16)
 fi
@@ -325,6 +330,7 @@ awk \
     -v safebox_web_service_nsec="$safebox_web_service_nsec" \
     -v installation_nsec="$installation_nsec" \
     -v cookie_key="$cookie_key" \
+    -v management_token="$management_token" \
     -v invite_code="$invite_code" '
     BEGIN {
         found_mainstay_local_image = 0
@@ -347,6 +353,7 @@ awk \
         found_safebox_web_service = 0
         found_installation = 0
         found_cookie = 0
+        found_management = 0
         found_invite = 0
     }
     /^MAINSTAY_LOCAL_IMAGE=/ {
@@ -489,6 +496,13 @@ awk \
         }
         next
     }
+    /^SAFEBOX_MANAGEMENT_TOKEN=/ {
+        if (!found_management) {
+            print "SAFEBOX_MANAGEMENT_TOKEN=" management_token
+            found_management = 1
+        }
+        next
+    }
     /^SAFEBOX_ONBOARD_INVITE_CODE=/ {
         if (!found_invite) {
             print "SAFEBOX_ONBOARD_INVITE_CODE=" invite_code
@@ -557,6 +571,9 @@ awk \
         }
         if (!found_cookie) {
             print "SAFEBOX_COOKIE_KEY=" cookie_key
+        }
+        if (!found_management) {
+            print "SAFEBOX_MANAGEMENT_TOKEN=" management_token
         }
         if (!found_invite) {
             print "SAFEBOX_ONBOARD_INVITE_CODE=" invite_code
