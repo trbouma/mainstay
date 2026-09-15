@@ -175,6 +175,13 @@ CMU, but it does not decide the CMU's issuance policy, redemption promise,
 budget, eligibility rules, or trustworthiness. Those remain with the treasurer
 or issuer represented by the treasurer.
 
+The role is close to familiar corporate treasury functions. A treasurer may be
+the officer authorized to issue shares, debt claims, credits, or vouchers, and
+a separate system may handle circulation and recordkeeping. Clear and Mainstay
+can provide that circulation and reachability machinery for CMUs, but they do
+not decide the instrument's legal character or whether the issuer has satisfied
+the governance, disclosure, transfer, or compliance duties attached to it.
+
 ### 5. Service identity and reachability
 
 The Clear service `npub` identifies the mint service independently of its
