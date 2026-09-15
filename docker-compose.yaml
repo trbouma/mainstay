@@ -28,6 +28,7 @@ services:
       CLEAR_OPERATOR_TOKEN: "${CLEAR_OPERATOR_TOKEN:?Set CLEAR_OPERATOR_TOKEN in .env}"
       CLEAR_OPERATOR_API_URL: "${CLEAR_OPERATOR_API_URL:-http://clear-operator:3340}"
       MAINSTAY_SAFEBOX_DATABASE_PATH: /app/safebox-data/database.db
+      MAINSTAY_CLEAR_ROOT_WALLET_PATH: /app/clear-data/clear-root-wallet.json
       MAINSTAY_SAFEBOX_MANAGEMENT_URL: "http://safebox-web:8000"
       SAFEBOX_MANAGEMENT_TOKEN: "${SAFEBOX_MANAGEMENT_TOKEN:?Run ./init-env.sh to generate SAFEBOX_MANAGEMENT_TOKEN}"
     ports:
@@ -38,6 +39,7 @@ services:
     volumes:
       - "${MAINSTAY_LOCAL_DATA_SOURCE:-mainstay-local-data}:/app/data"
       - "${MAINSTAY_SAFEBOX_DATA_SOURCE:-safebox-web-data}:/app/safebox-data:ro"
+      - "${MAINSTAY_CLEAR_DATA_SOURCE:-clear-data}:/app/clear-data:ro"
     security_opt:
       - no-new-privileges:true
     stop_grace_period: 30s

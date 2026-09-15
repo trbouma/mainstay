@@ -348,6 +348,55 @@ def list_clear_cmus(
     }
 
 
+def clear_root_wallet_balance(
+    *,
+    wallet_path: Path,
+) -> dict[str, Any]:
+    try:
+        if wallet_path.exists():
+            wallet = json.loads(wallet_path.read_text(encoding="utf-8"))
+        else:
+            wallet = {"version": 1, "entries": []}
+    except (OSError, json.JSONDecodeError) as exc:
+        raise LocalClearError(f"could not read Clear root wallet: {exc}") from exc
+    if not isinstance(wallet, dict) or wallet.get("version") != 1:
+        raise LocalClearError("Clear root wallet has an unsupported format")
+    entries = wallet.get("entries")
+    if not isinstance(entries, list):
+        raise LocalClearError("Clear root wallet entries are unavailable")
+
+    balances: dict[tuple[str, str], int] = {}
+    safe_entry_count = 0
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        mint = str(entry.get("mint") or "")
+        unit = str(entry.get("unit") or "")
+        proofs = entry.get("proofs")
+        if not mint or not unit or not isinstance(proofs, list):
+            continue
+        safe_entry_count += 1
+        total = 0
+        for proof in proofs:
+            if not isinstance(proof, dict):
+                continue
+            try:
+                total += int(proof.get("amount") or 0)
+            except (TypeError, ValueError):
+                continue
+        key = (mint, unit)
+        balances[key] = balances.get(key, 0) + total
+    return {
+        "status": "OK",
+        "wallet": str(wallet_path),
+        "entries": safe_entry_count,
+        "balances": [
+            {"mint": mint, "unit": unit, "amount": amount}
+            for (mint, unit), amount in sorted(balances.items())
+        ],
+    }
+
+
 def _root_cmu_unit(info: dict[str, Any]) -> str | None:
     currency = info.get("currency")
     if not isinstance(currency, dict):

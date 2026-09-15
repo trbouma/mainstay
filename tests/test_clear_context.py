@@ -12,6 +12,7 @@ from app.clear_context import (
     LocalClearRecipient,
     RegisteredHandle,
     clear_info,
+    clear_root_wallet_balance,
     list_clear_cmus,
     list_registered_handles,
     resolve_local_clear_recipient,
@@ -343,6 +344,42 @@ class LocalClearContextTests(unittest.TestCase):
             ],
         )
 
+    def test_clear_root_wallet_balance_summarizes_without_proofs(self) -> None:
+        wallet_path = Path(self.create_temp_wallet())
+
+        result = clear_root_wallet_balance(wallet_path=wallet_path)
+
+        self.assertEqual(result["entries"], 1)
+        self.assertEqual(
+            result["balances"],
+            [{"mint": "http://clear:3339", "unit": "cmu-root", "amount": 5}],
+        )
+        self.assertNotIn("proof-secret", json.dumps(result))
+
+    def create_temp_wallet(self) -> str:
+        import tempfile
+
+        handle = tempfile.NamedTemporaryFile("w", delete=False)
+        with handle:
+            handle.write(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "entries": [
+                            {
+                                "mint": "http://clear:3339",
+                                "unit": "cmu-root",
+                                "proofs": [
+                                    {"amount": 4, "secret": "proof-secret"},
+                                    {"amount": 1, "secret": "proof-secret"},
+                                ],
+                            }
+                        ],
+                    }
+                )
+            )
+        return handle.name
+
     def test_unreadable_success_requires_reconciliation(self) -> None:
         with (
             patch(
@@ -422,6 +459,33 @@ class LocalClearContextTests(unittest.TestCase):
 
         self.assertEqual(result, 0)
         self.assertEqual(cmus.call_args.kwargs["timeout"], 5)
+        output.assert_called_once_with(json.dumps(payload, indent=2))
+
+    def test_cli_exposes_clear_wallet_balance(self) -> None:
+        payload = {
+            "status": "OK",
+            "entries": 1,
+            "balances": [{"unit": "cmu-root", "amount": 5}],
+        }
+        with (
+            patch("app.cli.clear_root_wallet_balance", return_value=payload) as balance,
+            patch("builtins.print") as output,
+        ):
+            result = main(
+                [
+                    "clear",
+                    "wallet",
+                    "balance",
+                    "--wallet",
+                    "/tmp/clear-root-wallet.json",
+                ]
+            )
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            balance.call_args.kwargs["wallet_path"],
+            Path("/tmp/clear-root-wallet.json"),
+        )
         output.assert_called_once_with(json.dumps(payload, indent=2))
 
     def test_cli_can_load_a_custom_deployment_registry(self) -> None:

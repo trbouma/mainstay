@@ -14,6 +14,7 @@ from stroma import Keys
 from .clear_context import (
     LocalClearError,
     clear_info,
+    clear_root_wallet_balance,
     list_clear_cmus,
     list_registered_handles,
     send_local_clear,
@@ -42,6 +43,12 @@ DEFAULT_ENV_PATH = Path("build/mainstay-local/safebox-web.env")
 DEFAULT_COMPOSE_PATH = Path("docker-compose.yaml")
 DEFAULT_SAFEBOX_DATABASE_PATH = Path(
     os.getenv("MAINSTAY_SAFEBOX_DATABASE_PATH", "/app/safebox-data/database.db")
+)
+DEFAULT_CLEAR_ROOT_WALLET_PATH = Path(
+    os.getenv(
+        "MAINSTAY_CLEAR_ROOT_WALLET_PATH",
+        "/app/clear-data/clear-root-wallet.json",
+    )
 )
 
 
@@ -182,6 +189,24 @@ def main(argv: list[str] | None = None) -> int:
         type=float,
         default=2.0,
         help="Internal Clear API timeout in seconds.",
+    )
+    clear_wallet_parser = clear_subparsers.add_parser(
+        "wallet",
+        help="Inspect the managed Clear root wallet.",
+    )
+    clear_wallet_subparsers = clear_wallet_parser.add_subparsers(
+        dest="clear_wallet_command",
+        required=True,
+    )
+    clear_wallet_balance_parser = clear_wallet_subparsers.add_parser(
+        "balance",
+        help="Show Clear root wallet balances.",
+    )
+    clear_wallet_balance_parser.add_argument(
+        "--wallet",
+        type=Path,
+        default=DEFAULT_CLEAR_ROOT_WALLET_PATH,
+        help="Path to the Clear root wallet JSON file.",
     )
     clear_send_parser = clear_subparsers.add_parser(
         "send",
@@ -330,6 +355,12 @@ def main(argv: list[str] | None = None) -> int:
             args.config,
             timeout=args.timeout,
         )
+    if (
+        args.command == "clear"
+        and args.clear_command == "wallet"
+        and args.clear_wallet_command == "balance"
+    ):
+        return _clear_wallet_balance(args.wallet)
     if args.command == "clear" and args.clear_command == "send":
         return _clear_send(
             args.config,
@@ -619,6 +650,16 @@ def _clear_cmu_list(
         result = list_clear_cmus(bundle, timeout=timeout)
     except (LocalClearError, ValueError) as exc:
         print(f"mainstayctl clear cmu list failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+def _clear_wallet_balance(wallet_path: Path) -> int:
+    try:
+        result = clear_root_wallet_balance(wallet_path=wallet_path)
+    except LocalClearError as exc:
+        print(f"mainstayctl clear wallet balance failed: {exc}", file=sys.stderr)
         return 1
     print(json.dumps(result, indent=2))
     return 0
