@@ -51,6 +51,14 @@ DEFAULT_CLEAR_ROOT_WALLET_PATH = Path(
         "/app/clear-data/clear-root-wallet.json",
     )
 )
+NSEC_IDENTITIES = (
+    ("mainstay_installation", "MAINSTAY_INSTALLATION_NSEC"),
+    ("mainstay_treasurer", "MAINSTAY_TREASURER_NSEC"),
+    ("clear_mint_service", "CLEAR_MINT_SERVICE_NSEC"),
+    ("safebox_web_service", "SAFEBOX_WEB_SERVICE_NSEC"),
+    ("spurline_service", "SPURLINE_SERVICE_NSEC"),
+    ("grove_service", "GROVE_SERVICE_NSEC"),
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -101,6 +109,16 @@ def main(argv: list[str] | None = None) -> int:
         help="Path to the Safebox SQLite database.",
     )
     handles_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit structured JSON instead of a table.",
+    )
+
+    npubs_parser = subparsers.add_parser(
+        "npubs",
+        help="Show npubs derived from configured environment nsecs.",
+    )
+    npubs_parser.add_argument(
         "--json",
         action="store_true",
         help="Emit structured JSON instead of a table.",
@@ -370,6 +388,8 @@ def main(argv: list[str] | None = None) -> int:
         return _status(args.config, timeout=args.timeout)
     if args.command == "handles":
         return _handles(args.database, json_output=args.json)
+    if args.command == "npubs":
+        return _npubs(json_output=args.json)
     if args.command == "up":
         return _up(args.config, args.compose_file, args.env_file, args.detach)
     if args.command == "serve":
@@ -577,6 +597,67 @@ def _display_cell(value: object) -> str:
     if isinstance(value, list):
         return ", ".join(str(item) for item in value)
     return str(value)
+
+
+def _npubs(*, json_output: bool) -> int:
+    rows = []
+    has_invalid = False
+    for name, env_var in NSEC_IDENTITIES:
+        secret = os.getenv(env_var, "").strip()
+        if not secret:
+            rows.append(
+                {
+                    "name": name,
+                    "env": env_var,
+                    "status": "missing",
+                    "npub": "",
+                }
+            )
+            continue
+        try:
+            npub = Keys(priv_k=secret).public_key_bech32()
+        except StromaKeyError:
+            has_invalid = True
+            rows.append(
+                {
+                    "name": name,
+                    "env": env_var,
+                    "status": "invalid",
+                    "npub": "",
+                }
+            )
+            continue
+        rows.append(
+            {
+                "name": name,
+                "env": env_var,
+                "status": "configured",
+                "npub": npub,
+            }
+        )
+
+    if json_output:
+        print(json.dumps({"npubs": rows}, indent=2))
+        return 1 if has_invalid else 0
+
+    columns = ("name", "env", "status", "npub")
+    widths = {
+        column: max(
+            len(column),
+            *(len(_display_cell(row[column])) for row in rows),
+        )
+        for column in columns
+    }
+    print("  ".join(column.ljust(widths[column]) for column in columns))
+    print("  ".join("-" * widths[column] for column in columns))
+    for row in rows:
+        print(
+            "  ".join(
+                _display_cell(row[column]).ljust(widths[column])
+                for column in columns
+            )
+        )
+    return 1 if has_invalid else 0
 
 
 def _up(

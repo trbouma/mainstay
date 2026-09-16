@@ -515,6 +515,54 @@ class LocalClearContextTests(unittest.TestCase):
         self.assertEqual(info.call_args.kwargs["timeout"], 5)
         output.assert_called_once_with(json.dumps(payload, indent=2))
 
+    def test_cli_exposes_configured_npubs_without_secrets(self) -> None:
+        installation_nsec = "1".zfill(64)
+        treasurer_nsec = "2".zfill(64)
+        with (
+            patch.dict(
+                "os.environ",
+                {
+                    "MAINSTAY_INSTALLATION_NSEC": installation_nsec,
+                    "MAINSTAY_TREASURER_NSEC": treasurer_nsec,
+                },
+                clear=True,
+            ),
+            patch("builtins.print") as output,
+        ):
+            result = main(["npubs", "--json"])
+
+        self.assertEqual(result, 0)
+        payload = json.loads(output.call_args.args[0])
+        rows = {row["env"]: row for row in payload["npubs"]}
+        self.assertEqual(
+            rows["MAINSTAY_INSTALLATION_NSEC"]["npub"],
+            Keys(priv_k=installation_nsec).public_key_bech32(),
+        )
+        self.assertEqual(
+            rows["MAINSTAY_TREASURER_NSEC"]["npub"],
+            Keys(priv_k=treasurer_nsec).public_key_bech32(),
+        )
+        self.assertEqual(rows["CLEAR_MINT_SERVICE_NSEC"]["status"], "missing")
+        self.assertNotIn(installation_nsec, output.call_args.args[0])
+        self.assertNotIn(treasurer_nsec, output.call_args.args[0])
+
+    def test_cli_npubs_reports_invalid_configured_nsec(self) -> None:
+        with (
+            patch.dict(
+                "os.environ",
+                {"MAINSTAY_INSTALLATION_NSEC": "not-a-secret"},
+                clear=True,
+            ),
+            patch("builtins.print") as output,
+        ):
+            result = main(["npubs", "--json"])
+
+        self.assertEqual(result, 1)
+        payload = json.loads(output.call_args.args[0])
+        rows = {row["env"]: row for row in payload["npubs"]}
+        self.assertEqual(rows["MAINSTAY_INSTALLATION_NSEC"]["status"], "invalid")
+        self.assertEqual(rows["MAINSTAY_INSTALLATION_NSEC"]["npub"], "")
+
     def test_cli_exposes_clear_cmu_list(self) -> None:
         payload = {
             "status": "OK",
