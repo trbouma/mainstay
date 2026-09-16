@@ -50,6 +50,19 @@ or ask the service Acorn worker to fund an operating reserve.
 The important boundary is that this shared context is local to the deployment.
 It must not be treated as an external protocol or published as public metadata.
 
+`mainstayctl` is therefore designed primarily for the node-local operating
+surface: the shared operator context plus container-to-container communication
+between co-resident services. Core operator workflows should continue to work
+when public DNS, public HTTPS routes, relays, Lightning access, or other
+external network paths are disabled, unavailable, or not yet commissioned.
+
+This is an intentional property of Mainstay. A local operator must be able to
+inspect identities, verify service health, commission services, check local
+handles, inspect Clear CMUs, fund or inspect local reserves, and use internal
+management routes without depending on the public Internet. External protocols
+remain important for interoperability, but they are not the foundation of the
+root operator surface.
+
 ## Why Not Put Everything in One Container?
 
 Each service still owns its own domain:

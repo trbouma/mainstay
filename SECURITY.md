@@ -131,6 +131,8 @@ signed protocol authority rather than local deployment trust.
 ### Internal management paths
 
 - Safebox Web internal management endpoints use `SAFEBOX_MANAGEMENT_TOKEN`.
+- Internal management tokens are opaque random bearer values, not identity
+  keys. They can be rotated without changing service or treasurer `npub`s.
 - Missing management credentials cause internal management endpoints to behave
   as unavailable rather than as public features.
 - `mainstayctl reserve balance` and `mainstayctl reserve fund` use authenticated
@@ -139,6 +141,8 @@ signed protocol authority rather than local deployment trust.
 - Service Acorn reserve funding is queued through a narrow shared request file;
   the worker remains the only process mutating the service Acorn wallet.
 - Reverse proxies should block `/internal/` before any catch-all proxy rule.
+- Token checks are still required as an application-level backstop if an
+  internal path is accidentally exposed.
 
 ### Clear operator surface
 

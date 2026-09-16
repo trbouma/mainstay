@@ -115,6 +115,71 @@ The main safety invariant is:
 > Operator authority stays local or internal. Protocol authority is signed,
 > portable, and independent of the local deployment.
 
+## Offline and Isolated Operation
+
+`mainstayctl` is intentionally designed to operate on the shared root surface
+of one Mainstay node. It may use deployment-local secrets, read-only local
+mounts, and internal container addresses such as `http://clear:3339`,
+`http://clear-operator:3340`, `http://safebox-web:8000`, or
+`ws://spurline:8080`.
+
+That design lets an operator manage the instance even when all external network
+connectivity is disabled. Public DNS, public HTTPS proxies, remote relays,
+Lightning access, and future external address spaces are not required for core
+local administration tasks such as service checks, identity inspection, local
+handle inspection, Clear CMU inspection, reserve checks, commissioning, and
+recovery preparation.
+
+This offline-capable surface is powerful and must stay inside the deployment
+boundary. It is acceptable for `mainstayctl` to use shared root context because
+the caller is already the local operator. It is not acceptable to expose that
+same authority as a public API, a reverse-proxy route, a generic shell bridge,
+or a substitute for signed external protocol authorization.
+
+This is the main justification for separating internal-only paths from public
+protocol paths. Internal paths let a node operator administer a co-resident
+service bundle through trusted local context, including during disconnected or
+not-yet-commissioned operation. Public paths must remain safe for parties that
+do not share the node's root context. Mixing those roles would either weaken
+offline administration or accidentally export local operator authority beyond
+the instance boundary.
+
+Internal-only path names are not the only control. Internal management routes
+must also require a deployment-local operator or management token, such as
+`SAFEBOX_MANAGEMENT_TOKEN` or `CLEAR_OPERATOR_TOKEN`, so an accidental Docker
+port publication or reverse-proxy rule does not by itself grant authority. The
+preferred deployment still blocks `/internal/` and `/v1/operator` paths at the
+proxy, but token enforcement is the application-level backstop when a route is
+misconfigured.
+
+## Tokens Versus Identity Keys
+
+Mainstay deliberately separates local management tokens from Nostr private
+keys.
+
+Management tokens such as `SAFEBOX_MANAGEMENT_TOKEN` and
+`CLEAR_OPERATOR_TOKEN` are opaque random bearer values generated for one
+deployment. They authorize local or internal HTTP management actions. They do
+not derive public identities, sign protocol events, or represent portable
+authority outside the instance. If a token is exposed or an operator wants to
+rotate local access, the token can be replaced in `.env` and the affected
+containers recreated.
+
+Nostr private keys such as `MAINSTAY_INSTALLATION_NSEC`,
+`MAINSTAY_TREASURER_NSEC`, and service `*_NSEC` values are identity and signing
+material. They derive stable `npub`s, sign events, and bind protocol authority
+to a durable role. Rotating one of these keys changes the corresponding public
+identity and may require new commissioning evidence, service registration,
+treasury authorization, public metadata, or recovery records.
+
+The practical rule is:
+
+- use tokens as replaceable local locks for internal operator routes;
+- use `nsec` keys only when durable identity or signed protocol authority is
+  required;
+- never use possession of a local management token as a substitute for a signed
+  external treasury or protocol instruction.
+
 ## Current Applications of the Pattern
 
 ### Service-Acorn Reserve
