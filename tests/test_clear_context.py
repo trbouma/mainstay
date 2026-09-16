@@ -7,10 +7,13 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from stroma import Event, Keys
+
 from app.clear_context import (
     LocalClearError,
     LocalClearRecipient,
     RegisteredHandle,
+    bootstrap_clear_cmu,
     clear_info,
     clear_root_wallet_balance,
     list_clear_cmus,
@@ -344,6 +347,73 @@ class LocalClearContextTests(unittest.TestCase):
             ],
         )
 
+    def test_bootstrap_clear_cmu_adds_grant_and_signs_treasury_request(self) -> None:
+        calls = []
+        treasurer = Keys(priv_k="1".zfill(64))
+
+        def open_response(request, *, timeout):
+            body = json.loads(request.data.decode()) if request.data else None
+            calls.append(
+                (
+                    request.full_url,
+                    request.get_method(),
+                    body,
+                    request.headers.get("Authorization"),
+                )
+            )
+            if request.full_url.endswith("/v1/info"):
+                return FakeResponse({"mint_url": "http://clear:3339"})
+            if request.full_url.endswith("/v1/operator/treasurers"):
+                return FakeResponse({"npub": body["npub"], "status": "active"})
+            if request.full_url.endswith("/v1/operator/treasurer-grants"):
+                return FakeResponse(
+                    {
+                        "id": "grant-id",
+                        "npub": body["npub"],
+                        "scope": "keyset:create",
+                    }
+                )
+            event = Event.load(body["event"], validate=True)
+            self.assertIsNotNone(event)
+            assert event is not None
+            content = json.loads(event.content)
+            self.assertEqual(event.pub_key, treasurer.public_key_hex())
+            self.assertEqual(content["action"], "cmu:create")
+            self.assertEqual(content["grant_id"], "grant-id")
+            self.assertEqual(content["name"], "Crays Credits")
+            self.assertEqual(content["unit_alias"], "credits")
+            return FakeResponse(
+                {
+                    "unit": "cmu-created",
+                    "status": "active",
+                    "friendly_name": content["name"],
+                }
+            )
+
+        with (
+            patch.dict(
+                "os.environ",
+                {
+                    "CLEAR_OPERATOR_TOKEN": "operator-token",
+                    "MAINSTAY_TREASURER_NSEC": "1".zfill(64),
+                },
+            ),
+            patch("app.clear_context.urlopen", side_effect=open_response),
+        ):
+            result = bootstrap_clear_cmu(
+                BundleConfig.default(),
+                name="Crays Credits",
+                unit_alias="credits",
+                timeout=2,
+            )
+
+        self.assertEqual(result["treasurer_npub"], treasurer.public_key_bech32())
+        self.assertEqual(result["grant"]["id"], "grant-id")
+        self.assertEqual(result["cmu"]["unit"], "cmu-created")
+        self.assertEqual(calls[1][3], "Bearer operator-token")
+        self.assertEqual(calls[2][3], "Bearer operator-token")
+        self.assertEqual(calls[3][0], "http://clear:3339/v1/treasury/cmus")
+
     def test_clear_root_wallet_balance_summarizes_without_proofs(self) -> None:
         wallet_path = Path(self.create_temp_wallet())
 
@@ -459,6 +529,39 @@ class LocalClearContextTests(unittest.TestCase):
 
         self.assertEqual(result, 0)
         self.assertEqual(cmus.call_args.kwargs["timeout"], 5)
+        output.assert_called_once_with(json.dumps(payload, indent=2))
+
+    def test_cli_exposes_clear_cmu_bootstrap(self) -> None:
+        payload = {
+            "status": "OK",
+            "treasurer_npub": "npub1treasurer",
+            "cmu": {"unit": "cmu-created"},
+        }
+        with (
+            patch("app.cli.bootstrap_clear_cmu", return_value=payload) as bootstrap,
+            patch("builtins.print") as output,
+        ):
+            result = main(
+                [
+                    "clear",
+                    "cmu",
+                    "bootstrap",
+                    "--name",
+                    "Crays Credits",
+                    "--unit-alias",
+                    "credits",
+                    "--timeout",
+                    "5",
+                    "--lifetime",
+                    "120",
+                ]
+            )
+
+        self.assertEqual(result, 0)
+        self.assertEqual(bootstrap.call_args.kwargs["name"], "Crays Credits")
+        self.assertEqual(bootstrap.call_args.kwargs["unit_alias"], "credits")
+        self.assertEqual(bootstrap.call_args.kwargs["timeout"], 5)
+        self.assertEqual(bootstrap.call_args.kwargs["lifetime_seconds"], 120)
         output.assert_called_once_with(json.dumps(payload, indent=2))
 
     def test_cli_exposes_clear_wallet_balance(self) -> None:

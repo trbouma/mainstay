@@ -75,6 +75,7 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
     assert len(values["GROVE_SERVICE_NSEC"]) == 64
     assert len(values["SAFEBOX_WEB_SERVICE_NSEC"]) == 64
     assert len(values["MAINSTAY_INSTALLATION_NSEC"]) == 64
+    assert len(values["MAINSTAY_TREASURER_NSEC"]) == 64
     assert len(values["SAFEBOX_COOKIE_KEY"]) == 44
     assert values["SAFEBOX_COOKIE_KEY"].endswith("=")
     assert len(values["SAFEBOX_ONBOARD_INVITE_CODE"]) == 32
@@ -91,6 +92,16 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
         values["GROVE_SERVICE_NSEC"],
         values["SAFEBOX_WEB_SERVICE_NSEC"],
         values["MAINSTAY_INSTALLATION_NSEC"],
+        values["MAINSTAY_TREASURER_NSEC"],
+    }
+    assert values["MAINSTAY_TREASURER_NSEC"] not in {
+        values["CLEAR_MASTER_SECRET"],
+        values["CLEAR_OPERATOR_TOKEN"],
+        values["CLEAR_MINT_SERVICE_NSEC"],
+        values["SPURLINE_SERVICE_NSEC"],
+        values["GROVE_SERVICE_NSEC"],
+        values["SAFEBOX_WEB_SERVICE_NSEC"],
+        values["MAINSTAY_INSTALLATION_NSEC"],
     }
     assert stat.S_IMODE(env_file.stat().st_mode) == 0o600
     assert values["CLEAR_MASTER_SECRET"] not in result.stdout
@@ -100,6 +111,7 @@ def test_init_env_creates_private_file_with_independent_secrets(tmp_path: Path) 
     assert values["GROVE_SERVICE_NSEC"] not in result.stdout
     assert values["SAFEBOX_WEB_SERVICE_NSEC"] not in result.stdout
     assert values["MAINSTAY_INSTALLATION_NSEC"] not in result.stdout
+    assert values["MAINSTAY_TREASURER_NSEC"] not in result.stdout
     assert values["SAFEBOX_COOKIE_KEY"] not in result.stdout
     assert values["SAFEBOX_ONBOARD_INVITE_CODE"] not in result.stdout
 
@@ -317,6 +329,7 @@ def test_init_env_fills_missing_secrets_in_existing_file(tmp_path: Path) -> None
     assert len(values["GROVE_SERVICE_NSEC"]) == 64
     assert len(values["SAFEBOX_WEB_SERVICE_NSEC"]) == 64
     assert len(values["MAINSTAY_INSTALLATION_NSEC"]) == 64
+    assert len(values["MAINSTAY_TREASURER_NSEC"]) == 64
     assert len(values["SAFEBOX_COOKIE_KEY"]) == 44
     assert len(values["SAFEBOX_ONBOARD_INVITE_CODE"]) == 32
     assert stat.S_IMODE(env_file.stat().st_mode) == 0o600
@@ -413,10 +426,12 @@ def test_init_env_assigns_first_service_identity_to_existing_clear_volume(
     assert len(values["GROVE_SERVICE_NSEC"]) == 64
     assert len(values["SAFEBOX_WEB_SERVICE_NSEC"]) == 64
     assert len(values["MAINSTAY_INSTALLATION_NSEC"]) == 64
+    assert len(values["MAINSTAY_TREASURER_NSEC"]) == 64
     assert values["CLEAR_MINT_SERVICE_NSEC"] not in result.stdout
     assert values["SPURLINE_SERVICE_NSEC"] not in result.stdout
     assert values["GROVE_SERVICE_NSEC"] not in result.stdout
     assert values["SAFEBOX_WEB_SERVICE_NSEC"] not in result.stdout
+    assert values["MAINSTAY_TREASURER_NSEC"] not in result.stdout
 
 
 def test_init_env_refuses_to_replace_recorded_installation_identity(

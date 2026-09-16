@@ -13,6 +13,7 @@ from stroma import Keys
 
 from .clear_context import (
     LocalClearError,
+    bootstrap_clear_cmu,
     clear_info,
     clear_root_wallet_balance,
     list_clear_cmus,
@@ -190,6 +191,38 @@ def main(argv: list[str] | None = None) -> int:
         default=2.0,
         help="Internal Clear API timeout in seconds.",
     )
+    clear_cmu_bootstrap_parser = clear_cmu_subparsers.add_parser(
+        "bootstrap",
+        help="Create a CMU using this instance's Mainstay treasurer identity.",
+    )
+    clear_cmu_bootstrap_parser.add_argument(
+        "--config",
+        type=Path,
+        default=None,
+        help="Optional registry JSON for a customized deployment.",
+    )
+    clear_cmu_bootstrap_parser.add_argument(
+        "--name",
+        required=True,
+        help="Wallet-facing CMU name.",
+    )
+    clear_cmu_bootstrap_parser.add_argument(
+        "--unit-alias",
+        default=None,
+        help="Wallet-facing unit alias, such as credits or passes.",
+    )
+    clear_cmu_bootstrap_parser.add_argument(
+        "--timeout",
+        type=float,
+        default=5.0,
+        help="Internal Clear API timeout in seconds.",
+    )
+    clear_cmu_bootstrap_parser.add_argument(
+        "--lifetime",
+        type=int,
+        default=300,
+        help="Signed treasurer request lifetime in seconds.",
+    )
     clear_wallet_parser = clear_subparsers.add_parser(
         "wallet",
         help="Inspect the managed Clear root wallet.",
@@ -354,6 +387,18 @@ def main(argv: list[str] | None = None) -> int:
         return _clear_cmu_list(
             args.config,
             timeout=args.timeout,
+        )
+    if (
+        args.command == "clear"
+        and args.clear_command == "cmu"
+        and args.clear_cmu_command == "bootstrap"
+    ):
+        return _clear_cmu_bootstrap(
+            args.config,
+            name=args.name,
+            unit_alias=args.unit_alias,
+            timeout=args.timeout,
+            lifetime_seconds=args.lifetime,
         )
     if (
         args.command == "clear"
@@ -650,6 +695,34 @@ def _clear_cmu_list(
         result = list_clear_cmus(bundle, timeout=timeout)
     except (LocalClearError, ValueError) as exc:
         print(f"mainstayctl clear cmu list failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+def _clear_cmu_bootstrap(
+    config_path: Path | None,
+    *,
+    name: str,
+    unit_alias: str | None,
+    timeout: float,
+    lifetime_seconds: int,
+) -> int:
+    try:
+        bundle = (
+            BundleConfig.from_json(config_path)
+            if config_path is not None
+            else BundleConfig.default()
+        )
+        result = bootstrap_clear_cmu(
+            bundle,
+            name=name,
+            unit_alias=unit_alias,
+            timeout=timeout,
+            lifetime_seconds=lifetime_seconds,
+        )
+    except (LocalClearError, ValueError) as exc:
+        print(f"mainstayctl clear cmu bootstrap failed: {exc}", file=sys.stderr)
         return 1
     print(json.dumps(result, indent=2))
     return 0

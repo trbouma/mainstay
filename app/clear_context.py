@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import os
 import re
+import secrets
 import sqlite3
 import subprocess
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -12,10 +14,14 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from stroma import Event, Keys
+from stroma import KeyError as StromaKeyError
+
 from .registry import BundleConfig
 
 MAX_DIRECTORY_BYTES = 64 * 1024
 LOCAL_HANDLE_PATTERN = re.compile(r"^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$")
+TREASURY_EVENT_KIND = 37379
 
 
 class LocalClearError(RuntimeError):
@@ -348,6 +354,85 @@ def list_clear_cmus(
     }
 
 
+def bootstrap_clear_cmu(
+    bundle: BundleConfig,
+    *,
+    name: str,
+    unit_alias: str | None,
+    timeout: float,
+    lifetime_seconds: int = 300,
+) -> dict[str, Any]:
+    if timeout <= 0:
+        raise LocalClearError("timeout must be greater than zero")
+    if lifetime_seconds <= 0:
+        raise LocalClearError("lifetime must be greater than zero")
+    treasurer_nsec = os.getenv("MAINSTAY_TREASURER_NSEC", "").strip()
+    if not treasurer_nsec:
+        raise LocalClearError("MAINSTAY_TREASURER_NSEC must be set")
+    try:
+        treasurer_npub = Keys(priv_k=treasurer_nsec).public_key_bech32()
+    except StromaKeyError as exc:
+        raise LocalClearError("MAINSTAY_TREASURER_NSEC is invalid") from exc
+
+    clear = bundle.require_service("clear")
+    if not clear.enabled:
+        raise LocalClearError("the Mainstay Clear service is disabled")
+    operator_token = os.getenv("CLEAR_OPERATOR_TOKEN")
+    if not operator_token:
+        raise LocalClearError("CLEAR_OPERATOR_TOKEN must be set")
+
+    clear_url = clear.require_url("internal", purpose="mint")
+    operator_url = os.getenv("CLEAR_OPERATOR_API_URL") or clear_url
+    info = _clear_request_json(clear_url, "GET", "/v1/info", timeout=timeout)
+    mint_url = str(info.get("mint_url") or clear_url).rstrip("/")
+
+    treasurer = _clear_request_json(
+        operator_url,
+        "POST",
+        "/v1/operator/treasurers",
+        payload={"npub": treasurer_npub},
+        token=operator_token,
+        timeout=timeout,
+        label="Clear treasurer add API",
+    )
+    grant = _clear_request_json(
+        operator_url,
+        "POST",
+        "/v1/operator/treasurer-grants",
+        payload={"npub": treasurer_npub},
+        token=operator_token,
+        timeout=timeout,
+        label="Clear treasurer grant API",
+    )
+    grant_id = grant.get("id")
+    if not isinstance(grant_id, str) or not grant_id:
+        raise LocalClearError("Clear treasurer grant API returned no grant id")
+
+    cmu = _clear_request_json(
+        clear_url,
+        "POST",
+        "/v1/treasury/cmus",
+        payload=_build_cmu_create_envelope(
+            mint=mint_url,
+            grant_id=grant_id,
+            name=name,
+            unit_alias=unit_alias,
+            nsec=treasurer_nsec,
+            lifetime_seconds=lifetime_seconds,
+        ),
+        timeout=timeout,
+        label="Clear treasury CMU create API",
+    )
+    return {
+        "status": "OK",
+        "mint": clear_url,
+        "treasurer_npub": treasurer_npub,
+        "treasurer": treasurer,
+        "grant": grant,
+        "cmu": cmu,
+    }
+
+
 def clear_root_wallet_balance(
     *,
     wallet_path: Path,
@@ -395,6 +480,48 @@ def clear_root_wallet_balance(
             for (mint, unit), amount in sorted(balances.items())
         ],
     }
+
+
+def _build_cmu_create_envelope(
+    *,
+    mint: str,
+    grant_id: str,
+    name: str,
+    unit_alias: str | None,
+    nsec: str,
+    lifetime_seconds: int,
+) -> dict[str, Any]:
+    now = int(time.time())
+    payload = {
+        "action": "cmu:create",
+        "grant_id": grant_id,
+        "mint": mint.rstrip("/"),
+        "name": name,
+        "unit_alias": unit_alias,
+        "nonce": secrets.token_hex(32),
+        "created_at": now,
+        "expires_at": now + lifetime_seconds,
+    }
+    return {"payload": payload, "event": _sign_treasury_payload(payload, nsec)}
+
+
+def _sign_treasury_payload(payload: dict[str, Any], nsec: str) -> dict[str, Any]:
+    try:
+        event = Event(
+            kind=TREASURY_EVENT_KIND,
+            content=json.dumps(
+                payload,
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=False,
+            ),
+            tags=[],
+            created_at=int(payload["created_at"]),
+        )
+        event.sign(Keys(priv_k=nsec))
+    except StromaKeyError as exc:
+        raise LocalClearError("treasurer key cannot sign CMU request") from exc
+    return event.data()
 
 
 def _root_cmu_unit(info: dict[str, Any]) -> str | None:

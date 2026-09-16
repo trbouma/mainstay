@@ -183,6 +183,7 @@ spurline_service_nsec=$(read_value SPURLINE_SERVICE_NSEC)
 grove_service_nsec=$(read_value GROVE_SERVICE_NSEC)
 safebox_web_service_nsec=$(read_value SAFEBOX_WEB_SERVICE_NSEC)
 installation_nsec=$(read_value MAINSTAY_INSTALLATION_NSEC)
+treasurer_nsec=$(read_value MAINSTAY_TREASURER_NSEC)
 cookie_key=$(read_value SAFEBOX_COOKIE_KEY)
 management_token=$(read_value SAFEBOX_MANAGEMENT_TOKEN)
 invite_code=$(read_value SAFEBOX_ONBOARD_INVITE_CODE)
@@ -209,6 +210,7 @@ if [ -n "$master_secret" ] && [ -n "$operator_token" ] && \
     [ -n "$grove_service_nsec" ] && \
     [ -n "$safebox_web_service_nsec" ] && \
     [ -n "$installation_nsec" ] && \
+    [ -n "$treasurer_nsec" ] && \
     [ -n "$cookie_key" ] && [ -n "$management_token" ] && \
     [ -n "$invite_code" ] && \
     [ "$storage_complete" = true ] && [ "$images_complete" = true ]; then
@@ -284,6 +286,10 @@ if [ -z "$installation_nsec" ]; then
     installation_nsec=$(openssl rand -hex 32)
 fi
 
+if [ -z "$treasurer_nsec" ]; then
+    treasurer_nsec=$(openssl rand -hex 32)
+fi
+
 if [ -z "$cookie_key" ]; then
     if storage_has_data "$safebox_data_source" "$safebox_volume"; then
         printf '%s\n' \
@@ -330,6 +336,7 @@ awk \
     -v grove_service_nsec="$grove_service_nsec" \
     -v safebox_web_service_nsec="$safebox_web_service_nsec" \
     -v installation_nsec="$installation_nsec" \
+    -v treasurer_nsec="$treasurer_nsec" \
     -v cookie_key="$cookie_key" \
     -v management_token="$management_token" \
     -v invite_code="$invite_code" '
@@ -353,6 +360,7 @@ awk \
         found_grove_service = 0
         found_safebox_web_service = 0
         found_installation = 0
+        found_treasurer = 0
         found_cookie = 0
         found_management = 0
         found_invite = 0
@@ -490,6 +498,13 @@ awk \
         }
         next
     }
+    /^MAINSTAY_TREASURER_NSEC=/ {
+        if (!found_treasurer) {
+            print "MAINSTAY_TREASURER_NSEC=" treasurer_nsec
+            found_treasurer = 1
+        }
+        next
+    }
     /^SAFEBOX_COOKIE_KEY=/ {
         if (!found_cookie) {
             print "SAFEBOX_COOKIE_KEY=" cookie_key
@@ -569,6 +584,9 @@ awk \
         }
         if (!found_installation) {
             print "MAINSTAY_INSTALLATION_NSEC=" installation_nsec
+        }
+        if (!found_treasurer) {
+            print "MAINSTAY_TREASURER_NSEC=" treasurer_nsec
         }
         if (!found_cookie) {
             print "SAFEBOX_COOKIE_KEY=" cookie_key
