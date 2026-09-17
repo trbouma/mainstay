@@ -25,6 +25,55 @@ benefits, allowances, vouchers, or service credits among willing participants.
 Clear does not replace Canadian currency, cash, bank deposits, public benefits,
 or the community's obligations to members and providers.
 
+## A focused brief, not a limited architecture
+
+This brief focuses on Indigenous communities in the Canadian context because
+their distinct rights, governments, laws, treaties, institutions, and
+information-governance practices require specific attention. That focus does
+not mean Mainstay is an Indigenous-only architecture or that every Indigenous
+community has the same requirements.
+
+Mainstay is deliberately neutral about the form and scale of the community
+using it. A community could be an informal club, cooperative, congregation,
+neighbourhood association, professional body, municipality, Indigenous
+government, public institution, or state entity. Mainstay does not decide which
+of these bodies is legitimate, prescribe how it governs, or give it authority
+that it does not otherwise possess. It provides capabilities through which a
+body can express and operate the authority, rules, and relationships it
+actually has.
+
+Across many forms and scales of human organization, two institutional
+functions recur:
+
+1. a **system of record** preserves identity, membership, decisions, rights,
+   duties, agreements, evidence, and authoritative state; and
+2. a **system of exchange** accounts for and moves value through markets,
+   payments, credits, allocations, contributions, tribute, benefits, or other
+   recognized obligations.
+
+Mainstay describes these as the [Clerk and Treasury
+functions](clerk-and-treasury-functions.md). The names are functional
+shorthand, not prescribed offices or a claim that every society organizes
+itself in the same way. A small association may perform both functions through
+shared minutes and a cash box. A government may distribute them across laws,
+registries, departments, financial institutions, courts, auditors, and public
+accounts. The scale changes; the need to establish what is authoritative and
+what is owed, held, transferred, or settled remains recognizable.
+
+Mainstay's architectural neutrality comes from separating those functions and
+their authorities rather than encoding one governance model. Identity remains
+distinct from location. A record remains distinct from the application that
+displays it. An issuer remains distinct from a wallet. Transfer remains
+distinct from clearing and settlement. Local recognition remains distinct from
+universal legal effect.
+
+Those boundaries let trustworthiness scale systematically. Stable identifiers,
+signed evidence, explicit policies, independently verifiable state, bounded
+authority, clear acceptance rules, and auditable lifecycles allow participants
+to decide what they can rely on without placing every function inside one
+institution or database. Mainstay supplies that common capability layer while
+leaving each community's meaning, law, culture, and governance intact.
+
 ## There is no single Indigenous context
 
 "Indigenous community" is not one legal or political category. Section 35 of
@@ -130,6 +179,109 @@ The community's law and policy give a record meaning. Mainstay, Grove,
 Spurline, and OpenETR can preserve bytes, events, provenance, and derived state;
 none of them decides that a record is culturally, administratively, or legally
 authoritative.
+
+## Local recognition through OpenETR
+
+A community often needs to rely on a record that originated somewhere else.
+It might be a medical or health record, a certificate or status record issued
+by another government or community, a professional qualification, or evidence
+of eligibility for a local service. Repeatedly presenting the physical original
+or contacting the outside issuer may be impractical, especially when travel,
+connectivity, office hours, or urgent local needs intervene.
+
+The community can establish a governed local recognition process. An
+authorized reviewer inspects the source record, confirms its provenance to the
+degree required by policy, makes an exact digital copy, and signs evidence of
+what was reviewed, when, for which purpose, and under which authority. OpenETR
+then gives that process a verifiable structure:
+
+```text
+source record
+  -> exact Digital Artifact
+  -> authorized review and signed evidence
+  -> validation under community rules
+  -> Consequential State
+  -> Digital Original for the governed recognition context
+```
+
+In OpenETR terms, the copy becomes a **Digital Original** when valid evidence
+concerning the exact artifact establishes the required **Consequential State**.
+"Original" here describes the artifact's verifiable identity and governed
+state, not a claim that the community reissued the outside credential or
+changed its origin.
+
+For example, a council-appointed reviewer could vouch that an exact copy of a
+health record was examined and accepted for a defined community service. The
+record can then carry a locally recognized state such as `reviewed`, `current
+for this purpose`, `superseded`, or `further confirmation required`. Medical
+interpretation and care decisions remain with appropriately authorized health
+professionals, and privacy rules may require especially narrow access.
+
+Likewise, a council could vouch for an exact copy of a certificate or status
+record presented by a member of another community. The resulting Digital
+Original records the local council's review and recognition. It does not claim
+that the council issued the source credential, confer a status that only
+another authority can confer, or bind that authority to accept the copy for a
+different purpose.
+
+Recognition can also operate across communities. One community can publish the
+review roles, policies, and evidence it uses; another can decide that those
+signatures and rules are sufficient for a stated purpose. This produces
+federated recognition without assuming automatic trust:
+
+```text
+originating authority issues or holds the source record
+    -> Community A reviews and vouches for the exact artifact
+    -> OpenETR derives its consequential state under Community A's policy
+    -> Community B applies its own policy to recognize, re-check, or decline it
+```
+
+Each community retains its own decision-making authority. Governance agreements
+can define which record classes, reviewer roles, assurance levels, expiry
+periods, and purposes are mutually recognized, as well as how corrections,
+revocations, disputes, and compromised signing keys are handled.
+
+## Community record safekeeping
+
+A community may also offer voluntary safekeeping for important physical
+records. The physical original can be placed in a controlled community vault
+under documented custody, access, return, and succession procedures. An
+authorized custodian creates or verifies an exact digital artifact, records the
+chain of custody, and uses OpenETR evidence to establish its consequential
+state.
+
+Community policy can then give that Digital Original equivalent standing for
+specified decisions within the community. A member may present the digital
+artifact and its evidence instead of repeatedly withdrawing the physical
+document from the vault. The bytes can be copied for availability without
+creating competing originals because every exact copy has the same digest and
+can be evaluated against the same signed evidence.
+
+Equivalent local standing remains bounded by policy. It does not guarantee
+that a hospital, court, federal department, province, territory, bank, another
+Nation, or the original issuer will treat the Digital Original as equivalent
+to the physical record. An outside relying party applies its own law and
+recognition rules. Where governance permits, communities can negotiate mutual
+recognition rather than presuming it.
+
+A safekeeping service requires more than a vault and a scanner. Its policy must
+address:
+
+- voluntary deposit and the depositor's continuing rights;
+- authority to inspect, digitize, attest to, and disclose the record;
+- secure physical custody and a documented chain of custody;
+- confidentiality, encryption, access logs, and minimum disclosure;
+- return, temporary withdrawal, replacement, and transfer of custody;
+- corrections, expiry, supersession, revocation, and destruction;
+- incapacity, death, guardianship, and organizational succession;
+- disaster recovery for both physical and digital holdings; and
+- liability, complaints, appeals, and independent review.
+
+OpenETR makes the exact artifact and evidence history verifiable. Mainstay can
+keep it locally available, Grove can retain its encrypted bytes, and Spurline
+can preserve signed lifecycle events. The community vault remains responsible
+for custody, and community governance determines when the Digital Original is
+recognized and what follows from it.
 
 ## Local-first infrastructure for Canadian realities
 
@@ -351,4 +503,3 @@ The measure of success is not how much activity the software captures. It is
 whether the community retains understandable authority, participants are
 treated fairly, obligations are honoured, information is governed properly,
 and cooperation with the wider systems people rely on remains dependable.
-
