@@ -52,3 +52,14 @@ records: check first, present when necessary, share only for justified deeper
 review, and surrender only when custody or control is meant to change.
 
 [Read the policy brief](community-led-recordkeeping-and-digital-originals.md){ .md-button .md-button--primary }
+
+## Indigenous Community Stewardship in Canada
+
+Indigenous communities can operate digital infrastructure aligned with their
+own governance, languages, information practices, and service realities while
+remaining connected to Canadian public institutions and financial systems.
+This brief uses a distinctions-based Canadian frame and examines how Clear can
+administer a bounded community benefit without presenting it as cash, legal
+tender, or a replacement for ordinary payment options.
+
+[Read the policy brief](indigenous-community-stewardship-in-canada.md){ .md-button .md-button--primary }

@@ -1,14 +1,15 @@
 ---
 title: Project Status
-description: Current state and next milestones for Mainstay.
+description: What works today and what remains under construction in Mainstay.
 ---
 
 # Project Status
 
-Mainstay is currently a product vision and integration direction. This site is
-the flagship reference for how the sibling products fit together.
+Mainstay is a working, early-stage local-first product. Its installer brings up
+an integrated service bundle and dashboard, while this site documents how the
+sibling products fit together and which parts are still under construction.
 
-## Available foundations
+## Available today
 
 - Safebox Web provides working user-facing records and payment workflows.
 - Acorn provides the portable wallet, key, record, and proof runtime.
@@ -18,10 +19,12 @@ the flagship reference for how the sibling products fit together.
 - Spurline provides a tested local Nostr relay foundation.
 - Clear provides an experimental non-Lightning Cashu mint for bounded local
   currencies.
+- Mainstay provides an interactive installer, recovery workflow, service-health
+  dashboard, and integrated Docker Compose deployment.
 - Mainstay and Lockbox product principles, continuity modes, and component
   boundaries are documented.
 
-## Next
+## Under construction
 
 - continue proving each sibling component independently;
 - define stable service discovery and health contracts;

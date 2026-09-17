@@ -30,11 +30,11 @@ description: There's no place like home. Mainstay is a local-first application f
 
 ## A local-first approach
 
-Mainstay starts with an ordinary need: people should be able to use important
-records, service credits, approvals, and payment capabilities locally, where
+Mainstay starts with an ordinary need: people can use important records,
+service credits, approvals, and payment capabilities locally, where
 daily work happens. A community office, resort, campus, co-working facility, or
 local service network may already coordinate members, guests, staff, providers,
-records, and benefits across several tools. Mainstay is intended to give those
+records, and benefits across several tools. Mainstay gives those
 capabilities a dependable local home while keeping them connected to the wider
 systems that already matter.
 
@@ -75,7 +75,7 @@ civic and institutional dignity, not withdrawal from the wider society.
 
 ## Records, credits, and trusted local work
 
-Mainstay is intended to keep several practical questions clear:
+Mainstay keeps several practical questions clear:
 
 - Which records are available here?
 - Which local services are available and usable now?
@@ -92,10 +92,10 @@ program might issue locally governed service credits or preserve records and
 attestations according to its own procedures while maintaining cooperative
 links to external institutions.
 
-In each case, Mainstay should keep the local instrument bounded and legible.
-It should not imply that a resort credit is legal tender, that two community
+In each case, Mainstay keeps the local instrument bounded and legible. It does
+not imply that a resort credit is legal tender, that two community
 programs are interchangeable, or that a local attestation replaces the
-institution normally responsible for a record. It should show who issued the
+institution normally responsible for a record. It shows who issued the
 thing, who recognizes it, what can be done locally, and what still needs to be
 checked or finalized elsewhere.
 
@@ -231,7 +231,7 @@ applications and infrastructure without collapsing those responsibilities.
 
 ## Continuity without ambiguity
 
-Mainstay should always distinguish what is available now, what is confirmed,
+Mainstay distinguishes what is available now, what is confirmed,
 what remains pending, and what can be finalized later. A locally available
 Clear mint can confirm its own currency inside a community network, while
 proofs from an unavailable external mint remain pending until reconciliation.
@@ -276,7 +276,8 @@ The initial target is FreeBSD on Raspberry Pi 4 with a keypad and TROPIC01 HSM.
 
 </section>
 
-!!! note "An emerging product"
-    Mainstay is currently a product vision and integration direction. The
-    sibling components are being built and proven independently before the
-    unified application and Lockbox appliance profile are assembled.
+!!! note "A working product under active construction"
+    Mainstay runs today as an integrated local service bundle with a dashboard,
+    Safebox Web, Spurline, Grove, Clear, and service workers. Some unified user
+    flows, continuity modes, and the complete Lockbox appliance profile remain
+    under construction; the project status page identifies that work directly.

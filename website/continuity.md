@@ -15,7 +15,7 @@ may be temporarily inaccessible. The community still needs to coordinate the
 work in front of it.
 
 The people, funds, and records have not disappeared. The paths used to reach
-them have. Mainstay is intended to provide a local point of continuity: keeping
+them have. Mainstay provides a local point of continuity: keeping
 nearby records and payment capabilities understandable and usable, supporting
 community coordination, and reconciling with external systems when
 connectivity returns.
@@ -54,9 +54,9 @@ when one path is interrupted.
 | **Mobile Mode** | A phone or nearby device supplies temporary upstream connectivity while local services remain primary. |
 | **Community Mode** | Participating Mainstay instances exchange signed events, encrypted records, and value across a local network or mesh. A Lockbox can host one of those instances. |
 
-The same user app should work across all four. A mode change should alter
-availability and finality messaging, not force people into an unfamiliar
-emergency interface.
+The same user app works across all four. A mode change alters availability and
+finality messaging without forcing people into an unfamiliar emergency
+interface.
 
 ## Good boundaries, not barriers
 
@@ -97,8 +97,8 @@ Mint finality pending
 Reconciliation required when connected
 ```
 
-If exact change cannot be made without the mint, the app should show the
-closest available amounts and ask for explicit approval.
+If exact change cannot be made without the mint, the app shows the
+closest available amounts and asks for explicit approval.
 
 ### Local Clear mint available
 
@@ -113,7 +113,7 @@ outage.
 
 ## Honest status is a feature
 
-Mainstay should make three signals obvious:
+Mainstay makes three signals obvious:
 
 - **confirmed** value has finality from the relevant mint;
 - **pending** value is preserved but still needs finalization; and

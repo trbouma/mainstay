@@ -10,12 +10,12 @@ information and value available and usable when conditions change.**
 
 It gives individuals, organizations, and communities a dependable place to
 manage the information and value they need to continue operating. Hosted
-services can assist, but the experience should not disappear when a provider,
+services can assist, but the experience remains available when a provider,
 mint, or wider network becomes unavailable.
 
 ## The product promise
 
-Mainstay should make sophisticated continuity infrastructure feel ordinary:
+Mainstay makes sophisticated continuity infrastructure feel ordinary:
 
 - records remain available locally;
 - confirmed balance and pending value remain visibly distinct;
@@ -24,8 +24,8 @@ Mainstay should make sophisticated continuity infrastructure feel ordinary:
 - activity synchronizes and finalizes when services return; and
 - one application works across connected, local, mobile, and community modes.
 
-People should not need to understand relays, proof denominations, blob storage,
-or synchronization protocols to know what is available and what to do next.
+People do not need to understand relays, proof denominations, blob storage, or
+synchronization protocols to know what is available and what to do next.
 
 ## Identity outlives location
 
@@ -117,10 +117,10 @@ ledgers.
 
 ## Direction
 
-Safebox Web is the practical application foundation. Near-term work should
-continue proving each component independently, strengthen local operation, and
-simplify the shared user experience before assembling the complete Lockbox
-profile.
+Safebox Web is the practical application foundation. Mainstay already assembles
+the working service bundle around it. Current development continues proving
+each component independently, strengthens local operation, simplifies the
+shared user experience, and builds out the complete Lockbox profile.
 
-The desired result is calm capability: keys, records, payments, and local
+The result is calm capability: keys, records, payments, and local
 resource coordination remain understandable when conditions change.

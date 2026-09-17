@@ -20,8 +20,8 @@ and understood on its own.
 ## Safebox Web
 
 The standalone user app for records, payments, recovery, handles, and everyday
-wallet workflows. Safebox Web provides the practical application foundation
-from which Mainstay is evolving.
+wallet workflows. Safebox Web provides Mainstay's practical application
+foundation.
 
 [Visit Safebox Web](https://trbouma.github.io/safebox-web/)
 
@@ -151,7 +151,7 @@ evidence, derived state, and external recognition distinct.
        artifacts, control history, recognition
 ```
 
-Mainstay should discover available services and explain their state in plain
+Mainstay discovers available services and explains their state in plain
 language. It must keep different mints, currencies, issuers, relays, and
 storage providers visible enough that convenience never becomes false
 equivalence.
