@@ -63,3 +63,17 @@ administer a bounded community benefit without presenting it as cash, legal
 tender, or a replacement for ordinary payment options.
 
 [Read the policy brief](indigenous-community-stewardship-in-canada.md){ .md-button .md-button--primary }
+
+## Digital Public Infrastructure and the Capability to Deliver
+
+Digital sovereignty depends on more than regulation, procurement preferences,
+or local hosting. This brief examines the institutional capability to build,
+operate, maintain, connect, and replace foundational digital systems, drawing
+on OpenForum Europe's analysis of Digital Public Infrastructure.
+
+It connects Europe's federated approach to Mainstay's principles of component
+substitutability, stable identity, explicit recognition, and cooperative
+independence while keeping community-scale infrastructure distinct from
+population-scale DPI.
+
+[Read the policy brief](digital-public-infrastructure-and-the-capability-to-deliver.md){ .md-button .md-button--primary }
