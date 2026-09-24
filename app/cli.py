@@ -21,6 +21,7 @@ from .clear_context import (
     send_local_clear,
 )
 from .env import render_safebox_env
+from .payment_context import PaymentContextError, payment_command
 from .registry import BundleConfig
 from .reserve_context import (
     ReserveContextError,
@@ -112,6 +113,37 @@ def main(argv: list[str] | None = None) -> int:
         "--json",
         action="store_true",
         help="Emit structured JSON instead of a table.",
+    )
+
+    payments_parser = subparsers.add_parser(
+        "payments", help="Inspect or explicitly close failed Safebox provider payments."
+    )
+    payment_actions = payments_parser.add_subparsers(
+        dest="payments_command", required=True
+    )
+    payment_list = payment_actions.add_parser(
+        "list", help="Inspect up to 100 recent payments for a handle."
+    )
+    payment_list.add_argument("--handle", required=True)
+    payment_show = payment_actions.add_parser(
+        "show", help="Inspect a payment and its intervention audit."
+    )
+    payment_show.add_argument("payment_id")
+    payment_close = payment_actions.add_parser(
+        "close", help="Preview an abandoned/test closure; apply with --yes."
+    )
+    payment_close.add_argument("payment_id")
+    payment_close.add_argument("--handle", required=True)
+    payment_close.add_argument(
+        "--amount", type=int, required=True, help="Expected amount in sats."
+    )
+    payment_close.add_argument(
+        "--operator", required=True, help="Operator attribution (not a separate login)."
+    )
+    payment_close.add_argument("--reason", required=True)
+    payment_close.add_argument(
+        "--yes", action="store_true",
+        help="Commit the closure; does not refund or deliver funds."
     )
 
     npubs_parser = subparsers.add_parser(
@@ -388,6 +420,14 @@ def main(argv: list[str] | None = None) -> int:
         return _status(args.config, timeout=args.timeout)
     if args.command == "handles":
         return _handles(args.database, json_output=args.json)
+    if args.command == "payments":
+        try:
+            result = payment_command(args)
+        except PaymentContextError as exc:
+            print(f"mainstayctl payments failed: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(result, indent=2))
+        return 0
     if args.command == "npubs":
         return _npubs(json_output=args.json)
     if args.command == "up":

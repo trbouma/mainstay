@@ -279,6 +279,10 @@ the worker only when it was running beforehand. From a development checkout
 with Poetry installed, `poetry run mainstayctl reserve balance` remains an
 equivalent convenience command.
 
+For failed Lightning-address deliveries, see
+[Provider payment intervention](docs/PROVIDER-PAYMENT-INTERVENTION.md) for
+`mainstayctl payments list`, `show`, and audited `close` commands.
+
 Mainstay briefly pauses the singleton service Acorn worker while it loads the
 persisted wallet, then restores the worker only if it was running beforehand.
 The command reports the wallet's current Cash balance without exposing its
