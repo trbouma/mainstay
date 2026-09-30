@@ -77,3 +77,16 @@ independence while keeping community-scale infrastructure distinct from
 population-scale DPI.
 
 [Read the policy brief](digital-public-infrastructure-and-the-capability-to-deliver.md){ .md-button .md-button--primary }
+
+## Data Sovereignty, Authority, and Capability
+
+Data sovereignty is credible when legitimate authority and practical
+capability align. Drawing on the World Economic Forum's *Data Sovereignty in
+Practice*, this brief examines sovereignty across individuals, communities,
+institutions, governments, and technology platforms.
+
+It explains how Mainstay can strengthen local agency, portability, audit, and
+continuity while avoiding the claim that localization, open source, or
+self-hosting automatically creates sovereignty.
+
+[Read the policy brief](data-sovereignty-authority-capability-and-mainstay.md){ .md-button .md-button--primary }
