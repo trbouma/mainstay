@@ -179,7 +179,7 @@ system work. Each remains independently useful and replaceable.
 
 <figure class="mainstay-ecosystem-graphic">
   <a href="assets/mainstay-ecosystem.svg">
-    <img src="assets/mainstay-ecosystem.svg" alt="The Mainstay ecosystem: Mainstay, Safebox Web, Clear, OpenETR, Acorn, Spurline, Grove, and Stroma">
+    <img src="assets/mainstay-ecosystem.png" alt="The Mainstay ecosystem: Mainstay, Safebox Web, Clear, OpenETR, Acorn, Spurline, Grove, and Stroma">
   </a>
   <figcaption><a href="assets/mainstay-ecosystem.svg">View the full-size Mainstay ecosystem graphic</a></figcaption>
 </figure>
