@@ -145,6 +145,25 @@
   margin: 1rem 0 1.75rem;
 }
 
+.mainstay-ecosystem-graphic {
+  margin: 1.5rem 0 2rem;
+  text-align: center;
+}
+
+.mainstay-ecosystem-graphic img {
+  display: block;
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--md-default-fg-color) 14%, transparent);
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--mainstay-navy) 12%, transparent);
+}
+
+.mainstay-ecosystem-graphic figcaption {
+  margin-top: 0.6rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.78rem;
+}
+
 .family-value-grid > p,
 .family-strip > p {
   display: contents;

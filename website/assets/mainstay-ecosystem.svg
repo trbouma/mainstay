@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">The Mainstay ecosystem</title>
+  <desc id="desc">Mainstay and the seven products it coordinates: Safebox Web, Clear, OpenETR, Acorn, Spurline, Grove, and Stroma.</desc>
+  <defs>
+    <linearGradient id="background" x1="120" y1="60" x2="1480" y2="840" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f9fbff"/>
+      <stop offset="0.55" stop-color="#edf3ff"/>
+      <stop offset="1" stop-color="#fff8eb"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#173b78" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#background)"/>
+  <path d="M80 126 800 38l720 88" fill="none" stroke="#2f66d8" stroke-width="3" stroke-opacity="0.16"/>
+  <path d="M80 774 800 862l720-88" fill="none" stroke="#e4a53a" stroke-width="3" stroke-opacity="0.2"/>
+
+  <text x="800" y="72" fill="#173b78" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="6" text-anchor="middle">THE MAINSTAY ECOSYSTEM</text>
+
+  <g filter="url(#shadow)">
+    <rect x="650" y="102" width="300" height="230" rx="28" fill="#ffffff"/>
+  </g>
+  <image x="708" y="122" width="184" height="184" preserveAspectRatio="xMidYMid meet" xlink:href="mainstay-logo.svg" href="mainstay-logo.svg"/>
+  <text x="800" y="316" fill="#173b78" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="700" text-anchor="middle">Mainstay</text>
+
+  <path d="M800 350v32M202 382h1196" fill="none" stroke="#2f66d8" stroke-width="3" stroke-linecap="round" stroke-opacity="0.22"/>
+
+  <g filter="url(#shadow)">
+    <rect x="92" y="408" width="184" height="214" rx="22" fill="#ffffff"/>
+    <rect x="296" y="408" width="184" height="214" rx="22" fill="#ffffff"/>
+    <rect x="500" y="408" width="184" height="214" rx="22" fill="#ffffff"/>
+    <rect x="704" y="408" width="184" height="214" rx="22" fill="#ffffff"/>
+    <rect x="908" y="408" width="184" height="214" rx="22" fill="#ffffff"/>
+    <rect x="1112" y="408" width="184" height="214" rx="22" fill="#ffffff"/>
+    <rect x="1316" y="408" width="184" height="214" rx="22" fill="#ffffff"/>
+  </g>
+
+  <image x="120" y="432" width="128" height="128" preserveAspectRatio="xMidYMid meet" xlink:href="safebox-logo.png" href="safebox-logo.png"/>
+  <image x="324" y="432" width="128" height="128" preserveAspectRatio="xMidYMid meet" xlink:href="clear-logo.svg" href="clear-logo.svg"/>
+  <image x="528" y="432" width="128" height="128" preserveAspectRatio="xMidYMid meet" xlink:href="openetr-logo.png" href="openetr-logo.png"/>
+  <image x="732" y="432" width="128" height="128" preserveAspectRatio="xMidYMid meet" xlink:href="acorn-logo.png" href="acorn-logo.png"/>
+  <image x="936" y="432" width="128" height="128" preserveAspectRatio="xMidYMid meet" xlink:href="spurline-logo.svg" href="spurline-logo.svg"/>
+  <image x="1140" y="432" width="128" height="128" preserveAspectRatio="xMidYMid meet" xlink:href="grove-logo.png" href="grove-logo.png"/>
+  <image x="1344" y="432" width="128" height="128" preserveAspectRatio="xMidYMid meet" xlink:href="stroma-logo.png" href="stroma-logo.png"/>
+
+  <g fill="#173b78" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="700" text-anchor="middle">
+    <text x="184" y="594">Safebox Web</text>
+    <text x="388" y="594">Clear</text>
+    <text x="592" y="594">OpenETR</text>
+    <text x="796" y="594">Acorn</text>
+    <text x="1000" y="594">Spurline</text>
+    <text x="1204" y="594">Grove</text>
+    <text x="1408" y="594">Stroma</text>
+  </g>
+
+  <text x="800" y="704" fill="#2f66d8" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700" text-anchor="middle">One house. Distinct roles. Open protocols.</text>
+  <text x="800" y="748" fill="#455777" font-family="Inter, Arial, sans-serif" font-size="20" text-anchor="middle">Keys · Records · Value · Storage · Events · Continuity</text>
+  <circle cx="740" cy="805" r="6" fill="#2f66d8"/>
+  <circle cx="770" cy="805" r="6" fill="#3f725b"/>
+  <circle cx="800" cy="805" r="6" fill="#e4a53a"/>
+  <circle cx="830" cy="805" r="6" fill="#c9543b"/>
+  <circle cx="860" cy="805" r="6" fill="#173b78"/>
+</svg>

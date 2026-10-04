@@ -177,6 +177,13 @@ create new practical value, Safebox Web gives people access to that value, and
 the supporting components provide the focused capabilities that make the whole
 system work. Each remains independently useful and replaceable.
 
+<figure class="mainstay-ecosystem-graphic">
+  <a href="assets/mainstay-ecosystem.svg">
+    <img src="assets/mainstay-ecosystem.svg" alt="The Mainstay ecosystem: Mainstay, Safebox Web, Clear, OpenETR, Acorn, Spurline, Grove, and Stroma">
+  </a>
+  <figcaption><a href="assets/mainstay-ecosystem.svg">View the full-size Mainstay ecosystem graphic</a></figcaption>
+</figure>
+
 ### Value
 
 <div class="family-value-grid" markdown>
