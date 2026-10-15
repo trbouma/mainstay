@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.11-slim-bookworm AS builder
+FROM python:3.15.0rc1-slim-bookworm AS builder
 
 ARG POETRY_VERSION=1.8.2
 
@@ -18,7 +18,7 @@ COPY app /app/app
 RUN poetry install --only main --no-ansi
 
 
-FROM python:3.11-slim-bookworm AS runtime
+FROM python:3.15.0rc1-slim-bookworm AS runtime
 
 ENV PATH="/app/.venv/bin:${PATH}" \
     PYTHONDONTWRITEBYTECODE=1 \
