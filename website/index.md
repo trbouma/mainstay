@@ -173,13 +173,13 @@ mesh.
 ## One house, distinct roles
 
 Mainstay is the unified local operating context. Within it, Clear and OpenETR
-create new practical value, Safebox Web gives people access to that value, and
-the supporting components provide the focused capabilities that make the whole
-system work. Each remains independently useful and replaceable.
+create new practical value; Safebox Web, OakGate, and OpenQR provide distinct
+ways to enter, use, and inspect the system; and the supporting components make
+the whole system work. Each remains independently useful and replaceable.
 
 <figure class="mainstay-ecosystem-graphic">
   <a href="assets/mainstay-ecosystem.svg">
-    <img src="assets/mainstay-ecosystem.png" alt="The Mainstay ecosystem: Mainstay, Safebox Web, Clear, OpenETR, Acorn, Spurline, Grove, and Stroma">
+    <img src="assets/mainstay-ecosystem.png" alt="The Mainstay ecosystem: Mainstay, Safebox Web, OakGate, OpenQR, Clear, OpenETR, Acorn, Spurline, Grove, and Stroma">
   </a>
   <figcaption><a href="assets/mainstay-ecosystem.svg">View the full-size Mainstay ecosystem graphic</a></figcaption>
 </figure>
@@ -199,12 +199,24 @@ system work. Each remains independently useful and replaceable.
 
 </div>
 
-### Access
+### Access and inspection
 
-<a class="family-access" href="https://trbouma.github.io/safebox-web/">
+<div class="family-value-grid" markdown>
+
+<a class="family-feature" href="https://trbouma.github.io/safebox-web/">
   <img src="assets/safebox-logo.png" alt="Safebox Web">
   <span><strong>Safebox Web</strong><small>The application through which people use records, payments, identity, and recovery.</small></span>
 </a>
+<a class="family-feature" href="https://trbouma.github.io/oakgate/">
+  <img src="assets/oakgate-logo.png" alt="OakGate">
+  <span><strong>OakGate</strong><small>Familiar sign-in for a managed safebox, with custody and independence features under construction.</small></span>
+</a>
+<a class="family-feature" href="https://trbouma.github.io/openqr/">
+  <img src="assets/openqr-logo.svg" alt="OpenQR">
+  <span><strong>OpenQR</strong><small>Scan, resolve, retrieve, and inspect exact artifacts and their signed evidence.</small></span>
+</a>
+
+</div>
 
 ### Supporting capabilities
 

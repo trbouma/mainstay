@@ -30,10 +30,10 @@ The family contains four different kinds of component:
 
 | Kind | Components | Applicable service requirements |
 | --- | --- | --- |
-| User and control-plane applications | Mainstay Local, Safebox Web | Human interface, operational health, clear authority boundaries |
+| User and control-plane applications | Mainstay Local, Safebox Web, OakGate | Human interface, operational health, clear authority and custody boundaries |
 | Independently addressable services | Clear, Grove, Spurline | Service identity, health and information surfaces, persistent identity binding |
 | Embedded protocol components | Acorn, Stroma | Package, documentation, security and boundary conventions; no network service identity merely for being imported |
-| Adjacent protocol applications | OpenETR | Shared evidence, recognition, presentation and deployment conventions without implying that OpenETR is part of the local runtime bundle |
+| Adjacent protocol applications | OpenETR, OpenQR | Shared evidence, recognition, presentation and deployment conventions without implying that either application is part of the local runtime bundle |
 
 Acorn identities identify Acorns that control keys and resources. They are not
 identities for the Acorn Python package. Stroma is a protocol library and does
@@ -86,6 +86,8 @@ Each product retains a distinct palette:
 | Clear | water teal and coral; bounded issuance and redemption |
 | Stroma | violet and stone; layered protocol structure |
 | OpenETR | blue, gold and neutral document tones; independently verifiable evidence |
+| OpenQR | teal, record ink and coral; acquisition and resolution |
+| OakGate | olive and oak brown; a welcoming managed entrance |
 
 Shared style does not mean recoloring every product Mainstay blue. Logos,
 palettes and metaphors remain specific to each responsibility. Operational
@@ -538,6 +540,8 @@ milestones because they carry policy or value consequences.
 | Safebox Acorn | Strong protocol and authority boundary | No runtime-service changes apply | Continue release hardening and staged Stroma migration |
 | Stroma | Strong narrow protocol boundary and shared FIPS derivation | No runtime-service changes apply | Continue protocol hardening; no service identity is required for the library |
 | OpenETR | Strong evidence, consequential-state and recognition boundaries | Adjacent family scope is explicit; voice, multi-stage container and standalone lifecycle now follow the shared conventions | Continue verifier, retrieval, policy-adapter and domain-profile hardening |
+| OpenQR | Strong resolver, artifact-integrity and recognition boundaries | Public checking, interactive registration, verified retrieval and GS1 integration are documented | Continue operational hardening and stabilize the OpenETR identity adapter |
+| OakGate | Clear managed-access and custody direction | FastAPI, Keycloak sign-in, project-status and Go Independent boundaries are documented | Complete Acorn integration, protected custody, recovery and the exit workflow |
 
 ### Findings retained as explicit gaps
 

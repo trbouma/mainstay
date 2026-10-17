@@ -123,6 +123,40 @@ evidence, derived state, and external recognition distinct.
 
 </article>
 
+<article class="product-card" markdown>
+
+<a href="https://trbouma.github.io/openqr/" aria-label="Visit the OpenQR website">
+  <img src="../assets/openqr-logo.svg" alt="OpenQR">
+</a>
+
+## OpenQR
+
+The public acquisition and presentation surface for OpenETR evidence. OpenQR
+turns a printed QR code or digital link into a digest-verified artifact and its
+signed Anchor Records, while leaving authenticity, authority, and recognition
+to the applicable rulebook.
+
+[Visit OpenQR](https://trbouma.github.io/openqr/)
+
+</article>
+
+<article class="product-card" markdown>
+
+<a href="https://trbouma.github.io/oakgate/" aria-label="Visit the OakGate website">
+  <img src="../assets/oakgate-logo.png" alt="OakGate">
+</a>
+
+## OakGate
+
+A managed entrance to Acorn-backed safeboxes. OakGate provides familiar
+Keycloak sign-in today and is building the custodial storage, recovery, and
+Go Independent path needed to let a person later assume direct responsibility
+for the same safebox.
+
+[Visit OakGate](https://trbouma.github.io/oakgate/)
+
+</article>
+
 </div>
 
 ## How the pieces fit
@@ -133,8 +167,11 @@ evidence, derived state, and external recognition distinct.
                               |
              +----------------+----------------+
              |                |                |
-       Safebox Web         Acorn            Clear
-         user flows    portable authority   local mint
+       Safebox Web         OakGate           Clear
+       direct access    managed access      local mint
+             |                |                |
+             +------------ Acorn -------------+
+                       portable authority
                               |
                         +-----+-----+
                         |           |
@@ -148,7 +185,9 @@ evidence, derived state, and external recognition distinct.
 
                 Mainstay <----> OpenETR
              evidence and derived state
-       artifacts, control history, recognition
+                              |
+                           OpenQR
+                  scan, resolve, and inspect
 ```
 
 Mainstay discovers available services and explains their state in plain
@@ -162,6 +201,18 @@ consequential state can be derived under defined rules. Mainstay can present an
 exact Digital Artifact, its evidence, and the resulting state while leaving
 recognition and effect with the people, organizations, and authorities relying
 on it.
+
+OpenQR makes that evidence approachable at the point of use. It resolves a QR
+or GS1 Digital Link, verifies exact artifact bytes and signed anchors, and
+presents the result for inspection. It does not decide whether an issuer is
+authorized, a product is authentic, or a record has legal or community effect.
+
+OakGate and Safebox Web offer different access and custody choices around
+Acorn. Safebox Web does not retain a user's signing key. OakGate deliberately
+takes on a managed relationship: its sign-in foundation works today, while
+Acorn integration, custodial recovery, and the Go Independent exit process are
+still under construction. Those responsibilities must be explicit rather than
+blurred into a generic login experience.
 
 Stroma is not another application or hosted infrastructure service. It is the
 small protocol layer Acorn uses to speak Nostr without importing social-client

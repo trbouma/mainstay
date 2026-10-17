@@ -19,6 +19,10 @@ sibling products fit together and which parts are still under construction.
 - Spurline provides a tested local Nostr relay foundation.
 - Clear provides an experimental non-Lightning Cashu mint for bounded local
   currencies.
+- OpenQR provides a working public resolver, artifact checker, and registration
+  surface for OpenETR anchors, with optional verified artifact retrieval.
+- OakGate provides a working FastAPI and Keycloak sign-in foundation for a
+  managed safebox experience.
 - Mainstay provides an interactive installer, recovery workflow, service-health
   dashboard, and integrated Docker Compose deployment.
 - Mainstay and Lockbox product principles, continuity modes, and component
@@ -31,6 +35,8 @@ sibling products fit together and which parts are still under construction.
 - bring the current Safebox Web experience toward the Mainstay application model;
 - integrate local Spurline and Grove paths;
 - add Clear currency discovery without combining balances or issuers;
+- complete OakGate's Acorn integration, custodial recovery, and Go Independent
+  workflow;
 - define the first FreeBSD Lockbox service profile;
 - design TROPIC01 and keypad authority boundaries; and
 - create end-to-end local and community continuity tests.
@@ -44,6 +50,9 @@ sibling products fit together and which parts are still under construction.
 - [Grove](https://github.com/trbouma/grove)
 - [Spurline](https://github.com/trbouma/spurline)
 - [Clear](https://github.com/trbouma/clear)
+- [OpenETR](https://github.com/trbouma/openetr)
+- [OpenQR](https://github.com/trbouma/openqr)
+- [OakGate](https://github.com/trbouma/oakgate)
 
 !!! warning "Early-stage work"
     The product family is experimental. Do not rely on it for critical records,
