@@ -1,6 +1,6 @@
 ---
 title: Mainstay
-description: Move Value. Check Status. Mainstay is community infrastructure for exchanging value and understanding consequential state.
+description: Move Value. Check Status. Mainstay is community infrastructure for locally governed exchange.
 ---
 
 <section class="mainstay-hero" markdown>
@@ -11,7 +11,7 @@ description: Move Value. Check Status. Mainstay is community infrastructure for 
 
 <p class="mainstay-tagline">Move Value. Check Status.</p>
 
-<p class="mainstay-intro">Community infrastructure for exchanging value and understanding the current state of records, claims, and authority.</p>
+<p class="mainstay-intro">Community infrastructure for locally governed exchange where value moves under shared rules and status is grounded in verifiable evidence.</p>
 
 [Explore the vision](product-vision.md){ .md-button .md-button--primary }
 [Meet the product family](product-family.md){ .md-button }

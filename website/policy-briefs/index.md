@@ -11,6 +11,10 @@ for leaders, operators, policy makers, and partners who need to understand the
 purpose and implications of the work without beginning with its protocols or
 deployment details.
 
+Across these subjects, Mainstay supports locally governed exchange: communities
+remain responsible for the rules governing how value, records, and evidence
+move within their authority and across their relationships with others.
+
 ## Clerk and Treasury Functions
 
 Every institutionally sustainable community needs ways to preserve records and

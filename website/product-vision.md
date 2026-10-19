@@ -7,10 +7,17 @@ description: The product promise, principles, and direction for Mainstay.
 
 **Move Value. Check Status.**
 
-Mainstay is community infrastructure for exchanging value and understanding
-the current state of records, claims, and authority. It gives individuals,
-organizations, and communities a dependable local place to perform those two
-fundamental functions when conditions change.
+Mainstay is community infrastructure for locally governed exchange. It gives
+individuals, organizations, and communities a dependable local place to move
+value under shared rules and check the status of records, claims, and authority
+from verifiable evidence when conditions change.
+
+Exchange includes presenting, disclosing, and transferring records and
+evidence as well as moving value, rights, or goods. Local governance determines
+what may be exchanged, who may participate, and what recognition or effect
+follows. It does not require every exchange to remain within one locality;
+communities can cooperate with outside institutions and networks under agreed
+rules.
 
 Moving value exercises control and changes consequential state. Checking
 status examines verifiable evidence and determines what follows under a defined

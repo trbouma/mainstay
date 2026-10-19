@@ -2,10 +2,15 @@
 
 **Move Value. Check Status.**
 
-Mainstay is community infrastructure for exchanging value and understanding
-the current state of records, claims, and authority. It brings Safebox Web,
-OakGate, Acorn, Stroma, Grove, Spurline, Clear, OpenETR, and OpenQR into one
-coherent product family.
+Mainstay is community infrastructure for locally governed exchange. It helps
+value move under shared rules and supports checking the status of records,
+claims, and authority from verifiable evidence. It brings Safebox Web, OakGate,
+Acorn, Stroma, Grove, Spurline, Clear, OpenETR, and OpenQR into one coherent
+product family.
+
+Exchange includes presenting, disclosing, and transferring records and
+evidence as well as moving value. Local governance determines what may be
+exchanged, who may participate, and what recognition or effect follows.
 
 Value can include credits, claims, rights, custody, and goods. Mainstay can
 coordinate and preserve evidence of transfers without claiming that a digital

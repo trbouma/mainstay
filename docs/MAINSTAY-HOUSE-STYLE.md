@@ -258,6 +258,15 @@ Use the proposition consistently:
 - recognition and practical or legal effect remain decisions of the applicable
   community, institution, or relying party.
 
+Use locally governed exchange as ordinary descriptive language, not as a
+coined term, named framework, product category, or claim of ownership. Keep it
+lowercase in prose; do not place it in quotation marks, bold it as terminology,
+or introduce it with language such as “Mainstay calls this.” Exchange includes
+the movement of value and goods as well as the presentation, disclosure, or
+transfer of records and evidence. “Locally governed” identifies where
+accountable rules originate; it does not imply that exchange stops at the
+community boundary.
+
 Do not say that Mainstay physically moves goods merely because it records a
 shipment or transfer. Distinguish the physical act from the digital evidence,
 control transition, custody record, or acceptance associated with it.
