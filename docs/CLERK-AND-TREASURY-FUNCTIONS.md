@@ -8,6 +8,8 @@ implementation requirements named Clerk or Treasury.
 
 The frame is intended to simplify how Mainstay describes its purpose:
 
+> **Move Value. Check Status.**
+
 > Mainstay provides infrastructure for Clerk and Treasury functions:
 > preserving verifiable evidence of consequential acts and accountable,
 > transferable claims without requiring the applications that created them to
@@ -17,6 +19,16 @@ This statement does not make Mainstay an institutional authority, system of
 record, mint, or source of legal effect. Institutions define authority and
 recognition. Protocols make evidence and instruments portable and verifiable.
 Services keep the necessary data and operations available.
+
+The public proposition and institutional frame describe the same architecture.
+**Move Value** is the ordinary-language expression of exercising Treasury and
+control functions. **Check Status** is the ordinary-language expression of
+examining Clerk evidence and the consequential state derived from it.
+
+Value can include rights, claims, custody, and physical goods as well as
+monetary instruments. Mainstay can record and verify evidence associated with
+shipment, delivery, possession, or transfer of control. That digital evidence
+does not by itself prove physical movement or determine legal ownership.
 
 ## Terminology
 

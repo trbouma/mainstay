@@ -18,6 +18,11 @@ move value. These can be understood as **Clerk** and **Treasury** functions.
 The names are functional shorthand, not prescribed offices or governance
 models.
 
+In ordinary language, Mainstay expresses those functions as **Move Value.
+Check Status.** Value can include credits, claims, rights, custody, and goods;
+status is established from verifiable evidence and remains subject to the
+recognition rules of the relevant community or institution.
+
 Mainstay is not inventing these responsibilities. It is exploring how to
 reconstitute age-old institutional capabilities with local-first software,
 portable cryptographic identities, verifiable records, private bearer

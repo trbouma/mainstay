@@ -1,6 +1,6 @@
 ---
 title: Mainstay
-description: There's no place like home. Mainstay is a local-first application for keys, records, payments, and community continuity.
+description: Move Value. Check Status. Mainstay is community infrastructure for exchanging value and understanding consequential state.
 ---
 
 <section class="mainstay-hero" markdown>
@@ -9,9 +9,9 @@ description: There's no place like home. Mainstay is a local-first application f
 
 # Mainstay
 
-<p class="mainstay-tagline">There's no place like home.</p>
+<p class="mainstay-tagline">Move Value. Check Status.</p>
 
-<p class="mainstay-intro">A unified local-first application that keeps essential information and value available and usable when conditions change.</p>
+<p class="mainstay-intro">Community infrastructure for exchanging value and understanding the current state of records, claims, and authority.</p>
 
 [Explore the vision](product-vision.md){ .md-button .md-button--primary }
 [Meet the product family](product-family.md){ .md-button }
@@ -24,9 +24,27 @@ description: There's no place like home. Mainstay is a local-first application f
 
 <div class="mainstay-formula" markdown>
 
-**A dependable place for keys, records, payments, and community continuity.**
+**Move value under community-defined rules. Check status from verifiable evidence.**
 
 </div>
+
+## Two fundamental functions
+
+**Move Value** means exercising authority over community credits, vouchers,
+allowances, claims, and other recognized units. Each issuer and community
+defines what its value represents, where it is accepted, and how it is settled
+or redeemed. Mainstay does not present these instruments as cash, legal tender,
+or universally interchangeable funds. Value can also be embodied in physical
+goods: Mainstay can preserve evidence of custody, possession, shipment,
+delivery, acceptance, or a transfer of control. The digital record supports
+the movement; it does not claim that a physical object moved or that legal
+ownership changed.
+
+**Check Status** means using verifiable evidence to understand the current
+state of a record, claim, credential, or authority. A successful check can show
+what was signed, by whom, whether it changed, and what state follows under a
+defined rulebook. The relevant community, institution, or relying party still
+decides whether to recognize that result and what effect it has.
 
 ## A local-first approach
 

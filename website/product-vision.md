@@ -5,13 +5,24 @@ description: The product promise, principles, and direction for Mainstay.
 
 # Product Vision
 
-**Mainstay is a unified local-first application that keeps essential
-information and value available and usable when conditions change.**
+**Move Value. Check Status.**
 
-It gives individuals, organizations, and communities a dependable place to
-manage the information and value they need to continue operating. Hosted
-services can assist, but the experience remains available when a provider,
-mint, or wider network becomes unavailable.
+Mainstay is community infrastructure for exchanging value and understanding
+the current state of records, claims, and authority. It gives individuals,
+organizations, and communities a dependable local place to perform those two
+fundamental functions when conditions change.
+
+Moving value exercises control and changes consequential state. Checking
+status examines verifiable evidence and determines what follows under a defined
+rulebook. Recognition remains with the community, institution, or relying
+party; Mainstay does not turn cryptographic verification into a claim of legal
+or institutional effect.
+
+Value is not limited to money. It can include credits, vouchers, benefits,
+claims, rights, custody, and the goods to which those instruments or records
+refer. Mainstay can coordinate and evidence a transfer of control, custody,
+shipment, delivery, or acceptance. A digital state transition does not by
+itself establish that a physical object moved or that legal ownership changed.
 
 ## The product promise
 
@@ -74,18 +85,25 @@ on one central host.
 9. **Security includes availability.** Treat confidentiality, integrity, and
    availability as complementary obligations. A network route is only one
    contributor to keeping authorized services and information usable.
+10. **Evidence does not replace the physical act.** Represent transfers of
+    goods, custody, or control without claiming that a digital event alone
+    proves physical movement or legal ownership.
 
 ## The product model
 
 ```text
 Mainstay is the application.
 Lockbox is the appliance.
-There's no place like home.
+Move Value. Check Status.
 ```
 
 **Our House. Our Rules. Our Business.** is the governance expression of that
 model: local stewardship, accountable procedures, ordinary work, and
 appropriate confidentiality within a community's legitimate scope.
+
+**There's no place like home.** remains the welcoming expression of Mainstay's
+local-first character. **Move Value. Check Status.** states what the community
+infrastructure is fundamentally there to do.
 
 Mainstay is the primary user entry point. Lockbox is the preferred integrated
 deployment when durable local operation, appliance simplicity, and

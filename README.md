@@ -1,8 +1,15 @@
 # Mainstay
 
-Mainstay is a unified local-first application that keeps essential information
-and value available and usable when conditions change. It brings Safebox,
-Acorn, Stroma, Grove, Spurline, and Clear into one coherent product family.
+**Move Value. Check Status.**
+
+Mainstay is community infrastructure for exchanging value and understanding
+the current state of records, claims, and authority. It brings Safebox Web,
+OakGate, Acorn, Stroma, Grove, Spurline, Clear, OpenETR, and OpenQR into one
+coherent product family.
+
+Value can include credits, claims, rights, custody, and goods. Mainstay can
+coordinate and preserve evidence of transfers without claiming that a digital
+event alone moves a physical object or determines legal ownership.
 
 Mainstay is the application. Lockbox is the appliance. There's no place like
 home.

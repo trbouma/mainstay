@@ -195,6 +195,18 @@ language. It must keep different mints, currencies, issuers, relays, and
 storage providers visible enough that convenience never becomes false
 equivalence.
 
+Across the family, the public proposition is **Move Value. Check Status.**
+Clear, Acorn, and the safebox applications support the movement of
+community-defined value. OpenETR and OpenQR support checking the consequential
+state of records and claims. Mainstay coordinates the experience while leaving
+issuance, settlement, verification, and recognition with the components and
+governing parties responsible for them.
+
+Value can be monetary, contractual, institutional, or embodied in physical
+goods. The family can record and verify changes in control, custody, shipment,
+delivery, and acceptance, but the evidence of a transition is not the physical
+transition itself and does not independently determine legal ownership.
+
 OpenETR is not another storage provider or system of record. It complements
 Mainstay with Digital Controllable Records: portable signed evidence from which
 consequential state can be derived under defined rules. Mainstay can present an

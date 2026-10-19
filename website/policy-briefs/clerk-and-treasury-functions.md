@@ -9,6 +9,8 @@ description: Why sustainable communities need durable records and accountable wa
 
 ## Core proposition
 
+**Move Value. Check Status.**
+
 Every institutionally sustainable community needs two enduring capabilities:
 
 1. a way to preserve authoritative records and establish what follows from
@@ -57,7 +59,13 @@ decisions.
 
 A community must also be able to account for and move value. That can include
 money, credits, benefits, allowances, vouchers, claims, obligations, service
-units, or other instruments recognized under a defined policy.
+units, rights, custody, physical goods, or other instruments and assets
+recognized under a defined policy.
+
+For physical goods, digital infrastructure can preserve evidence of custody,
+shipment, delivery, acceptance, and changes in control. The record of a
+transition is not the physical transition itself and does not independently
+determine legal ownership.
 
 This is the Treasury function. It includes more than making payments. A
 sustainable treasury capability must be able to distinguish:
@@ -211,6 +219,11 @@ source of authority.
 A sustainable community needs institutional memory and an accountable way to
 move value. Those are ancient requirements expressed here as Clerk and
 Treasury functions.
+
+In public-facing language, Mainstay reduces those functions to two familiar
+actions: **Move Value. Check Status.** Moving value exercises authorized
+control; checking status uses verifiable evidence to understand what can
+currently be relied upon under the applicable rules.
 
 Mainstay's contribution is not to invent the functions, but to help communities
 reconstitute them with technology suited to present conditions: private,

@@ -244,9 +244,23 @@ statement when the surrounding copy makes its meaning explicit:
   that confidential affairs are not exposed by default.
 
 The line does not imply disregard for law, outside obligations, voluntary
-participants or interoperable relationships. Keep **There's no place like
-home.** as the welcoming general tagline; use the governance statement where
+participants or interoperable relationships. Use **Move Value. Check Status.**
+as the primary capability proposition. Keep **There's no place like home.** as
+the welcoming local-first expression, and use the governance statement where
 local policy, privacy and autonomy are already being explained.
+
+Use the proposition consistently:
+
+- **Move Value** includes transferring community-defined instruments, claims,
+  rights, custody, control, and the evidence associated with physical goods;
+- **Check Status** means verifying evidence and understanding current derived
+  state under identified rules; and
+- recognition and practical or legal effect remain decisions of the applicable
+  community, institution, or relying party.
+
+Do not say that Mainstay physically moves goods merely because it records a
+shipment or transfer. Distinguish the physical act from the digital evidence,
+control transition, custody record, or acceptance associated with it.
 
 ## Identity and Commissioning
 
