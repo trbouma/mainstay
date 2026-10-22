@@ -6,12 +6,13 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 cd "$repo_dir"
 
 data_root=
+health_timeout=300
 force_recreate=false
 build=true
 
 usage() {
     printf '%s\n' \
-        'Usage: ./start-mainstay.sh [--data-root PATH] [--no-build] [--force-recreate]'
+        'Usage: ./start-mainstay.sh [--data-root PATH] [--no-build] [--force-recreate] [--timeout SECONDS]'
 }
 
 env_value() {
@@ -94,6 +95,11 @@ while [ "$#" -gt 0 ]; do
             data_root=$2
             shift 2
             ;;
+        --timeout)
+            [ "$#" -ge 2 ] || { printf '%s\n' 'Missing timeout value.' >&2; exit 2; }
+            health_timeout=$2
+            shift 2
+            ;;
         --no-build)
             build=false
             shift
@@ -127,6 +133,14 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
+case "$health_timeout" in
+    ''|0*|*[!0-9]*) printf '%s\n' 'Timeout must be an integer from 1 to 3600 seconds.' >&2; exit 2 ;;
+esac
+if [ "${#health_timeout}" -gt 4 ] || [ "$health_timeout" -gt 3600 ]; then
+    printf '%s\n' 'Timeout must be an integer from 1 to 3600 seconds.' >&2
+    exit 2
+fi
+
 printf '%s\n' 'Preparing the Mainstay environment...'
 if [ -n "$data_root" ]; then
     "$repo_dir/init-env.sh" --data-root "$data_root"
@@ -147,56 +161,38 @@ check_available_port \
 check_available_port \
     'Safebox Web' MAINSTAY_SAFEBOX_PORT safebox-web "$safebox_port"
 
-printf '%s\n' 'Starting the Mainstay service bundle...'
-if [ "$build" = true ] && [ "$force_recreate" = true ]; then
-    docker compose up --build --force-recreate --detach
-elif [ "$build" = true ]; then
-    docker compose up --build --detach
-elif [ "$force_recreate" = true ]; then
-    docker compose up --force-recreate --detach
-else
-    docker compose up --detach
+if ! docker compose up --help | grep -q -- '--wait-timeout'; then
+    printf '%s\n' 'Update Docker Compose: --wait and --wait-timeout support is required.' >&2
+    exit 1
 fi
+startup_failed() {
+    printf '%s\n' "$1" >&2
+    docker compose ps --all mainstay-local safebox-web service-acorn-worker spurline grove clear clear-operator >&2 || true
+    for service in mainstay-local safebox-web service-acorn-worker spurline grove clear clear-operator; do
+        containers=$(docker compose ps --all --quiet "$service") || continue
+        for container in $containers; do
+            printf '%s\n' "Diagnostics for $service ($container):" >&2
+            docker inspect --format '{{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}} error={{.State.Error}}' "$container" >&2 || true
+            docker inspect --format '{{if .State.Health}}{{range .State.Health.Log}}health exit={{.ExitCode}}: {{.Output}}{{end}}{{end}}' "$container" >&2 || true
+        done
+    done
+    docker compose logs --no-color --tail=100 mainstay-local safebox-web service-acorn-worker spurline grove clear clear-operator >&2 || true
+    exit 1
+}
 
-max_attempts=30
-printf '%s\n' 'Waiting for the managed service status check...'
-attempt=1
-while ! docker compose exec -T mainstay-local python -c \
-    "import json, urllib.request; response = json.load(urllib.request.urlopen('http://127.0.0.1:8788/status', timeout=3)); assert response.get('status') == 'ok'" \
-    >/dev/null 2>&1
-do
-    if [ "$attempt" -ge "$max_attempts" ]; then
-        printf '%s\n' 'Managed services did not become ready within 60 seconds.' >&2
-        docker compose ps >&2
-        docker compose logs --tail 50 mainstay-local clear grove spurline safebox-web >&2
-        exit 1
-    fi
-    attempt=$((attempt + 1))
-    sleep 2
-done
-
-printf '%s\n' 'Waiting for the service Acorn worker to initialize...'
-attempt=1
-while :
-do
-    worker_id=$(docker compose ps -q service-acorn-worker)
-    worker_health=$(
-        docker inspect --format '{{.State.Health.Status}}' "$worker_id" \
-            2>/dev/null || true
-    )
-    if [ "$worker_health" = "healthy" ]; then
-        break
-    fi
-    if [ "$attempt" -ge "$max_attempts" ]; then
-        printf '%s\n' \
-            'Service Acorn worker did not initialize within 60 seconds.' >&2
-        docker compose ps >&2
-        docker compose logs --tail 50 service-acorn-worker >&2
-        exit 1
-    fi
-    attempt=$((attempt + 1))
-    sleep 2
-done
+printf '%s\n' "Starting Mainstay and waiting up to ${health_timeout}s for service health..."
+set -- --detach --wait --wait-timeout "$health_timeout"
+if [ "$build" = true ]; then set -- "$@" --build; fi
+if [ "$force_recreate" = true ]; then set -- "$@" --force-recreate; fi
+if ! docker compose up "$@"; then
+    startup_failed "Startup failed or services did not become healthy within ${health_timeout}s."
+fi
+# Preserve the control service's semantic check after Docker readiness.
+if ! docker compose exec -T mainstay-local python -c \
+    "import json, urllib.request; response = json.load(urllib.request.urlopen('http://127.0.0.1:8788/status', timeout=3)); assert response.get('status') == 'ok'"; then
+    startup_failed 'Containers are healthy, but the managed service status check failed.'
+fi
+docker compose ps
 
 printf '%s\n' 'Mainstay is ready.'
 printf '%s\n' "Dashboard: http://127.0.0.1:${mainstay_port:-8788}/"

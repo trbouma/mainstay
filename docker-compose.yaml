@@ -142,15 +142,12 @@ services:
       spurline:
         condition: service_healthy
     healthcheck:
-      test:
-        - CMD
-        - python
-        - -c
-        - "import json, os; path=os.getenv('SAFEBOX_SERVICE_ACORN_STATE_FILE', 'data/service-acorn.json'); state=json.load(open(path)); assert state.get('initialized') is True"
-      interval: 10s
-      timeout: 3s
-      retries: 12
-      start_period: 10s
+      test: ["CMD", "python", "-m", "app.service_acorn_worker", "health"]
+      interval: 15s
+      # Match standalone Safebox Web; Python imports need startup allowance.
+      timeout: 15s
+      retries: 4
+      start_period: 45s
     environment:
       SAFEBOX_WALLET_LOAD_TIMEOUT_SECONDS: "${SAFEBOX_WALLET_LOAD_TIMEOUT_SECONDS:-20}"
       SAFEBOX_PAYMENT_TIMEOUT_SECONDS: "${SAFEBOX_PAYMENT_TIMEOUT_SECONDS:-90}"

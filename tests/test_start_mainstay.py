@@ -6,10 +6,13 @@ import stat
 import subprocess
 from pathlib import Path
 
+import pytest
+
 REPOSITORY = Path(__file__).parents[1]
 
 
-def test_fresh_start_prepares_environment_and_waits_for_readiness(tmp_path) -> None:
+@pytest.mark.parametrize("failure", ["", "wait", "status"])
+def test_fresh_start_prepares_environment_and_waits_for_readiness(tmp_path, failure) -> None:
     deployment = tmp_path / "mainstay"
     deployment.mkdir()
     for name in (
@@ -28,7 +31,12 @@ def test_fresh_start_prepares_environment_and_waits_for_readiness(tmp_path) -> N
     docker.write_text(
         """#!/bin/sh
 printf '%s\n' "$*" >> "$DOCKER_LOG"
+if [ "$FAILURE" = wait ] && [ "$1 $2 $3" = "compose up --detach" ]; then exit 1; fi
+if [ "$FAILURE" = status ] && [ "$1 $2" = "compose exec" ]; then exit 1; fi
 case "$*" in
+  "compose ps --all --quiet "*) printf '%s\n' worker-id ;;
+  "compose logs "*) printf '%s\n' 'recent service logs' ;;
+  "compose up --help") printf '%s\\n' '--wait --wait-timeout' ;;
   "volume inspect "*) exit 1 ;;
   "compose ps -q service-acorn-worker") printf '%s\n' worker-id ;;
   "inspect --format "*) printf '%s\n' healthy ;;
@@ -45,6 +53,7 @@ exit 0
     environment = os.environ.copy()
     environment["PATH"] = f"{fake_bin}:{environment['PATH']}"
     environment["DOCKER_LOG"] = str(docker_log)
+    environment["FAILURE"] = failure
     result = subprocess.run(
         [str(deployment / "start-mainstay.sh"), "--no-build"],
         cwd=deployment,
@@ -53,6 +62,16 @@ exit 0
         text=True,
         check=False,
     )
+
+    if failure:
+        assert result.returncode != 0
+        assert "Mainstay is ready." not in result.stdout
+        assert "recent service logs" in result.stderr
+        commands = docker_log.read_text()
+        assert "compose ps --all mainstay-local safebox-web service-acorn-worker spurline grove clear clear-operator" in commands
+        assert "inspect --format" in commands
+        assert "compose down" not in commands
+        return
 
     assert result.returncode == 0, result.stderr
     assert "Created .env with generated Mainstay secrets." in result.stdout
@@ -68,7 +87,7 @@ exit 0
     assert "compose config --quiet" in commands
     assert "compose up --detach" in commands
     assert "compose exec -T mainstay-local" in commands
-    assert "inspect --format {{.State.Health.Status}} worker-id" in commands
+    assert "--wait --wait-timeout 300" in commands
 
 
 def test_start_rejects_a_host_port_owned_by_another_project(
@@ -100,7 +119,8 @@ def test_start_rejects_a_host_port_owned_by_another_project(
         """#!/bin/sh
 printf '%s\n' "$*" >> "$DOCKER_LOG"
 case "$*" in
-    "volume inspect "*) exit 1 ;;
+    "compose up --help") printf '%s\\n' '--wait --wait-timeout' ;;
+  "volume inspect "*) exit 1 ;;
 esac
 if [ "$1" = "ps" ]; then
     case "$*" in
@@ -151,3 +171,11 @@ def test_refresh_delegates_to_the_canonical_start_path() -> None:
     script = (REPOSITORY / "refresh-containers.sh").read_text(encoding="utf-8")
 
     assert 'exec "$repo_dir/start-mainstay.sh" --force-recreate "$@"' in script
+
+
+def test_worker_health_checks_fresh_heartbeat():
+    compose = (REPOSITORY / "docker-compose.yaml").read_text()
+    worker = compose.split("\n  service-acorn-worker:", 1)[1].split("\n  spurline:", 1)[0]
+    assert '"app.service_acorn_worker", "health"' in worker
+    assert 'timeout: 15s' in worker
+    assert 'start_period: 45s' in worker

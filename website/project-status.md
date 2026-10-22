@@ -37,6 +37,10 @@ sibling products fit together and which parts are still under construction.
 - add Clear currency discovery without combining balances or issuers;
 - complete OakGate's Acorn integration, custodial recovery, and Go Independent
   workflow;
+- integrate OakGate, private Redis sessions, and durable Keycloak identity as
+  an optional Mainstay deployment profile before considering OakGate the
+  default managed web client, following the
+  [deployment integration review](https://github.com/trbouma/mainstay/blob/main/docs/OAKGATE-MAINSTAY-DEPLOYMENT-INTEGRATION.md);
 - define the first FreeBSD Lockbox service profile;
 - design TROPIC01 and keypad authority boundaries; and
 - create end-to-end local and community continuity tests.
