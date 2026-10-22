@@ -377,7 +377,7 @@ authenticated and more tightly reachable than public information APIs.
 ## Configuration and Persistence
 
 Environment variables use a component prefix (`CLEAR_`, `GROVE_`,
-`SPURLINE_`, `SAFEBOX_`, or `MAINSTAY_`). Repositories provide an annotated
+`SPURLINE_`, `SAFEBOX_`, `OAKGATE_`, `KEYCLOAK_`, or `MAINSTAY_`). Repositories provide an annotated
 `.env.example` when they have a standalone runtime configuration.
 
 Secrets are generated with cryptographic randomness, stored with restrictive
@@ -405,6 +405,107 @@ Configuration distinguishes:
 - durable policy and canonical identifiers;
 - replaceable internal, local, external and FIPS reachability; and
 - development conveniences that must not become production assumptions.
+
+### Source configuration versus instance configuration
+
+Commit portable Compose definitions, annotated `.env.example` files, refresh
+scripts and dependency locks. Keep actual `.env` files, credentials, database
+files and recovery material out of Git and container build contexts. A local
+`.env` is configuration storage, not an encrypted secret vault: restrict it to
+the operator (normally mode `0600`) and retain an encrypted off-host backup.
+Only placeholders and generation instructions belong in `.env.example`.
+
+Host-specific paths, bind addresses, published ports and public URLs belong in
+instance configuration rather than edits to the tracked Compose file. Public
+HTTPS URLs are distinct from internal container URLs and host bind addresses.
+OakGate and Keycloak retain separate settings for each service. Reverse proxies
+terminate TLS and supply the expected forwarded headers; applications trust
+only the configured proxy boundary.
+
+For standalone deployments, the current storage selectors are:
+
+| Deployment | Instance setting | Scope |
+| --- | --- | --- |
+| OakGate | `OAKGATE_DATA_DIR` | App data, including payment recovery state |
+| Keycloak in OakGate | `KEYCLOAK_DATA_DIR` | Identity-provider data |
+| Safebox Web | `SAFEBOX_DATA_DIR` | Shared web and service Acorn worker data |
+| Clear | `CLEAR_DATA_DIR` | Shared public mint and operator data |
+| Grove | `GROVE_DATA_PATH` | Blob storage and metadata database |
+| Spurline | `SPURLINE_DATA_DIR` | Relay database directory |
+| Mainstay bundle | `MAINSTAY_DATA_ROOT` | Managed instance root; use its lifecycle tooling |
+
+`/mnt/lexar/<service>` is a Beelink deployment choice, not a portable family
+default. Preserve existing instance values when updating examples or defaults.
+Mainstay-managed paths must be configured through the Mainstay instance rather
+than through a sibling application's standalone `.env`.
+
+A dirty-tree refresh refusal is a request to review and preserve local edits.
+Do not blindly stash a storage change to make the refresh run: this previously
+reattached Clear to an old Docker volume and hid newer CMUs. Move the instance
+path into the supported environment setting, reconcile the tracked file, and
+verify the resolved mount before restarting. Use `docker compose config --quiet`
+for validation; full rendered configuration can disclose secrets.
+
+### Secret continuity and recovery
+
+Generate fresh secrets only for a new instance, using the application's required
+format. `openssl rand -hex 32` is suitable for a setting requiring 32 random
+bytes encoded as hex; it is not a substitute for an application's Nostr or
+Fernet key generator. Never regenerate mint, service identity or custody
+encryption material merely to resolve a missing configuration value. Recover the
+original matching material with its database instead.
+
+Keep signing and encryption keys, OIDC client secrets, SMTP credentials, LND
+macaroons and recovery files out of logs, screenshots, tickets and chat. Redact
+health diagnostics before sharing them. Where supported, use restricted secret
+files mounted read-only; otherwise protect the environment file and Docker
+administrative access. Moving a leaked secret into `.env` does not undo exposure.
+Rotation is a separate, service-specific operation: mint keys and custody keys
+may require retention of old material to honor outstanding tokens or decrypt
+existing state. Do not combine key rotation with a disk migration.
+
+Backups must pair durable state with the configuration and keys that interpret
+it, plus the deployed source/image revision. Mainstay's `.env.recovery` behavior
+above applies to its managed bind-mounted instances; standalone apps do not
+implicitly acquire this facility. Keep encrypted backups on another device or
+host and test restoration in isolation without starting a second payment worker
+against live state.
+
+### Storage placement and migration
+
+Prefer SSD storage for SQLite and other latency-sensitive mutable databases.
+On Beelink, a shared USB rotational disk caused multi-second database operations,
+lock contention and payment delays; moving active databases to SSD substantially
+improved responsiveness. USB transport alone does not identify a slow disk.
+Grove's blobs and metadata may share a directory, so migrate the complete service
+data layout unless separate storage is explicitly supported.
+
+For a migration:
+
+1. Verify the destination filesystem is mounted, has capacity and is the intended
+   device. Record the actual container mount sources before changing anything.
+2. Stop every writer to the data being copied, including workers and operator
+   services sharing a database. Confirm shutdown completed.
+3. Copy the complete data directory, preserving ownership and permissions,
+   including SQLite WAL/journal files. Verify the copy while writers remain
+   stopped. Keep the matching configuration and credentials backed up.
+4. Change only the instance storage setting and necessary mount declaration.
+   Preserve the image, application identity and internal database path. Existing
+   named bind volumes can retain old driver options; inspect and explicitly
+   reconcile them rather than assuming an `.env` edit changes the existing volume.
+5. Validate Compose, recreate the affected services without rebuilding, inspect
+   their actual mounts, and check health and user workflows.
+6. Retain the stopped source copy temporarily, but mark it stale as soon as the
+   new instance processes writes. Never casually switch a mint back to it: spent
+   proofs and payment recovery state may have advanced. Recovery must preserve
+   the latest authoritative state, not merge database files or replay payments.
+
+Use long-form binds with `create_host_path: false` where supported to prevent
+silent creation of an empty data directory. This checks directory existence,
+not disk identity. Check the mount before manual startup and arrange appropriate
+mount ordering for automatic Docker restarts at boot; a manual `mountpoint`
+guard does not protect a later automatic restart. Do not run two live copies of
+the same mint or wallet database during a move.
 
 ## Python and Repository Convention
 
@@ -476,6 +577,43 @@ script must refuse tracked working-tree changes, use `git pull --ff-only`, run
 the service health contract and print focused status and recent logs on
 failure. It does not perform schema rollback, secret rotation, commissioning,
 treasury enablement or destructive data cleanup.
+
+### Compose names, readiness and refresh behavior
+
+Prefer `compose.yaml` for new deployments. Existing `docker-compose.yaml` files
+remain supported; filename renames are a separate coordinated change, not a
+requirement for a working deployment. Keep one authoritative default Compose
+file per deployment directory and update scripts and documentation together if
+renaming it. Use the `docker compose` plugin command.
+
+The standardized refresh contract uses Compose `--wait --wait-timeout` support
+to wait for the required service set, including background workers and operator
+services, before reporting success. Each required long-running service needs a
+health check; merely running is insufficient. HTTP probes remain lightweight
+and local. Worker probes use a fresh heartbeat, not a persisted initialization
+flag. Mainstay and standalone Safebox Web use the service Acorn worker's
+`python -m app.service_acorn_worker health` check, allowing 15 seconds for the
+probe process and a 45-second startup grace period.
+
+`./refresh-containers.sh --timeout 300` overrides the readiness wait. Standalone
+refreshes default to 120 seconds; Mainstay and OakGate full-stack startup default
+to 300 seconds. The deadline excludes image build time. Failure must return a
+nonzero exit code and provide service state, recent probe results and focused
+logs. Do not automatically delete volumes, reset payment records or roll back
+a database after failure. Run only one refresh operation per deployment at a
+time. A healthy container is not proof of external TLS, working login, mint
+funding or successful payment settlement; verify those workflows separately.
+
+OakGate's `./refresh-app.sh` is deliberately app-only, defaults to 120 seconds,
+and leaves Keycloak and Redis running. Use full-stack refresh only when those
+services also need updating. Preserve recovery journals and singleton ownership
+through either update path. Stop all writers for storage migration even when
+routine app-only refresh normally leaves dependencies running.
+
+These conventions apply to family-owned deployment tooling. Third-party
+services such as Nutshell need a separately maintained local deployment
+configuration and their own upgrade guidance; do not assume they implement
+Mainstay refresh or recovery safeguards.
 
 The default published bind address is loopback. An operator may deliberately
 select a LAN, VPN or reverse-proxy interface and then owns the corresponding

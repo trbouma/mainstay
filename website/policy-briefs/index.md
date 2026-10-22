@@ -15,6 +15,15 @@ Across these subjects, Mainstay supports locally governed exchange: communities
 remain responsible for the rules governing how value, records, and evidence
 move within their authority and across their relationships with others.
 
+## Clarity of Priority
+
+Community purpose leads; applicable obligations shape how that purpose is
+carried out. This brief establishes Mainstay's priority of enabling useful
+community activity, with accountable local governance, proportionate
+compliance, and constructive cooperation with outside institutions.
+
+[Read the policy brief](clarity-of-priority.md){ .md-button .md-button--primary }
+
 ## Clerk and Treasury Functions
 
 Every institutionally sustainable community needs ways to preserve records and
