@@ -24,6 +24,25 @@ compliance, and constructive cooperation with outside institutions.
 
 [Read the policy brief](clarity-of-priority.md){ .md-button .md-button--primary }
 
+## Community Purpose and Personal Privacy Terms
+
+Community capability and member agency should reinforce each other. Drawing
+on IEEE 7012 and MyTerms, this brief connects Mainstay's philosophy to explicit
+privacy commitments, accountable representation, portable agreement evidence,
+and practical remedy.
+
+[Read the policy brief](community-purpose-and-personal-privacy-terms.md){ .md-button .md-button--primary }
+
+## Community Wallets for Records and Phone Free Access
+
+Safebox Web, OakGate, and OpenETR offer a community-first implementation
+direction for the World Bank's digital wallet guidance. This brief examines
+broader record verification, a smaller reusable technical core, community-defined
+trust, and NFC access that can remove the need to own a phone. A linked detailed
+analysis maps requirements to implemented capabilities and remaining work.
+
+[Read the policy brief](community-wallets-records-and-phone-free-access.md){ .md-button .md-button--primary }
+
 ## Clerk and Treasury Functions
 
 Every institutionally sustainable community needs ways to preserve records and
