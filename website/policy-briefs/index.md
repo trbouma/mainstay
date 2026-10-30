@@ -24,7 +24,7 @@ compliance, and constructive cooperation with outside institutions.
 
 [Read the policy brief](clarity-of-priority.md){ .md-button .md-button--primary }
 
-## Community Purpose and Personal Privacy Terms
+## Community Purpose and Personal Agency
 
 Community capability and member agency should reinforce each other. Drawing
 on IEEE 7012 and MyTerms, this brief connects Mainstay's philosophy to explicit

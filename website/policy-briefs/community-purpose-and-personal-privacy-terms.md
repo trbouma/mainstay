@@ -1,9 +1,9 @@
 ---
-title: Community Purpose and Personal Privacy Terms
+title: Community Purpose and Personal Agency
 description: Mainstay principles for member agency, reciprocal agreements, and accountable community stewardship in relation to IEEE 7012.
 ---
 
-# Community Purpose and Personal Privacy Terms
+# Community Purpose and Personal Agency
 
 **Policy brief**
 

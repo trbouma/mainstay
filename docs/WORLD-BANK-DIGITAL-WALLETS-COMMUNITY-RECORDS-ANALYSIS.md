@@ -561,4 +561,4 @@ pp. 64–65 for lock-in; and pp. 67–74 for deployment and conclusions.
 - [Mainstay product-family responsibilities](../website/product-family.md).
 - [Mainstay continuity model](../website/continuity.md).
 - [Clarity of Priority](../website/policy-briefs/clarity-of-priority.md).
-- [Community Purpose and Personal Privacy Terms](../website/policy-briefs/community-purpose-and-personal-privacy-terms.md).
+- [Community Purpose and Personal Agency](../website/policy-briefs/community-purpose-and-personal-privacy-terms.md).
